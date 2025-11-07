@@ -1,85 +1,116 @@
-# Event Management Platform - Workshop 3: Full-Stack Implementation
+# Event Management Platform - Workshop 3
 
-## Project Overview
+Complete system for event management with ticket purchasing, user authentication, and location management.
 
-This workshop implements an **event ticketing platform** similar to "Tu Boleta" with three main components:
+---
 
-- **Java Backend** - User authentication and management
-- **Python Backend** - Event management and business logic  
-- **React Frontend** - User interface
+## What's Included?
 
-## Project Structure
+This project has **two main systems** that work together:
 
+1. **User System** (Java) - Handles user registration and authentication
+2. **Event System** (Python) - Manages events, tickets, locations, and orders
+
+Both systems have their own databases and can work independently.
+
+---
+
+## Quick Start Guide
+
+### Prerequisites
+
+You need to have installed:
+- Java 17 or higher
+- Python 3.12 or higher
+- MySQL (for users)
+- PostgreSQL (for events)
+
+---
+
+## Step-by-Step Installation
+
+### User System (Java)
+
+**Set up MySQL database:**
+
+```sql
+# Open MySQL and run:
+CREATE DATABASE eventplatform_auth;
 ```
-Workshop-3/
-├── java-backend/          # Authentication service (Spring Boot + MySQL)
-├── python-backend/        # Business logic service (FastAPI + PostgreSQL) 
-├── react-frontend/        # User interface (React)
-├── docker/               # Docker configuration files
-└── docs/                 # Documentation
+
+**Start the server:**
+
+```bash
+# Go to the Java project folder
+cd java-backend
+
+# Start the server
+mvnw.cmd spring-boot:run
 ```
 
-## Technology Stack
+Server will be available at: **http://localhost:8080**
 
-### Java Backend (Authentication)
-- **Spring Boot** - Web framework
-- **MySQL** - Database
-- **JWT** - Authentication tokens
-- **Port**: 8081
+---
 
-### Python Backend (Business Logic)  
-- **FastAPI** - Web framework
-- **PostgreSQL** - Database
-- **SQLAlchemy** - Database ORM
-- **Port**: 8000
+### Event System (Python)
 
-### React Frontend
-- **React 18** - UI framework
-- **Material-UI** - Component library
-- **Axios** - HTTP client
-- **Port**: 3000
+**Set up PostgreSQL database:**
 
-##  Security
+```sql
+# Open PostgreSQL and run:
+CREATE DATABASE eventplatform;
+```
 
-- **JWT Authentication** for secure user sessions
-- **Role-based access control** (Admin, Organizer, Buyer)
-- **Password encryption** using BCrypt
-- **CORS protection** for frontend integration
+**Start the server:**
 
-## Additional Resources
+```bash
+# Go to the Python project folder
+cd python-backend
 
-- [Class Diagram](../Workshop-2/ClassDiagram.png)
-- [Architecture Diagram](../Workshop-2/ArchitectureDiagram.png)  
-- [Business Process](../Workshop-2/TicketPurchaseProcess.png)
-- [Business Model](../Workshop-1/Business_Model_Canvas_Planning.png)
+# Activate virtual environment
+.\venv\Scripts\activate
 
-## Development Status
+# Start the server
+uvicorn main:app --reload --port 8000
+```
 
-### Completed
-- [x] Java Backend (Authentication service)
-- [x] Database design and implementation
-- [x] JWT authentication system
-- [x] API documentation with Swagger
+Server will be available at: **http://localhost:8000**
 
-### In Progress  
-- [ ] Python Backend (Business logic service)
-- [ ] React Frontend (User interface)
+---
 
-### Planned
-- [ ] Integration testing
-- [ ] Docker deployment
-- [ ] Production optimization
+## Database Connection
 
-## Development Team
+### MySQL Database (User System)
 
-- **Carlos Andres Abella**
-- **Daniel Felipe Paez**  
-- **Leidy Marcela Morales**
+- **Database**: `eventplatform_auth`
+- **User**: `root`
+- **Password**: Configure your own password
+- **Port**: `3306`
+- **Server**: `localhost`
 
-**Supervisor**: Carlos Andrés Sierra  
-**Institution**: Universidad Distrital Francisco José de Caldas  
-**Date**: November 2025
+**Configuration file:** `java-backend/src/main/resources/application.properties`
 
-## 📄 License
+**Lines to modify with your credentials:**
 
-This project is part of an academic assignment for Universidad Distrital Francisco José de Caldas.
+```properties
+spring.datasource.username=root
+spring.datasource.password=YOUR_MYSQL_PASSWORD_HERE
+```
+
+---
+
+### PostgreSQL Database (Event System)
+
+- **Database**: `eventplatform`
+- **User**: `postgres`
+- **Password**: Configure your own password
+- **Port**: `5432`
+- **Server**: `localhost`
+
+**Configuration file:** `python-backend/.env`
+
+**Line to modify with your credentials:**
+````
+<userPrompt>
+Provide the fully rewritten file, incorporating the suggested code change. You must produce the complete file.
+</userPrompt>

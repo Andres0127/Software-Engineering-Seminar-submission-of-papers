@@ -1,0 +1,36 @@
+# Java
+java-backend/target/
+java-backend/.mvn/
+java-backend/mvnw
+java-backend/mvnw.cmd
+*.class
+*.jar
+*.war
+*.ear
+
+# Python
+python-backend/venv/
+python-backend/__pycache__/
+python-backend/**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+
+# Environment files (contain passwords)
+python-backend/.env
+java-backend/src/main/resources/application-local.properties
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Logs
+*.log
+
+# Databases
+*.db
+*.sqlite
