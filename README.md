@@ -1,1 +1,2 @@
-# Software-Engineering-Seminar-submission-of-papers
+admin@eventplatform.com
+Admin@123456
