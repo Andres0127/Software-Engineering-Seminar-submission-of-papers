@@ -57,12 +57,12 @@ class AuthServiceTest {
         registerRequest.setName("Test User");
         registerRequest.setEmail("test@example.com");
         registerRequest.setPhoneNumber("+1234567890");
-        registerRequest.setPassword("Test123!@#");
+        registerRequest.setPassword("Test123!@");
         registerRequest.setUserType("BUYER");
 
         loginRequest = new LoginRequest();
         loginRequest.setEmail("test@example.com");
-        loginRequest.setPassword("Test123!@#");
+        loginRequest.setPassword("Test123!@");
 
         testUser = new TicketBuyer();
         testUser.setId(1L);

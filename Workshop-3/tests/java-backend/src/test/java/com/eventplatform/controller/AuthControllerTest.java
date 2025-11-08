@@ -52,12 +52,12 @@ class AuthControllerTest {
         registerRequest.setName("Test User");
         registerRequest.setEmail("test@example.com");
         registerRequest.setPhoneNumber(null); // Optional field
-        registerRequest.setPassword("Test123!@#");
+        registerRequest.setPassword("Test123!@");
         registerRequest.setUserType("BUYER");
 
         loginRequest = new LoginRequest();
         loginRequest.setEmail("test@example.com");
-        loginRequest.setPassword("Test123!@#");
+        loginRequest.setPassword("Test123!@");
 
         authResponse = AuthResponse.builder()
                 .token("test-token")
