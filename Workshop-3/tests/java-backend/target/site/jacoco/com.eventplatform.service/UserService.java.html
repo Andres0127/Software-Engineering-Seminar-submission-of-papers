@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Event Platform - Unit Tests</a> &gt; <a href="index.source.html" class="el_package">com.eventplatform.service</a> &gt; <span class="el_source">UserService.java</span></div><h1>UserService.java</h1><pre class="source lang-java linenums">package com.eventplatform.service;
+
+import com.eventplatform.dto.UpdateUserRequest;
+import com.eventplatform.dto.UserDTO;
+import com.eventplatform.exception.ResourceNotFoundException;
+import com.eventplatform.model.EventOrganizer;
+import com.eventplatform.model.User;
+import com.eventplatform.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ * User Service
+ * Handles user management operations
+ */
+@Service
+@Transactional
+<span class="fc" id="L24">public class UserService {</span>
+
+<span class="fc" id="L26">    private static final Logger logger = LoggerFactory.getLogger(UserService.class);</span>
+
+    @Autowired
+    private UserRepository userRepository;
+
+    /**
+     * Get user by ID
+     */
+    public UserDTO getUserById(Long userId) {
+<span class="fc" id="L35">        logger.info(&quot;Fetching user with ID: {}&quot;, userId);</span>
+        
+<span class="fc" id="L37">        User user = userRepository.findById(userId)</span>
+<span class="fc" id="L38">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User&quot;, &quot;id&quot;, userId));</span>
+
+<span class="fc" id="L40">        return UserDTO.fromEntity(user);</span>
+    }
+
+    /**
+     * Get all users
+     */
+    public List&lt;UserDTO&gt; getAllUsers() {
+<span class="fc" id="L47">        logger.info(&quot;Fetching all users&quot;);</span>
+        
+<span class="fc" id="L49">        return userRepository.findAll().stream()</span>
+<span class="fc" id="L50">                .map(UserDTO::fromEntity)</span>
+<span class="fc" id="L51">                .collect(Collectors.toList());</span>
+    }
+
+    /**
+     * Update user
+     */
+    public UserDTO updateUser(Long userId, UpdateUserRequest request) {
+<span class="fc" id="L58">        logger.info(&quot;Updating user with ID: {}&quot;, userId);</span>
+        
+<span class="fc" id="L60">        User user = userRepository.findById(userId)</span>
+<span class="fc" id="L61">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User&quot;, &quot;id&quot;, userId));</span>
+
+        // Update fields if provided
+<span class="fc bfc" id="L64" title="All 2 branches covered.">        if (request.getName() != null) {</span>
+<span class="fc" id="L65">            user.setName(request.getName());</span>
+        }
+<span class="fc bfc" id="L67" title="All 2 branches covered.">        if (request.getEmail() != null) {</span>
+<span class="fc" id="L68">            user.setEmail(request.getEmail());</span>
+        }
+<span class="fc bfc" id="L70" title="All 2 branches covered.">        if (request.getPhoneNumber() != null) {</span>
+<span class="fc" id="L71">            user.setPhoneNumber(request.getPhoneNumber());</span>
+        }
+
+        // Update organization name for organizers
+<span class="pc bpc" id="L75" title="1 of 4 branches missed.">        if (user instanceof EventOrganizer &amp;&amp; request.getOrganizationName() != null) {</span>
+<span class="fc" id="L76">            ((EventOrganizer) user).setOrganizationName(request.getOrganizationName());</span>
+        }
+
+<span class="fc" id="L79">        user = userRepository.save(user);</span>
+<span class="fc" id="L80">        logger.info(&quot;User updated successfully: {}&quot;, user.getEmail());</span>
+
+<span class="fc" id="L82">        return UserDTO.fromEntity(user);</span>
+    }
+
+    /**
+     * Delete user (soft delete)
+     */
+    public void deleteUser(Long userId) {
+<span class="fc" id="L89">        logger.info(&quot;Deleting user with ID: {}&quot;, userId);</span>
+        
+<span class="fc" id="L91">        User user = userRepository.findById(userId)</span>
+<span class="fc" id="L92">                .orElseThrow(() -&gt; new ResourceNotFoundException(&quot;User&quot;, &quot;id&quot;, userId));</span>
+
+<span class="fc" id="L94">        user.setStatus(User.UserStatus.DELETED);</span>
+<span class="fc" id="L95">        userRepository.save(user);</span>
+        
+<span class="fc" id="L97">        logger.info(&quot;User deleted successfully: {}&quot;, user.getEmail());</span>
+<span class="fc" id="L98">    }</span>
+
+    /**
+     * Get user statistics
+     */
+    public Object getUserStatistics() {
+<span class="fc" id="L104">        long totalUsers = userRepository.count();</span>
+<span class="fc" id="L105">        long activeUsers = userRepository.countByStatus(User.UserStatus.ACTIVE);</span>
+<span class="fc" id="L106">        long suspendedUsers = userRepository.countByStatus(User.UserStatus.SUSPENDED);</span>
+
+<span class="fc" id="L108">        return new Object() {</span>
+<span class="fc" id="L109">            public final long total = totalUsers;</span>
+<span class="fc" id="L110">            public final long active = activeUsers;</span>
+<span class="fc" id="L111">            public final long suspended = suspendedUsers;</span>
+        };
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

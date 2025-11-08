@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GlobalExceptionHandler.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Event Platform - Unit Tests</a> &gt; <a href="index.source.html" class="el_package">com.eventplatform.exception</a> &gt; <span class="el_source">GlobalExceptionHandler.java</span></div><h1>GlobalExceptionHandler.java</h1><pre class="source lang-java linenums">package com.eventplatform.exception;
+
+import com.eventplatform.dto.ErrorResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+
+import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Global Exception Handler
+ * Handles all exceptions and returns consistent error responses
+ */
+@RestControllerAdvice
+<span class="fc" id="L23">public class GlobalExceptionHandler {</span>
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleResourceNotFoundException(
+            ResourceNotFoundException ex,
+            WebRequest request
+    ) {
+<span class="nc" id="L30">        ErrorResponse errorResponse = ErrorResponse.builder()</span>
+<span class="nc" id="L31">                .status(HttpStatus.NOT_FOUND.value())</span>
+<span class="nc" id="L32">                .error(&quot;Not Found&quot;)</span>
+<span class="nc" id="L33">                .message(ex.getMessage())</span>
+<span class="nc" id="L34">                .timestamp(LocalDateTime.now())</span>
+<span class="nc" id="L35">                .path(request.getDescription(false).replace(&quot;uri=&quot;, &quot;&quot;))</span>
+<span class="nc" id="L36">                .build();</span>
+
+<span class="nc" id="L38">        return new ResponseEntity&lt;&gt;(errorResponse, HttpStatus.NOT_FOUND);</span>
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleUnauthorizedException(
+            UnauthorizedException ex,
+            WebRequest request
+    ) {
+<span class="nc" id="L46">        ErrorResponse errorResponse = ErrorResponse.builder()</span>
+<span class="nc" id="L47">                .status(HttpStatus.UNAUTHORIZED.value())</span>
+<span class="nc" id="L48">                .error(&quot;Unauthorized&quot;)</span>
+<span class="nc" id="L49">                .message(ex.getMessage())</span>
+<span class="nc" id="L50">                .timestamp(LocalDateTime.now())</span>
+<span class="nc" id="L51">                .path(request.getDescription(false).replace(&quot;uri=&quot;, &quot;&quot;))</span>
+<span class="nc" id="L52">                .build();</span>
+
+<span class="nc" id="L54">        return new ResponseEntity&lt;&gt;(errorResponse, HttpStatus.UNAUTHORIZED);</span>
+    }
+
+    @ExceptionHandler(DuplicateResourceException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleDuplicateResourceException(
+            DuplicateResourceException ex,
+            WebRequest request
+    ) {
+<span class="nc" id="L62">        ErrorResponse errorResponse = ErrorResponse.builder()</span>
+<span class="nc" id="L63">                .status(HttpStatus.CONFLICT.value())</span>
+<span class="nc" id="L64">                .error(&quot;Conflict&quot;)</span>
+<span class="nc" id="L65">                .message(ex.getMessage())</span>
+<span class="nc" id="L66">                .timestamp(LocalDateTime.now())</span>
+<span class="nc" id="L67">                .path(request.getDescription(false).replace(&quot;uri=&quot;, &quot;&quot;))</span>
+<span class="nc" id="L68">                .build();</span>
+
+<span class="nc" id="L70">        return new ResponseEntity&lt;&gt;(errorResponse, HttpStatus.CONFLICT);</span>
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity&lt;ErrorResponse&gt; handleAccessDeniedException(
+            AccessDeniedException ex,
+            WebRequest request
+    ) {
+<span class="nc" id="L78">        ErrorResponse errorResponse = ErrorResponse.builder()</span>
+<span class="nc" id="L79">                .status(HttpStatus.FORBIDDEN.value())</span>
+<span class="nc" id="L80">                .error(&quot;Forbidden&quot;)</span>
+<span class="nc" id="L81">                .message(&quot;Access denied&quot;)</span>
+<span class="nc" id="L82">                .timestamp(LocalDateTime.now())</span>
+<span class="nc" id="L83">                .path(request.getDescription(false).replace(&quot;uri=&quot;, &quot;&quot;))</span>
+<span class="nc" id="L84">                .build();</span>
+
+<span class="nc" id="L86">        return new ResponseEntity&lt;&gt;(errorResponse, HttpStatus.FORBIDDEN);</span>
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleValidationExceptions(
+            MethodArgumentNotValidException ex,
+            WebRequest request
+    ) {
+<span class="nc" id="L94">        Map&lt;String, String&gt; errors = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L95">        ex.getBindingResult().getAllErrors().forEach((error) -&gt; {</span>
+<span class="nc" id="L96">            String fieldName = ((FieldError) error).getField();</span>
+<span class="nc" id="L97">            String errorMessage = error.getDefaultMessage();</span>
+<span class="nc" id="L98">            errors.put(fieldName, errorMessage);</span>
+<span class="nc" id="L99">        });</span>
+
+<span class="nc" id="L101">        Map&lt;String, Object&gt; response = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L102">        response.put(&quot;status&quot;, HttpStatus.BAD_REQUEST.value());</span>
+<span class="nc" id="L103">        response.put(&quot;error&quot;, &quot;Validation Failed&quot;);</span>
+<span class="nc" id="L104">        response.put(&quot;message&quot;, &quot;Invalid input data&quot;);</span>
+<span class="nc" id="L105">        response.put(&quot;errors&quot;, errors);</span>
+<span class="nc" id="L106">        response.put(&quot;timestamp&quot;, LocalDateTime.now());</span>
+<span class="nc" id="L107">        response.put(&quot;path&quot;, request.getDescription(false).replace(&quot;uri=&quot;, &quot;&quot;));</span>
+
+<span class="nc" id="L109">        return new ResponseEntity&lt;&gt;(response, HttpStatus.BAD_REQUEST);</span>
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity&lt;Map&lt;String, Object&gt;&gt; handleException(Exception ex) {
+<span class="nc" id="L114">        ex.printStackTrace(); // Esto imprimirá el stack trace completo</span>
+
+<span class="nc" id="L116">        Map&lt;String, Object&gt; error = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L117">        error.put(&quot;status&quot;, HttpStatus.INTERNAL_SERVER_ERROR.value());</span>
+<span class="nc" id="L118">        error.put(&quot;error&quot;, &quot;Internal Server Error&quot;);</span>
+<span class="nc" id="L119">        error.put(&quot;message&quot;, ex.getMessage());</span>
+<span class="nc" id="L120">        error.put(&quot;details&quot;, ex.getClass().getName());</span>
+<span class="nc" id="L121">        error.put(&quot;timestamp&quot;, LocalDateTime.now());</span>
+
+<span class="nc" id="L123">        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
