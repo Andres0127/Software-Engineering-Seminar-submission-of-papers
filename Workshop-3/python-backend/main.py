@@ -2,11 +2,11 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routes import events, tickets, orders, locations, categories
-# from app.models import Base
-# from app.core.database import engine
+from app.models import Base
+from app.core.database import engine
 
 # Create database tables
-# Base.metadata.create_all(bind=engine)
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
