@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Event Platform - Unit Tests</a> &gt; <a href="index.source.html" class="el_package">com.eventplatform.dto</a> &gt; <span class="el_source">UserDTO.java</span></div><h1>UserDTO.java</h1><pre class="source lang-java linenums">package com.eventplatform.dto;
+
+import com.eventplatform.model.User;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
+/**
+ * User DTO
+ * Data Transfer Object for user information (without password)
+ */
+<span class="nc bnc" id="L15" title="All 94 branches missed.">@Data</span>
+<span class="nc" id="L16">@NoArgsConstructor</span>
+<span class="fc" id="L17">@AllArgsConstructor</span>
+<span class="pc" id="L18">@Builder</span>
+public class UserDTO {
+
+<span class="fc" id="L21">    private Long id;</span>
+<span class="fc" id="L22">    private String name;</span>
+<span class="fc" id="L23">    private String email;</span>
+<span class="fc" id="L24">    private String phoneNumber;</span>
+<span class="nc" id="L25">    private String status;</span>
+<span class="fc" id="L26">    private String role;</span>
+<span class="nc" id="L27">    private LocalDateTime createdAt;</span>
+<span class="nc" id="L28">    private LocalDateTime lastLogin;</span>
+    
+    // Specific fields for different user types
+<span class="fc" id="L31">    private String organizationName;  // For EventOrganizer</span>
+<span class="nc" id="L32">    private String permissions;       // For PlatformAdmin</span>
+<span class="nc" id="L33">    private String accessLevel;       // For PlatformAdmin</span>
+
+    /**
+     * Convert User entity to UserDTO
+     */
+    public static UserDTO fromEntity(User user) {
+<span class="fc" id="L39">        UserDTOBuilder builder = UserDTO.builder()</span>
+<span class="fc" id="L40">                .id(user.getId())</span>
+<span class="fc" id="L41">                .name(user.getName())</span>
+<span class="fc" id="L42">                .email(user.getEmail())</span>
+<span class="fc" id="L43">                .phoneNumber(user.getPhoneNumber())</span>
+<span class="fc" id="L44">                .status(user.getStatus().name())</span>
+<span class="fc" id="L45">                .role(user.getRole())</span>
+<span class="fc" id="L46">                .createdAt(user.getCreatedAt())</span>
+<span class="fc" id="L47">                .lastLogin(user.getLastLogin());</span>
+
+        // Add specific fields based on user type
+<span class="fc bfc" id="L50" title="All 2 branches covered.">        if (user instanceof com.eventplatform.model.EventOrganizer) {</span>
+<span class="fc" id="L51">            builder.organizationName(((com.eventplatform.model.EventOrganizer) user).getOrganizationName());</span>
+<span class="pc bpc" id="L52" title="1 of 2 branches missed.">        } else if (user instanceof com.eventplatform.model.PlatformAdmin) {</span>
+<span class="nc" id="L53">            builder.permissions(((com.eventplatform.model.PlatformAdmin) user).getPermissions());</span>
+<span class="nc" id="L54">            builder.accessLevel(((com.eventplatform.model.PlatformAdmin) user).getAccessLevel());</span>
+        }
+
+<span class="fc" id="L57">        return builder.build();</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>

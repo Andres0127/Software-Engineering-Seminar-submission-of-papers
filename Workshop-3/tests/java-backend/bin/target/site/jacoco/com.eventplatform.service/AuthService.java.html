@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="es"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">Event Platform - Unit Tests</a> &gt; <a href="index.source.html" class="el_package">com.eventplatform.service</a> &gt; <span class="el_source">AuthService.java</span></div><h1>AuthService.java</h1><pre class="source lang-java linenums">package com.eventplatform.service;
+
+import com.eventplatform.dto.*;
+import com.eventplatform.exception.DuplicateResourceException;
+import com.eventplatform.exception.UnauthorizedException;
+import com.eventplatform.model.*;
+import com.eventplatform.repository.AuditLogRepository;
+import com.eventplatform.repository.UserRepository;
+import com.eventplatform.security.JwtTokenProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+
+/**
+ * Authentication Service
+ * Handles user registration, login, and authentication
+ */
+@Service
+@Transactional
+<span class="fc" id="L25">public class AuthService {</span>
+
+<span class="fc" id="L27">    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);</span>
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private AuditLogRepository auditLogRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private JwtTokenProvider tokenProvider;
+
+    /**
+     * Register new user
+     */
+    public AuthResponse register(RegisterRequest request) {
+<span class="fc" id="L45">        logger.info(&quot;Registering new user with email: {}&quot;, request.getEmail());</span>
+
+        // Check if email already exists
+<span class="fc bfc" id="L48" title="All 2 branches covered.">        if (userRepository.existsByEmailIgnoreCase(request.getEmail())) {</span>
+<span class="fc" id="L49">            throw new DuplicateResourceException(&quot;Email already exists: &quot; + request.getEmail());</span>
+        }
+
+        // Create user based on type
+<span class="fc" id="L53">        User user = createUserByType(request);</span>
+        
+        // Encode password
+<span class="fc" id="L56">        user.setPassword(passwordEncoder.encode(request.getPassword()));</span>
+        
+        // Save user
+<span class="fc" id="L59">        user = userRepository.save(user);</span>
+        
+        // Create audit log
+<span class="fc" id="L62">        createAuditLog(user, &quot;USER_REGISTER&quot;, &quot;User registered successfully&quot;);</span>
+
+        // Generate JWT token
+<span class="fc" id="L65">        String token = tokenProvider.generateToken(user.getId(), user.getEmail(), user.getRole());</span>
+
+<span class="fc" id="L67">        logger.info(&quot;User registered successfully: {}&quot;, user.getEmail());</span>
+
+<span class="fc" id="L69">        return AuthResponse.builder()</span>
+<span class="fc" id="L70">                .token(token)</span>
+<span class="fc" id="L71">                .userId(user.getId())</span>
+<span class="fc" id="L72">                .email(user.getEmail())</span>
+<span class="fc" id="L73">                .name(user.getName())</span>
+<span class="fc" id="L74">                .role(user.getRole())</span>
+<span class="fc" id="L75">                .expiresIn(tokenProvider.getExpirationMs())</span>
+<span class="fc" id="L76">                .build();</span>
+    }
+
+    /**
+     * User login
+     */
+    public AuthResponse login(LoginRequest request) {
+<span class="fc" id="L83">        logger.info(&quot;Login attempt for email: {}&quot;, request.getEmail());</span>
+
+        // Find user by email
+<span class="fc" id="L86">        User user = userRepository.findByEmailIgnoreCase(request.getEmail())</span>
+<span class="fc" id="L87">                .orElseThrow(() -&gt; new UnauthorizedException(&quot;Invalid email or password&quot;));</span>
+
+        // Check if user is active
+<span class="fc bfc" id="L90" title="All 2 branches covered.">        if (user.getStatus() != User.UserStatus.ACTIVE) {</span>
+<span class="fc" id="L91">            throw new UnauthorizedException(&quot;User account is &quot; + user.getStatus());</span>
+        }
+
+        // Verify password
+<span class="fc bfc" id="L95" title="All 2 branches covered.">        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {</span>
+<span class="fc" id="L96">            throw new UnauthorizedException(&quot;Invalid email or password&quot;);</span>
+        }
+
+        // Update last login
+<span class="fc" id="L100">        user.setLastLogin(LocalDateTime.now());</span>
+<span class="fc" id="L101">        userRepository.save(user);</span>
+
+        // Create audit log
+<span class="fc" id="L104">        createAuditLog(user, &quot;USER_LOGIN&quot;, &quot;User logged in successfully&quot;);</span>
+
+        // Generate JWT token
+<span class="fc" id="L107">        String token = tokenProvider.generateToken(user.getId(), user.getEmail(), user.getRole());</span>
+
+<span class="fc" id="L109">        logger.info(&quot;User logged in successfully: {}&quot;, user.getEmail());</span>
+
+<span class="fc" id="L111">        return AuthResponse.builder()</span>
+<span class="fc" id="L112">                .token(token)</span>
+<span class="fc" id="L113">                .userId(user.getId())</span>
+<span class="fc" id="L114">                .email(user.getEmail())</span>
+<span class="fc" id="L115">                .name(user.getName())</span>
+<span class="fc" id="L116">                .role(user.getRole())</span>
+<span class="fc" id="L117">                .expiresIn(tokenProvider.getExpirationMs())</span>
+<span class="fc" id="L118">                .build();</span>
+    }
+
+    /**
+     * Create user entity based on type
+     */
+    private User createUserByType(RegisterRequest request) {
+        User user;
+
+<span class="pc bpc" id="L127" title="1 of 4 branches missed.">        switch (request.getUserType().toUpperCase()) {</span>
+            case &quot;ADMIN&quot;:
+<span class="fc" id="L129">                PlatformAdmin admin = new PlatformAdmin();</span>
+<span class="fc" id="L130">                admin.setPermissions(request.getPermissions());</span>
+<span class="fc" id="L131">                admin.setAccessLevel(request.getAccessLevel());</span>
+<span class="fc" id="L132">                user = admin;</span>
+<span class="fc" id="L133">                break;</span>
+
+            case &quot;ORGANIZER&quot;:
+<span class="fc" id="L136">                EventOrganizer organizer = new EventOrganizer();</span>
+<span class="fc" id="L137">                organizer.setOrganizationName(request.getOrganizationName());</span>
+<span class="fc" id="L138">                user = organizer;</span>
+<span class="fc" id="L139">                break;</span>
+
+            case &quot;BUYER&quot;:
+<span class="fc" id="L142">                user = new TicketBuyer();</span>
+<span class="fc" id="L143">                break;</span>
+
+            default:
+<span class="nc" id="L146">                throw new IllegalArgumentException(&quot;Invalid user type: &quot; + request.getUserType());</span>
+        }
+
+<span class="fc" id="L149">        user.setName(request.getName());</span>
+<span class="fc" id="L150">        user.setEmail(request.getEmail());</span>
+<span class="fc" id="L151">        user.setPhoneNumber(request.getPhoneNumber());</span>
+<span class="fc" id="L152">        user.setStatus(User.UserStatus.ACTIVE);</span>
+
+<span class="fc" id="L154">        return user;</span>
+    }
+
+    /**
+     * Create audit log entry
+     */
+    private void createAuditLog(User user, String action, String details) {
+<span class="fc" id="L161">        AuditLog auditLog = AuditLog.builder()</span>
+<span class="fc" id="L162">                .user(user)</span>
+<span class="fc" id="L163">                .action(action)</span>
+<span class="fc" id="L164">                .entity(&quot;User&quot;)</span>
+<span class="fc" id="L165">                .entityId(user.getId())</span>
+<span class="fc" id="L166">                .details(details)</span>
+<span class="fc" id="L167">                .timestamp(LocalDateTime.now())</span>
+<span class="fc" id="L168">                .build();</span>
+
+<span class="fc" id="L170">        auditLogRepository.save(auditLog);</span>
+<span class="fc" id="L171">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.11.202310140853</span></div></body></html>
