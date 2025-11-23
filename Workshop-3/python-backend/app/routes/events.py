@@ -4,7 +4,7 @@ from typing import List
 from ..core.database import get_db
 from ..schemas.event import EventCreate, EventResponse
 from ..models.event import Event
-from ..utils.auth import require_auth, get_current_user_id
+from ..utils.auth import require_auth, get_current_user_id, require_organizer_or_admin
 from datetime import datetime
 
 router = APIRouter(prefix="/api/events", tags=["events"])
@@ -14,7 +14,7 @@ async def create_event(
     event: EventCreate,
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user_id),
-    payload: dict = Depends(require_auth)
+    payload: dict = Depends(require_organizer_or_admin)
 ):
     try:
         # Get organizer_id from JWT token
@@ -81,7 +81,10 @@ async def get_event(event_id: int, db: Session = Depends(get_db)):
 
 @router.get("/", response_model=List[EventResponse])
 async def list_events(db: Session = Depends(get_db)):
-    events = db.query(Event).all()
+    """
+    List all published events (public endpoint, no authentication required).
+    """
+    events = db.query(Event).filter(Event.event_status == "published").all()
     
     # Transformar cada evento al formato esperado por el frontend
     transformed_events = []
@@ -127,6 +130,18 @@ async def update_event(
     current_user_id: int = Depends(get_current_user_id),
     payload: dict = Depends(require_auth)
 ):
+    # Check if user is the organizer of this event or admin
+    db_event = db.query(Event).filter(Event.id == event_id).first()
+    if not db_event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    user_role = payload.get("role", "")
+    # Admin can edit any event, organizer can only edit their own
+    if user_role != "ROLE_ADMIN" and db_event.organizer_id != current_user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied. You can only edit your own events"
+        )
     db_event = db.query(Event).filter(Event.id == event_id).first()
     if not db_event:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -145,6 +160,18 @@ async def delete_event(
     current_user_id: int = Depends(get_current_user_id),
     payload: dict = Depends(require_auth)
 ):
+    # Check if user is the organizer of this event or admin
+    event = db.query(Event).filter(Event.id == event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+    
+    user_role = payload.get("role", "")
+    # Admin can delete any event, organizer can only delete their own
+    if user_role != "ROLE_ADMIN" and event.organizer_id != current_user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied. You can only delete your own events"
+        )
     event = db.query(Event).filter(Event.id == event_id).first()
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -152,3 +179,52 @@ async def delete_event(
     db.delete(event)
     db.commit()
     return {"message": "Event deleted successfully"}
+
+
+@router.get("/my-events", response_model=List[EventResponse])
+async def get_my_events(
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id),
+    payload: dict = Depends(require_organizer_or_admin)
+):
+    """
+    Get all events created by the current organizer.
+    Only accessible by ORGANIZER or ADMIN roles.
+    """
+    events = db.query(Event).filter(Event.organizer_id == current_user_id).all()
+    
+    # Transform each event to EventResponse format
+    from datetime import timedelta
+    
+    transformed_events = []
+    for event in events:
+        transformed_event = EventResponse(
+            # Campos mapeados para el frontend
+            id=event.id,
+            title=event.name,
+            description=f"Evento de {event.category}" if event.category else "Evento especial",
+            startDate=event.date,
+            endDate=event.date + timedelta(hours=2) if event.date else None,
+            maxAttendees=event.capacity or 100,
+            ticketPrice=50000.0,  # TODO: Get from TicketType
+            status=event.event_status.upper() if event.event_status else "PUBLISHED",
+            categoryId=1,  # TODO: Get from category relationship
+            locationId=event.location_id or 1,
+            organizerId=event.organizer_id or 1,
+            
+            # Campos originales (para compatibilidad)
+            name=event.name,
+            date=event.date,
+            category=event.category,
+            capacity=event.capacity,
+            event_status=event.event_status,
+            age_restriction=event.age_restriction,
+            max_tickets_per_purchase=event.max_tickets_per_purchase,
+            media=event.media,
+            organizer_id=event.organizer_id,
+            location_id=event.location_id,
+            created_at=getattr(event, 'created_at', None)
+        )
+        transformed_events.append(transformed_event)
+    
+    return transformed_events

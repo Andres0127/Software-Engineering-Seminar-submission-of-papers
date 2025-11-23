@@ -1,4 +1,4 @@
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -136,5 +136,92 @@ def get_current_user_info(payload: Dict[str, Any] = Depends(require_auth)) -> Di
         "email": payload.get("email", ""),
         "role": payload.get("role", "")
     }
+
+
+def require_role(allowed_roles: List[str]):
+    """
+    Dependency to check if user has one of the allowed roles.
+    
+    Args:
+        allowed_roles: List of allowed roles (e.g., ["ROLE_ADMIN", "ROLE_ORGANIZER"])
+        
+    Returns:
+        Dependency function that validates role
+    """
+    def role_checker(payload: Dict[str, Any] = Depends(require_auth)) -> Dict[str, Any]:
+        user_role = payload.get("role", "")
+        if user_role not in allowed_roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Access denied. Required roles: {allowed_roles}, but user has: {user_role}"
+            )
+        return payload
+    return role_checker
+
+
+def require_organizer_or_admin(payload: Dict[str, Any] = Depends(require_auth)) -> Dict[str, Any]:
+    """
+    Dependency to check if user is ORGANIZER or ADMIN.
+    
+    Args:
+        payload: JWT token payload from require_auth
+        
+    Returns:
+        Payload if user is organizer or admin
+        
+    Raises:
+        HTTPException: If user is not organizer or admin
+    """
+    user_role = payload.get("role", "")
+    if user_role not in ["ROLE_ORGANIZER", "ROLE_ADMIN"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. This endpoint requires ORGANIZER or ADMIN role"
+        )
+    return payload
+
+
+def require_admin(payload: Dict[str, Any] = Depends(require_auth)) -> Dict[str, Any]:
+    """
+    Dependency to check if user is ADMIN.
+    
+    Args:
+        payload: JWT token payload from require_auth
+        
+    Returns:
+        Payload if user is admin
+        
+    Raises:
+        HTTPException: If user is not admin
+    """
+    user_role = payload.get("role", "")
+    if user_role != "ROLE_ADMIN":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. This endpoint requires ADMIN role"
+        )
+    return payload
+
+
+def require_buyer_or_admin(payload: Dict[str, Any] = Depends(require_auth)) -> Dict[str, Any]:
+    """
+    Dependency to check if user is BUYER or ADMIN.
+    
+    Args:
+        payload: JWT token payload from require_auth
+        
+    Returns:
+        Payload if user is buyer or admin
+        
+    Raises:
+        HTTPException: If user is not buyer or admin
+    """
+    user_role = payload.get("role", "")
+    if user_role not in ["ROLE_BUYER", "ROLE_ADMIN"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. This endpoint requires BUYER or ADMIN role"
+        )
+    return payload
 
 
