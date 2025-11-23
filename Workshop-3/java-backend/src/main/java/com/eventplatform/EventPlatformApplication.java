@@ -25,9 +25,9 @@ public class EventPlatformApplication {
         SpringApplication.run(EventPlatformApplication.class, args);
         System.out.println("\n========================================");
         System.out.println("Event Platform Authentication Service");
-        System.out.println("Server running on: http://localhost:8080");
-        System.out.println("Swagger UI: http://localhost:8080/swagger-ui.html");
-        System.out.println("API Docs: http://localhost:8080/api-docs");
+        System.out.println("Server running on: http://localhost:8081");
+        System.out.println("Swagger UI: http://localhost:8081/swagger-ui.html");
+        System.out.println("API Docs: http://localhost:8081/api-docs");
         System.out.println("========================================\n");
     }
 }

@@ -35,7 +35,22 @@ public class CorsConfig {
         
         configuration.setAllowedOrigins(Arrays.asList(allowedOrigins));
         configuration.setAllowedMethods(Arrays.asList(allowedMethods));
-        configuration.setAllowedHeaders(List.of(allowedHeaders));
+        
+        // Handle allowed headers
+        // Note: When allowCredentials is true, "*" cannot be used for allowedHeaders
+        // So we specify common headers explicitly
+        if ("*".equals(allowedHeaders)) {
+            // Allow common headers when "*" is specified
+            configuration.setAllowedHeaders(Arrays.asList(
+                "Authorization", "Content-Type", "X-Requested-With", 
+                "Accept", "Origin", "Access-Control-Request-Method", 
+                "Access-Control-Request-Headers"
+            ));
+        } else {
+            // Split by comma if multiple headers are specified
+            configuration.setAllowedHeaders(Arrays.asList(allowedHeaders.split(",\\s*")));
+        }
+        
         configuration.setAllowCredentials(allowCredentials);
         configuration.setMaxAge(3600L); // Cache preflight response for 1 hour
 
