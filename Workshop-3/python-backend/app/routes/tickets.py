@@ -38,3 +38,55 @@ async def get_event_ticket_types(event_id: int, db: Session = Depends(get_db)):
     return tickets
 
 
+@router.get("/event/{event_id}/types/{ticket_type_id}/availability")
+async def check_ticket_availability(
+    event_id: int,
+    ticket_type_id: int,
+    quantity: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Check availability of tickets for a specific ticket type.
+    
+    Args:
+        event_id: ID of the event
+        ticket_type_id: ID of the ticket type
+        quantity: Number of tickets requested
+        
+    Returns:
+        Dict with available status and remaining tickets
+    """
+    from ..models.ticket import Ticket, TicketType
+    
+    # Get ticket type
+    ticket_type = db.query(TicketType).filter(
+        TicketType.id == ticket_type_id,
+        TicketType.event_id == event_id
+    ).first()
+    
+    if not ticket_type:
+        raise HTTPException(status_code=404, detail="Ticket type not found")
+    
+    # Count tickets already sold for this ticket type
+    tickets_sold = db.query(Ticket).filter(
+        Ticket.ticket_type_id == ticket_type_id,
+        Ticket.status == "valid"
+    ).count()
+    
+    # Calculate available tickets
+    total_quantity = ticket_type.quantity
+    available_quantity = total_quantity - tickets_sold
+    remaining_tickets = max(0, available_quantity)
+    
+    # Check if requested quantity is available
+    is_available = remaining_tickets >= quantity
+    
+    return {
+        "available": is_available,
+        "remainingTickets": remaining_tickets,
+        "requestedQuantity": quantity,
+        "totalQuantity": total_quantity,
+        "ticketsSold": tickets_sold
+    }
+
+
