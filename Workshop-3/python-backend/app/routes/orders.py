@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from ..core.database import get_db
 from ..schemas.order import OrderCreate, OrderResponse
 from ..models.order import Order
+from ..models.ticket import TicketType
 from ..utils.auth import require_auth, get_current_user_id
 import uuid
 from datetime import datetime
@@ -20,8 +21,21 @@ async def create_order(
     current_user_id: int = Depends(get_current_user_id),
     payload: dict = Depends(require_auth)
 ):
+    """
+    Create a new order and calculate total amount based on ticket type price and quantity.
+    """
     try:
+        # Get ticket type to calculate total
+        ticket_type = db.query(TicketType).filter(TicketType.id == order.ticket_type_id).first()
+        if not ticket_type:
+            raise HTTPException(status_code=404, detail="Ticket type not found")
+        
+        # Calculate total amount: price * quantity
+        total_amount = Decimal(str(ticket_type.price)) * Decimal(str(order.quantity))
+        
+        # Generate order number
         order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+        
         # Get buyer_id from JWT token
         buyer_id = current_user_id
         
@@ -29,13 +43,15 @@ async def create_order(
             order_number=order_number,
             purchase_date=datetime.utcnow(),
             status="pending",
-            total_amount=Decimal("0.00"),
+            total_amount=total_amount,
             buyer_id=buyer_id,
         )
         db.add(db_order)
         db.commit()
         db.refresh(db_order)
         return db_order
+    except HTTPException:
+        raise
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=str(e))
