@@ -4,13 +4,22 @@ from typing import List
 from ..core.database import get_db
 from ..schemas.event import EventCreate, EventResponse
 from ..models.event import Event
+from ..utils.auth import require_auth, get_current_user_id
 from datetime import datetime
 
 router = APIRouter(prefix="/api/events", tags=["events"])
 
 @router.post("/", response_model=EventResponse)
-async def create_event(event: EventCreate, db: Session = Depends(get_db)):
+async def create_event(
+    event: EventCreate,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id),
+    payload: dict = Depends(require_auth)
+):
     try:
+        # Get organizer_id from JWT token
+        organizer_id = current_user_id
+        
         db_event = Event(
             name=event.name,
             date=event.date,
@@ -20,7 +29,7 @@ async def create_event(event: EventCreate, db: Session = Depends(get_db)):
             age_restriction=event.age_restriction,
             max_tickets_per_purchase=event.max_tickets_per_purchase,
             media=event.media,
-            organizer_id=1,
+            organizer_id=organizer_id,
             location_id=event.location_id
         )
         db.add(db_event)
@@ -111,7 +120,13 @@ async def list_events(db: Session = Depends(get_db)):
     return transformed_events
 
 @router.put("/{event_id}", response_model=EventResponse)
-async def update_event(event_id: int, event: EventCreate, db: Session = Depends(get_db)):
+async def update_event(
+    event_id: int,
+    event: EventCreate,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id),
+    payload: dict = Depends(require_auth)
+):
     db_event = db.query(Event).filter(Event.id == event_id).first()
     if not db_event:
         raise HTTPException(status_code=404, detail="Event not found")
@@ -124,7 +139,12 @@ async def update_event(event_id: int, event: EventCreate, db: Session = Depends(
     return db_event
 
 @router.delete("/{event_id}")
-async def delete_event(event_id: int, db: Session = Depends(get_db)):
+async def delete_event(
+    event_id: int,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id),
+    payload: dict = Depends(require_auth)
+):
     event = db.query(Event).filter(Event.id == event_id).first()
     if not event:
         raise HTTPException(status_code=404, detail="Event not found")

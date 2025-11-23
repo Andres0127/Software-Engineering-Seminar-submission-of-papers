@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from ..core.database import get_db
 from ..schemas.order import OrderCreate, OrderResponse
 from ..models.order import Order
+from ..utils.auth import require_auth, get_current_user_id
 import uuid
 from datetime import datetime
 from decimal import Decimal
@@ -13,15 +14,23 @@ router = APIRouter(prefix="/api/orders", tags=["orders"])
 
 
 @router.post("/", response_model=OrderResponse)
-async def create_order(order: OrderCreate, db: Session = Depends(get_db)):
+async def create_order(
+    order: OrderCreate,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id),
+    payload: dict = Depends(require_auth)
+):
     try:
         order_number = f"ORD-{uuid.uuid4().hex[:8].upper()}"
+        # Get buyer_id from JWT token
+        buyer_id = current_user_id
+        
         db_order = Order(
             order_number=order_number,
             purchase_date=datetime.utcnow(),
             status="pending",
             total_amount=Decimal("0.00"),
-            buyer_id=1,  # TODO: Get from JWT token
+            buyer_id=buyer_id,
         )
         db.add(db_order)
         db.commit()

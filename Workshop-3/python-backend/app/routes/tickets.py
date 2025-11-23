@@ -5,13 +5,18 @@ from typing import List
 from ..core.database import get_db
 from ..schemas.ticket import TicketTypeCreate, TicketTypeResponse
 from ..models.ticket import TicketType
+from ..utils.auth import require_auth
 
 
 router = APIRouter(prefix="/api/tickets", tags=["tickets"])
 
 
 @router.post("/types", response_model=TicketTypeResponse)
-async def create_ticket_type(ticket: TicketTypeCreate, db: Session = Depends(get_db)):
+async def create_ticket_type(
+    ticket: TicketTypeCreate,
+    db: Session = Depends(get_db),
+    payload: dict = Depends(require_auth)
+):
     db_ticket = TicketType(**ticket.dict())
     db.add(db_ticket)
     db.commit()
