@@ -22,7 +22,7 @@ export const EventsPage: React.FC = () => {
       try {
         setLoading(true);
         
-        // Cargar eventos y categorías en paralelo
+        // Load events and categories in parallel
         const [eventsData, categoriesData] = await Promise.all([
           EventService.getEvents(),
           EventService.getCategories()
@@ -31,47 +31,61 @@ export const EventsPage: React.FC = () => {
         setEvents(eventsData);
         setCategories(categoriesData);
       } catch (error: any) {
-        console.error('Error al cargar datos:', error);
-        toast.error('Error al cargar eventos. Mostrando datos de ejemplo.');
-        
-        // Fallback a datos mock si la API falla
+        console.error('Error loading data:', error);
+        toast.error('Unable to load events. Showing curated samples.');
+
         setEvents([
           {
             id: 1,
-            title: 'Conferencia de Tecnología 2025',
-            description: 'Una conferencia sobre las últimas tendencias en tecnología',
-            startDate: '2025-12-15T09:00:00Z',
-            endDate: '2025-12-15T18:00:00Z',
-            maxAttendees: 500,
-            ticketPrice: 150000,
+            title: 'Global Innovation Summit 2026',
+            description: 'A forum exploring AI, sustainability, and digital leadership.',
+            startDate: '2026-03-15T09:00:00Z',
+            endDate: '2026-03-15T18:00:00Z',
+            maxAttendees: 800,
+            ticketPrice: 299000,
             status: 'PUBLISHED',
             categoryId: 1,
             locationId: 1,
             organizerId: 1,
-            category: { id: 1, name: 'Tecnología', description: 'Eventos tecnológicos' },
-            location: { id: 1, name: 'Centro de Convenciones', address: 'Calle 123 #45-67', capacity: 500 }
+            category: { id: 1, name: 'Technology', description: 'Conferences about emerging technology and innovation.' },
+            location: { id: 1, name: 'Innovation Hall', address: '123 Tech Blvd, Boston, MA 02110', capacity: 800 }
           },
           {
             id: 2,
-            title: 'Concierto de Jazz',
-            description: 'Una noche mágica con los mejores artistas de jazz',
-            startDate: '2025-12-20T20:00:00Z',
-            endDate: '2025-12-20T23:00:00Z',
-            maxAttendees: 300,
-            ticketPrice: 80000,
+            title: 'Cityscape Marketing Forum',
+            description: 'Leadership sessions on storytelling, analytics, and growth strategy.',
+            startDate: '2026-05-20T10:00:00Z',
+            endDate: '2026-05-20T17:30:00Z',
+            maxAttendees: 600,
+            ticketPrice: 225000,
             status: 'PUBLISHED',
             categoryId: 2,
             locationId: 2,
             organizerId: 2,
-            category: { id: 2, name: 'Música', description: 'Eventos musicales' },
-            location: { id: 2, name: 'Teatro Municipal', address: 'Carrera 56 #78-90', capacity: 300 }
+            category: { id: 2, name: 'Business', description: 'Summits covering strategy, finance, and leadership.' },
+            location: { id: 2, name: 'Summit Center', address: '450 Business Way, Chicago, IL 60601', capacity: 600 }
+          },
+          {
+            id: 3,
+            title: 'Harmony Music Expedition',
+            description: 'An immersive music festival celebrating acoustic experiences.',
+            startDate: '2026-08-10T16:00:00Z',
+            endDate: '2026-08-10T23:00:00Z',
+            maxAttendees: 400,
+            ticketPrice: 149000,
+            status: 'PUBLISHED',
+            categoryId: 3,
+            locationId: 3,
+            organizerId: 3,
+            category: { id: 3, name: 'Music', description: 'Live performances and curated concerts.' },
+            location: { id: 3, name: 'Harmony Garden', address: '89 Concert Avenue, Austin, TX 73301', capacity: 400 }
           }
         ]);
-        
+
         setCategories([
-          { id: 1, name: 'Tecnología', description: 'Eventos tecnológicos' },
-          { id: 2, name: 'Música', description: 'Eventos musicales' },
-          { id: 3, name: 'Deportes', description: 'Eventos deportivos' }
+          { id: 1, name: 'Technology', description: 'Conferences about emerging technology and innovation.' },
+          { id: 2, name: 'Business', description: 'Summits covering strategy, finance, and leadership.' },
+          { id: 3, name: 'Music', description: 'Live performances and curated showcases.' }
         ]);
       } finally {
         setLoading(false);
@@ -91,7 +105,7 @@ export const EventsPage: React.FC = () => {
       });
       setEvents(filteredEvents);
     } catch (error: any) {
-      toast.error('Error al filtrar eventos');
+      toast.error('Unable to filter events.');
     } finally {
       setLoading(false);
     }
@@ -99,7 +113,7 @@ export const EventsPage: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -109,7 +123,7 @@ export const EventsPage: React.FC = () => {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-CO', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'COP'
     }).format(price);
@@ -121,10 +135,10 @@ export const EventsPage: React.FC = () => {
         <div className="loading-spinner" style={{ width: '32px', height: '32px', borderWidth: '3px' }}></div>
         <div className="text-center">
           <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-            Cargando eventos...
+            Loading events...
           </h3>
           <p className="text-gray-600">
-            Preparando las mejores experiencias para ti
+            Preparing the best experiences for you
           </p>
         </div>
       </div>
@@ -137,10 +151,10 @@ export const EventsPage: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-4xl font-bold text-gray-900">
-            Eventos
+            Events
           </h1>
           <p className="text-gray-600 mt-2">
-            Descubre experiencias increíbles cerca de ti
+            Discover incredible experiences near you
           </p>
         </div>
         
@@ -150,7 +164,7 @@ export const EventsPage: React.FC = () => {
             className="btn-primary"
           >
             <Plus className="w-5 h-5 mr-2" />
-            Crear Evento
+            Create Event
           </Link>
         )}
       </div>
@@ -158,21 +172,21 @@ export const EventsPage: React.FC = () => {
       {/* Filtros */}
       <div className="card p-8">
         <div className="mb-6">
-          <h3 className="text-2xl font-semibold text-gray-900 mb-2">Filtrar Eventos</h3>
-          <p className="text-gray-600">Encuentra exactamente lo que buscas</p>
+          <h3 className="text-2xl font-semibold text-gray-900 mb-2">Filter events</h3>
+          <p className="text-gray-600">Find exactly what you're looking for</p>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div>
             <label className="label">
-              Categoría
+              Category
             </label>
             <select 
               value={filters.categoryId}
               onChange={(e) => setFilters(prev => ({ ...prev, categoryId: e.target.value }))}
               className="select"
             >
-              <option value="">Todas las categorías</option>
+              <option value="">All categories</option>
               {categories.map(category => (
                 <option key={category.id} value={category.id.toString()}>
                   {category.name}
@@ -183,7 +197,7 @@ export const EventsPage: React.FC = () => {
           
           <div>
             <label className="label">
-              Fecha
+              Date
             </label>
             <input
               type="date"
@@ -195,11 +209,11 @@ export const EventsPage: React.FC = () => {
           
           <div>
             <label className="label">
-              Precio máximo
+              Max price
             </label>
             <input
               type="number"
-              placeholder="Ingresa monto"
+              placeholder="Enter amount"
               value={filters.maxPrice}
               onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value }))}
               className="input"
@@ -207,21 +221,21 @@ export const EventsPage: React.FC = () => {
           </div>
           
           <div className="flex items-end">
-            <button 
-              onClick={handleFilterChange}
-              className="btn-primary w-full"
-            >
-              Filtrar
-            </button>
+          <button 
+            onClick={handleFilterChange}
+            className="btn-primary w-full"
+          >
+            Filter
+          </button>
           </div>
         </div>
       </div>
 
-      {/* Lista de eventos */}
+      {/* Events list */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.map((event) => (
           <div key={event.id} className="event-card">
-            {/* Imagen del evento */}
+            {/* Event image */}
             <div className="event-image">
               <div className="event-badge">
                 {event.category?.name || 'General'}
@@ -233,7 +247,7 @@ export const EventsPage: React.FC = () => {
             </div>
 
             <div className="p-6">
-              {/* Título y descripción */}
+              {/* Title and description */}
               <h3 className="text-xl font-semibold text-gray-900 mb-3">
                 {event.title}
               </h3>
@@ -244,24 +258,24 @@ export const EventsPage: React.FC = () => {
                 }
               </p>
 
-              {/* Información del evento */}
+              {/* Event information */}
               <div className="space-y-3 mb-6">
-                <div className="info-item">
-                  <Calendar className="info-icon" />
-                  <div>
-                    <div className="info-label">Fecha</div>
-                    <div className="info-value">
-                      {formatDate(event.startDate)}
-                    </div>
-                  </div>
+            <div className="info-item">
+              <Calendar className="info-icon" />
+              <div>
+                <div className="info-label">Date</div>
+                <div className="info-value">
+                  {formatDate(event.startDate)}
                 </div>
+              </div>
+            </div>
                 
                 <div className="info-item">
                   <MapPin className="info-icon" />
                   <div>
-                    <div className="info-label">Ubicación</div>
+                <div className="info-label">Location</div>
                     <div className="info-value">
-                      {event.location?.name || 'Por definir'}
+                      {event.location?.name || 'To be defined'}
                     </div>
                   </div>
                 </div>
@@ -269,27 +283,27 @@ export const EventsPage: React.FC = () => {
                 <div className="info-item">
                   <Users className="info-icon" />
                   <div>
-                    <div className="info-label">Capacidad</div>
+                    <div className="info-label">Capacity</div>
                     <div className="info-value">
-                      {event.maxAttendees} personas
+                      {event.maxAttendees} people
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Botones de acción */}
+              {/* Action buttons */}
               <div className="flex space-x-3">
                 <Link
                   to={`/events/${event.id || 'unknown'}`}
                   className="btn-secondary flex-1"
                 >
-                  Ver Detalles
+                  View details
                 </Link>
                 <Link
                   to={`/events/${event.id || 'unknown'}/tickets`}
                   className="btn-primary"
                 >
-                  Comprar
+                  Buy
                 </Link>
               </div>
             </div>
@@ -314,10 +328,10 @@ export const EventsPage: React.FC = () => {
           </div>
           
           <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            No hay eventos disponibles
+            No events available
           </h3>
           <p className="text-gray-600 mb-8" style={{ maxWidth: '400px', margin: '0 auto 32px auto' }}>
-            No hay eventos que coincidan con tus criterios de búsqueda.
+            There are no events matching your filters.
           </p>
           
           {(user?.userType === 'ORGANIZER' || user?.userType === 'ADMIN') && (
@@ -326,7 +340,7 @@ export const EventsPage: React.FC = () => {
               className="btn-primary"
             >
               <Plus className="w-5 h-5 mr-2" />
-              Crear evento
+              Create Event
             </Link>
           )}
         </div>

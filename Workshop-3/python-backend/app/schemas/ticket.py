@@ -1,6 +1,7 @@
-from pydantic import BaseModel
-from typing import Optional
+from datetime import datetime
 from decimal import Decimal
+from typing import Optional
+from pydantic import BaseModel
 
 
 class TicketTypeBase(BaseModel):
@@ -33,4 +34,21 @@ class TicketResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
+class BuyerTicketResponse(BaseModel):
+    id: int
+    qr_code: str
+    status: str
+    ticket_type_id: int
+    ticket_type_name: str
+    ticket_price: float
+    event_id: int
+    event_title: str
+    event_start: Optional[datetime] = None
+    location_name: Optional[str] = None
+    order_id: int
+    order_number: str
+
+    class Config:
+        from_attributes = True
 

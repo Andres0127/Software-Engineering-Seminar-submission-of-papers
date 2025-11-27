@@ -10,25 +10,25 @@ import { useAuthStore } from '../../store/authStore';
 const registerSchema = z.object({
   name: z
     .string()
-    .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .max(100, 'El nombre es muy largo'),
+    .min(2, 'Name must have at least 2 characters')
+    .max(100, 'Name is too long'),
   email: z
     .string()
-    .email('Ingrese un email válido')
-    .min(1, 'El email es requerido'),
+    .email('Please enter a valid email')
+    .min(1, 'Email is required'),
   password: z
     .string()
-    .min(8, 'La contraseña debe tener al menos 8 caracteres')
-    .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-    .regex(/[a-z]/, 'Debe contener al menos una minúscula')
-    .regex(/[0-9]/, 'Debe contener al menos un número')
-    .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un carácter especial'),
+    .min(8, 'Password must have at least 8 characters')
+    .regex(/[A-Z]/, 'Include at least one uppercase letter')
+    .regex(/[a-z]/, 'Include at least one lowercase letter')
+    .regex(/[0-9]/, 'Include at least one number')
+    .regex(/[^A-Za-z0-9]/, 'Include at least one special character'),
   confirmPassword: z.string(),
   userType: z.string(),
   phoneNumber: z.string().optional(),
   organizationName: z.string().optional()
 }).refine(data => data.password === data.confirmPassword, {
-  message: 'Las contraseñas no coinciden',
+  message: 'Passwords do not match',
   path: ['confirmPassword']
 });
 
@@ -56,10 +56,10 @@ export const RegisterForm: React.FC = () => {
     try {
       const { confirmPassword, ...registerData } = data;
       await registerUser(registerData);
-      toast.success('Cuenta creada exitosamente');
+      toast.success('Account created successfully');
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.message || 'Error al crear la cuenta');
+      toast.error(error.message || 'Error creating the account');
     }
   };
 
@@ -83,10 +83,10 @@ export const RegisterForm: React.FC = () => {
               <UserPlus className="w-10 h-10 text-white" />
             </div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 via-pink-600 to-orange-600 bg-clip-text text-transparent mb-3">
-              Únete a nosotros
+              Join us
             </h1>
             <p className="text-lg text-gray-600">
-              Crea tu cuenta en <span className="font-semibold text-purple-600">Event Platform</span>
+              Create your account on <span className="font-semibold text-purple-600">Event Platform</span>
             </p>
           </div>
 
@@ -94,14 +94,14 @@ export const RegisterForm: React.FC = () => {
             {/* Name Input */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                Nombre completo
+                Full name
               </label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   {...register('name')}
                   type="text"
-                  placeholder="Tu nombre completo"
+                  placeholder="Your full name"
                   className="input-modern pl-12"
                 />
               </div>
@@ -132,7 +132,7 @@ export const RegisterForm: React.FC = () => {
             {/* Password Input */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                Contraseña
+                Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -151,7 +151,7 @@ export const RegisterForm: React.FC = () => {
             {/* Confirm Password Input */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                Confirmar contraseña
+                Confirm password
               </label>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -170,7 +170,7 @@ export const RegisterForm: React.FC = () => {
             {/* Phone Input */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                Teléfono <span className="text-gray-400">(opcional)</span>
+                Phone <span className="text-gray-400">(optional)</span>
               </label>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -189,15 +189,15 @@ export const RegisterForm: React.FC = () => {
             {/* User Type Select */}
             <div className="space-y-2">
               <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                Tipo de usuario
+                User type
               </label>
               <select
                 {...register('userType')}
                 className="input-modern"
               >
-                <option value="BUYER">Comprador de tickets</option>
-                <option value="ORGANIZER">Organizador de eventos</option>
-                <option value="ADMIN">Administrador</option>
+                <option value="BUYER">Ticket buyer</option>
+                <option value="ORGANIZER">Event organizer</option>
+                <option value="ADMIN">Admin</option>
               </select>
             </div>
 
@@ -205,14 +205,14 @@ export const RegisterForm: React.FC = () => {
             {userType === 'ORGANIZER' && (
               <div className="space-y-2 animate-fadeInUp">
                 <label className="block text-sm font-semibold text-gray-700 uppercase tracking-wide">
-                  Nombre de la organización
+                  Organization name
                 </label>
                 <div className="relative">
                   <Building className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     {...register('organizationName')}
                     type="text"
-                    placeholder="Tu empresa u organización"
+                    placeholder="Your company or organization"
                     className="input-modern pl-12"
                   />
                 </div>
@@ -229,13 +229,13 @@ export const RegisterForm: React.FC = () => {
               className="btn-premium w-full justify-center text-lg py-4 group mt-8"
             >
               {isLoading ? (
-                <div className="flex items-center">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                  Creando cuenta...
-                </div>
+                  <div className="flex items-center">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
+                    Creating account...
+                  </div>
               ) : (
                 <>
-                  <span>Crear Cuenta</span>
+                  <span>Create Account</span>
                   <div className="ml-3 transform group-hover:scale-110 transition-transform">
                     →
                   </div>
@@ -246,13 +246,13 @@ export const RegisterForm: React.FC = () => {
             {/* Login Link */}
             <div className="text-center pt-6 border-t border-gray-200">
               <p className="text-gray-600 mb-4">
-                ¿Ya tienes cuenta?
+                Already have an account?
               </p>
               <Link 
                 to="/login" 
                 className="btn-secondary group"
               >
-                <span>Inicia sesión</span>
+                <span>Log in</span>
                 <div className="ml-2 transform group-hover:translate-x-1 transition-transform">
                   →
                 </div>

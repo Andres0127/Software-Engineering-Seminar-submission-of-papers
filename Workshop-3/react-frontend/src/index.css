@@ -7,7 +7,7 @@
 }
 
 :root {
-  /* Paleta de colores profesional - Minimalista */
+  /* Professional palette - Minimalist */
   --primary-600: #1e293b;
   --primary-500: #334155;
   --primary-400: #475569;
@@ -16,7 +16,7 @@
   --primary-100: #cbd5e1;
   --primary-50: #f1f5f9;
 
-  /* Accent - Un solo color de acento elegante */
+  /* Accent - Single elegant accent color */
   --accent-600: #0f172a;
   --accent-500: #1e293b;
   --accent-400: #334155;
@@ -25,7 +25,7 @@
   --accent-100: #94a3b8;
   --accent-50: #f8fafc;
 
-  /* Status colors - Colores sutiles para estados */
+  /* Status colors - Subtle state indicators */
   --success-600: #059669;
   --success-500: #10b981;
   --success-100: #d1fae5;
@@ -38,7 +38,7 @@
   --warning-500: #f59e0b;
   --warning-100: #fef3c7;
 
-  /* Neutrales */
+  /* Neutrals */
   --white: #ffffff;
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;
@@ -51,20 +51,20 @@
   --gray-800: #1e293b;
   --gray-900: #0f172a;
 
-  /* Sombras minimalistas */
+  /* Minimalist shadows */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
   
-  /* Bordes */
+  /* Border radii */
   --border-radius-sm: 6px;
   --border-radius-md: 8px;
   --border-radius-lg: 12px;
   --border-radius-xl: 16px;
   
-  /* Transiciones */
+  /* Transitions */
   --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
@@ -78,7 +78,7 @@ body {
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
 }
 
-/* Animaciones minimalistas */
+/* Minimalist animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -109,7 +109,7 @@ body {
   animation: slideIn 0.3s ease-out;
 }
 
-/* Cards profesionales */
+/* Professional cards */
 .card {
   background: var(--white);
   border: 1px solid var(--gray-200);
@@ -135,7 +135,7 @@ body {
   box-shadow: var(--shadow-xl);
 }
 
-/* Botones profesionales */
+/* Professional buttons */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -222,7 +222,7 @@ body {
   color: var(--white);
 }
 
-/* Inputs profesionales */
+/* Professional inputs */
 .input {
   width: 100%;
   padding: 12px 14px;
@@ -271,7 +271,7 @@ body {
   box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
 }
 
-/* Layout profesional */
+/* Professional layout */
 .header {
   background-color: var(--white);
   border-bottom: 1px solid var(--gray-200);
@@ -283,7 +283,7 @@ body {
   border-right: 1px solid var(--gray-200);
 }
 
-/* Event cards minimalistas */
+/* Minimalist event cards */
 .event-card {
   background: var(--white);
   border: 1px solid var(--gray-200);
@@ -876,7 +876,7 @@ body {
   }
 }
 
-/* Event cards - versión profesional */
+/* Event cards - professional version */
 .event-card {
   background: var(--white);
   border: 1px solid var(--gray-200);
@@ -924,7 +924,7 @@ body {
   font-weight: 600;
 }
 
-/* Dashboard específico */
+/* Specialized dashboard layout */
 .space-y-4 > * + * {
   margin-top: 16px;
 }

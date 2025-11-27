@@ -1,35 +1,32 @@
-# Script para verificar si el entorno virtual está activado
+# Script to confirm whether the virtual environment is active
 
-Write-Host "`n=== Verificación del Entorno Virtual ===" -ForegroundColor Cyan
+Write-Host "`n=== Virtual Environment Check ===" -ForegroundColor Cyan
 
-# Verificar si VIRTUAL_ENV está definido
+# Check if VIRTUAL_ENV is set
 if ($env:VIRTUAL_ENV) {
-    Write-Host "✅ Entorno virtual ACTIVADO" -ForegroundColor Green
-    Write-Host "   Ruta: $env:VIRTUAL_ENV" -ForegroundColor Gray
+    Write-Host "✅ Virtual environment DETECTED" -ForegroundColor Green
+    Write-Host "   Path: $env:VIRTUAL_ENV" -ForegroundColor Gray
 } else {
-    Write-Host "❌ Entorno virtual NO ACTIVADO" -ForegroundColor Red
+    Write-Host "❌ Virtual environment NOT DETECTED" -ForegroundColor Red
 }
 
-# Verificar la ruta de Python
-Write-Host "`nPython ejecutable:" -ForegroundColor Yellow
+# Show Python executable
+Write-Host "`nPython executable:" -ForegroundColor Yellow
 python -c "import sys; print(sys.executable)"
 
-# Verificar si es del .venv
+# Check if Python comes from the .venv
 $pythonPath = python -c "import sys; print(sys.executable)"
 if ($pythonPath -like "*\.venv\Scripts\python.exe" -or $pythonPath -like "*/.venv/Scripts/python.exe") {
-    Write-Host "✅ Python está usando el entorno virtual" -ForegroundColor Green
+    Write-Host "✅ Python is using the virtual environment" -ForegroundColor Green
 } else {
-    Write-Host "❌ Python NO está usando el entorno virtual" -ForegroundColor Red
-    Write-Host "   (Probablemente está usando Python global)" -ForegroundColor Gray
+    Write-Host "❌ Python is NOT using the virtual environment" -ForegroundColor Red
+    Write-Host "   (It is probably using the system-wide Python)" -ForegroundColor Gray
 }
 
-# Mostrar el prompt actual
-Write-Host "`nPrompt actual:" -ForegroundColor Yellow
+# Display the current script path
+Write-Host "`nCurrent prompt:" -ForegroundColor Yellow
 Write-Host $PSCommandPath -ForegroundColor Gray
 
-Write-Host "`nPara activar el entorno virtual:" -ForegroundColor Cyan
+Write-Host "`nTo activate the virtual environment:" -ForegroundColor Cyan
 Write-Host "   .\.venv\Scripts\Activate.ps1" -ForegroundColor White
 Write-Host ""
-
-
-

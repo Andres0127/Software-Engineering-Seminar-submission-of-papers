@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
-import { Event, Category, Location, ApiResponse } from '../types';
+import { Event, Category, Location, ApiResponse, EventStatistics } from '../types';
 import { AuthService } from './authService';
 
-// Configuración para Python Backend (Events)
+// Configuration for Python Backend (Events)
 const PYTHON_API_BASE_URL = 'http://localhost:8000/api';
 
 const eventApi = axios.create({
@@ -12,7 +12,7 @@ const eventApi = axios.create({
   },
 });
 
-// Interceptor para agregar token JWT a las requests del Python backend
+// Interceptor to attach JWT token to Python backend requests
 eventApi.interceptors.request.use((config) => {
   const token = AuthService.getToken();
   if (token) {
@@ -21,7 +21,7 @@ eventApi.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor para manejar errores de respuesta
+// Interceptor to handle response errors
 eventApi.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -35,7 +35,7 @@ eventApi.interceptors.response.use(
 );
 
 export class EventService {
-  // Obtener todos los eventos
+  // Fetch all events
   static async getEvents(filters?: {
     categoryId?: number;
     locationId?: number;
@@ -62,20 +62,20 @@ export class EventService {
       
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al obtener eventos');
+      throw new Error(error.response?.data?.message || 'Unable to fetch events');
     }
   }
 
-  // Obtener evento por ID
+  // Fetch event by ID
   static async getEventById(eventId: number): Promise<Event> {
     try {
       const response: AxiosResponse<Event> = await eventApi.get(`/events/${eventId}`);
       return response.data;
     } catch (error: any) {
       if (error.response?.status === 404) {
-        throw new Error('Evento no encontrado');
+        throw new Error('Event not found');
       }
-      throw new Error(error.response?.data?.message || 'Error al obtener evento');
+      throw new Error(error.response?.data?.message || 'Unable to fetch event');
     }
   }
 
@@ -84,18 +84,20 @@ export class EventService {
     title: string;
     description: string;
     startDate: string;
-    endDate: string;
+    endDate?: string;
     maxAttendees: number;
     ticketPrice: number;
     categoryId: number;
     locationId: number;
-    status?: 'DRAFT' | 'PUBLISHED';
+    status?: 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
+    maxTicketsPerPurchase?: number;
+    ageRestriction?: string;
   }): Promise<Event> {
     try {
-      const response: AxiosResponse<Event> = await eventApi.post('/events', eventData);
+      const response: AxiosResponse<Event> = await eventApi.post('/events/', eventData);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al crear evento');
+      throw new Error(error.response?.data?.message || 'Error creating event');
     }
   }
 
@@ -105,7 +107,7 @@ export class EventService {
       const response: AxiosResponse<Event> = await eventApi.put(`/events/${eventId}`, eventData);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al actualizar evento');
+      throw new Error(error.response?.data?.message || 'Error updating event');
     }
   }
 
@@ -114,57 +116,57 @@ export class EventService {
     try {
       await eventApi.delete(`/events/${eventId}`);
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al eliminar evento');
+      throw new Error(error.response?.data?.message || 'Error deleting event');
     }
   }
 
-  // Obtener eventos del usuario actual (organizer)
+  // Fetch events for the current organizer
   static async getMyEvents(): Promise<Event[]> {
     try {
       const response: AxiosResponse<Event[]> = await eventApi.get('/events/my-events');
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al obtener mis eventos');
+      throw new Error(error.response?.data?.message || 'Error fetching my events');
     }
   }
 
-  // Obtener categorías
+  // Fetch categories
   static async getCategories(): Promise<Category[]> {
     try {
       const response: AxiosResponse<Category[]> = await eventApi.get('/categories');
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al obtener categorías');
+      throw new Error(error.response?.data?.message || 'Error fetching categories');
     }
   }
 
-  // Obtener ubicaciones
+  // Fetch locations
   static async getLocations(): Promise<Location[]> {
     try {
       const response: AxiosResponse<Location[]> = await eventApi.get('/locations');
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al obtener ubicaciones');
+      throw new Error(error.response?.data?.message || 'Error fetching locations');
     }
   }
 
-  // Buscar eventos por texto
+  // Search events by text
   static async searchEvents(query: string): Promise<Event[]> {
     try {
       const response: AxiosResponse<Event[]> = await eventApi.get(`/events/search?q=${encodeURIComponent(query)}`);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error en la búsqueda');
+      throw new Error(error.response?.data?.message || 'Error during search');
     }
   }
 
-  // Obtener estadísticas de evento (para organizers)
-  static async getEventStatistics(eventId: number): Promise<any> {
+  // Fetch event statistics (for organizers)
+  static async getEventStatistics(eventId: number): Promise<EventStatistics> {
     try {
       const response = await eventApi.get(`/events/${eventId}/statistics`);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al obtener estadísticas');
+      throw new Error(error.response?.data?.message || 'Error fetching statistics');
     }
   }
 }

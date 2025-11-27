@@ -1,4 +1,5 @@
 from typing import Dict, Any, Optional, List
+import logging
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -6,6 +7,8 @@ from jose import jwt, JWTError
 
 from app.core.config import settings
 
+
+logger = logging.getLogger(__name__)
 
 http_bearer = HTTPBearer(auto_error=True)
 
@@ -24,9 +27,11 @@ def require_auth(credentials: HTTPAuthorizationCredentials = Depends(http_bearer
         HTTPException: If token is invalid or expired
     """
     token = credentials.credentials
+    allowed_algorithms = getattr(settings, "JWT_ALGORITHMS", [settings.JWT_ALGORITHM])
     try:
-        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
+        payload = jwt.decode(token, settings.JWT_SECRET, algorithms=allowed_algorithms)
     except JWTError as e:
+        logger.debug("JWT decode failed: %s", e)
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid or expired token: {str(e)}"

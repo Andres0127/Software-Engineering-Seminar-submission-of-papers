@@ -2,35 +2,35 @@ import requests
 import json
 
 def test_python_api():
-    """Script simple para probar la API de Python"""
+    """Simple script to test the Python API"""
     
     try:
-        print("🔍 Probando API de eventos...")
+        print("🔍 Testing events API...")
         
-        # Probar endpoint de eventos
+        # Test events endpoint
         response = requests.get("http://localhost:8000/api/events")
         
         print(f"Status Code: {response.status_code}")
         
         if response.status_code == 200:
             events = response.json()
-            print(f"✅ Eventos encontrados: {len(events)}")
+            print(f"✅ Events found: {len(events)}")
             
             if events:
-                print("\n📋 Primer evento:")
+                print("\n📋 First event details:")
                 first_event = events[0]
                 print(json.dumps(first_event, indent=2, ensure_ascii=False))
                 
-                # Verificar que tenga ID válido
+                # Check valid ID
                 event_id = first_event.get('id')
-                print(f"\n🆔 ID del primer evento: {event_id} (tipo: {type(event_id)})")
+                print(f"\n🆔 Event ID: {event_id} (type: {type(event_id)})")
             else:
-                print("⚠️  No hay eventos en la base de datos")
+                print("⚠️  No events stored in the database")
         else:
-            print(f"❌ Error en API: {response.text}")
+            print(f"❌ API error: {response.text}")
             
     except requests.exceptions.ConnectionError:
-        print("❌ No se pudo conectar al servidor Python en puerto 8000")
+        print("❌ Could not connect to the Python server on port 8000")
     except Exception as e:
         print(f"❌ Error: {e}")
 

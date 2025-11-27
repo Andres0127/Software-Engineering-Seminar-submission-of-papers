@@ -7,7 +7,8 @@ import {
   Users, 
   BarChart3, 
   Settings,
-  Plus 
+  Plus,
+  Receipt
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
@@ -19,43 +20,49 @@ export const Sidebar: React.FC = () => {
       name: 'Dashboard',
       href: '/dashboard',
       icon: Home,
-      show: user?.userType !== 'BUYER' // Buyers no ven dashboard general
+      show: user?.userType !== 'BUYER'
     },
     {
-      name: 'Eventos',
+      name: 'Events',
       href: '/events',
       icon: Calendar,
-      show: true // Todos pueden ver eventos
+      show: true
     },
     {
-      name: 'Mis Tickets',
+      name: 'My Tickets',
       href: '/tickets',
       icon: Ticket,
-      show: user?.userType === 'BUYER' || user?.userType === 'ADMIN'
+      show: user?.userType === 'BUYER'
     },
     {
-      name: 'Crear Evento',
+      name: 'My Orders',
+      href: '/orders',
+      icon: Receipt,
+      show: user?.userType === 'BUYER'
+    },
+    {
+      name: 'Create Event',
       href: '/events/create',
       icon: Plus,
       show: user?.userType === 'ORGANIZER' || user?.userType === 'ADMIN'
     },
     {
-      name: 'Mis Eventos',
+      name: 'My Events',
       href: '/organizer',
       icon: BarChart3,
       show: user?.userType === 'ORGANIZER' || user?.userType === 'ADMIN'
     },
     {
-      name: 'Usuarios',
+      name: 'Users',
       href: '/users',
       icon: Users,
       show: user?.userType === 'ADMIN'
     },
     {
-      name: 'Configuración',
+      name: 'Settings',
       href: '/settings',
       icon: Settings,
-      show: true // Todos pueden ver configuración
+      show: true
     }
   ];
 

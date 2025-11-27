@@ -1,23 +1,23 @@
-# Event Platform - Guía de Ejecución
+# Event Platform - Execution Guide
 
-Guía completa para ejecutar los backends (Java y Python) y el frontend (React) del proyecto.
-
----
-
-## 📋 Prerrequisitos
-
-Antes de comenzar, asegúrate de tener instalado:
-
-- ✅ **Java 17 o superior**
-- ✅ **Python 3.12 o superior**
-- ✅ **Node.js 16 o superior** (incluye npm)
-- ✅ **Maven** (o usar el wrapper `mvnw`)
-- ✅ **MySQL** corriendo
-- ✅ **PostgreSQL** corriendo
+Step-by-step instructions so anyone can start the Java backend, Python backend, and React frontend locally.
 
 ---
 
-## 🗄️ Configuración de Bases de Datos
+## 📋 Prerequisites
+
+Install the following before running the services:
+
+- ✅ **Java 17+**
+- ✅ **Python 3.12+**
+- ✅ **Node.js 16+ (includes npm)**
+- ✅ **Maven** (or use the bundled `mvnw` wrapper)
+- ✅ **MySQL** running locally
+- ✅ **PostgreSQL** running locally
+
+---
+
+## 🗄️ Database Setup
 
 ### MySQL (Java Backend)
 
@@ -25,10 +25,10 @@ Antes de comenzar, asegúrate de tener instalado:
 CREATE DATABASE eventplatform_auth;
 ```
 
-**Credenciales por defecto** (configurar en `java-backend/src/main/resources/application.properties`):
-- Usuario: `root`
-- Contraseña: `RootPass`
-- Puerto: `3306`
+Default credentials (adjust `java-backend/src/main/resources/application.properties` if needed):
+- User: `root`
+- Password: `*****`
+- Port: `3306`
 
 ### PostgreSQL (Python Backend)
 
@@ -36,26 +36,272 @@ CREATE DATABASE eventplatform_auth;
 CREATE DATABASE eventplatform;
 ```
 
-**Credenciales por defecto** (configurar en `python-backend/app/core/config.py` o `.env`):
-- Usuario: `postgres`
-- Contraseña: `postgres`
-- Puerto: `5432`
+Default credentials (tweak `python-backend/app/core/config.py` or `.env` if necessary):
+- User: `postgres`
+- Password: `*****`
+- Port: `5432`
+
+---
+
+## ☕ Java Backend (Spring Boot)
+
+### Location
+
+```
+Workshop-3/java-backend/
+```
+
+### Configuration
+
+- **Port**: `8081`
+- **Database**: MySQL (`eventplatform_auth`)
+- **Swagger UI**: http://localhost:8081/swagger-ui.html
+
+### Run
+
+**Windows (PowerShell/CMD):**
+
+```powershell
+cd Workshop-3/java-backend
+.\mvnw.cmd spring-boot:run
+```
+
+**Linux / macOS:**
+
+```bash
+cd Workshop-3/java-backend
+./mvnw spring-boot:run
+```
+
+**With Maven installed globally:**
+
+```bash
+cd Workshop-3/java-backend
+mvn spring-boot:run
+```
+
+### Verify
+
+- Swagger UI: http://localhost:8081/swagger-ui.html
+- API Docs: http://localhost:8081/api-docs
+
+---
+
+## 🐍 Python Backend (FastAPI)
+
+### Location
+
+```
+Workshop-3/python-backend/
+```
+
+### Configuration
+
+- **Port**: `8000`
+- **Database**: PostgreSQL (`eventplatform`)
+- **API Docs**: http://localhost:8000/docs
+
+### Run (Poetry only)
+
+```powershell
+# Install Poetry if you still need it
+pip install --user poetry
+
+cd Workshop-3/python-backend
+poetry install
+poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+Poetry isolates dependencies, so `requirements.txt` is not used for local development.
+
+### Verify
+
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+- Health check: http://localhost:8000/api/health
+
+---
+
+## ⚛️ React Frontend
+
+### Location
+
+```
+Workshop-3/react-frontend/
+```
+
+### Configuration
+
+- **Port**: `3000`
+- **Java Auth Backend**: http://localhost:8081/api
+- **Python Events Backend**: http://localhost:8000/api
+
+### Run
+
+```powershell
+cd Workshop-3/react-frontend
+npm install        # only required once
+npm start
+```
+
+This launches the dev server and opens http://localhost:3000 automatically.
+
+### Verify
+
+- App URL: http://localhost:3000
+
+---
+
+## 🔄 Run All Services Side-by-Side
+
+Open three terminal windows:
+
+### Terminal 1 – Java Backend
+
+```powershell
+cd Workshop-3/java-backend
+.\mvnw.cmd spring-boot:run
+```
+
+### Terminal 2 – Python Backend
+
+```powershell
+cd Workshop-3/python-backend
+poetry install
+poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Terminal 3 – React Frontend
+
+```powershell
+cd Workshop-3/react-frontend
+npm start
+```
+
+---
+
+## 📊 Ports Overview
+
+| Service | Port | URL |
+|---------|------|-----|
+| React frontend | 3000 | http://localhost:3000 |
+| Java backend | 8081 | http://localhost:8081 |
+| Python backend | 8000 | http://localhost:8000 |
+
+---
+
+## ⚠️ Troubleshooting
+
+### Port already in use
+
+```powershell
+# Identify conflicting processes
+netstat -ano | findstr :8081  # Java
+netstat -ano | findstr :8000  # Python
+netstat -ano | findstr :3000  # React
+
+# Terminate the blocking PID
+taskkill /PID <PID> /F
+```
+
+### Poetry issues
+
+If Poetry itself is missing or corrupted:
+
+```powershell
+pip install --user poetry
+cd Workshop-3/python-backend
+poetry install
+```
+
+### ModuleNotFoundError in Python
+
+```powershell
+cd Workshop-3/python-backend
+poetry install
+```
+
+### Cannot connect to the databases
+
+1. Ensure MySQL/PostgreSQL services are running.  
+2. Double-check the credentials inside the Java and Python configuration files.  
+3. Confirm both databases exist:
+   - MySQL: `eventplatform_auth`
+   - PostgreSQL: `eventplatform`
+
+---
+
+## 📝 Notes
+
+- **Recommended start order:**
+  1. Java backend (port 8081)
+  2. Python backend (port 8000)
+  3. React frontend (port 3000)
+
+- **Hot reloading:**
+  - React: the dev server already hot reloads UI changes
+  - Python: uvicorn with `--reload`
+  - Java: Spring Boot DevTools (if enabled in the IDE)
+# Event Platform - Execution Guide
+
+Step-by-step instructions to start both backends (Java + Python) and the React frontend so anyone can run the platform locally.
+
+---
+
+## 📋 Prerequisites
+
+Install the following before you begin:
+
+- ✅ **Java 17+**
+- ✅ **Python 3.12+**
+- ✅ **Node.js 16+ (includes npm)**
+- ✅ **Maven** (or use the `mvnw` wrapper)
+- ✅ **MySQL** running locally
+- ✅ **PostgreSQL** running locally
+
+---
+
+## 🗄️ Configuración de Bases de Datos
+
+### MySQL (Java Backend)
+
+Run:
+```sql
+CREATE DATABASE eventplatform_auth;
+```
+
+Default credentials (adjust `java-backend/src/main/resources/application.properties` if needed):
+- User: `root`
+- Password: `*****`
+- Port: `3306`
+
+### PostgreSQL (Python Backend)
+
+Run:
+```sql
+CREATE DATABASE eventplatform;
+```
+
+Default credentials (tweak `python-backend/app/core/config.py` or `.env` if necessary):
+- User: `postgres`
+- Password: `*****`
+- Port: `5432`
 
 ---
 
 ## ☕ Backend Java (Spring Boot)
 
-### Ubicación
+### Location
 ```
 Workshop-3/java-backend/
 ```
 
-### Configuración
-- **Puerto**: `8081`
-- **Base de datos**: MySQL (`eventplatform_auth`)
+### Configuration
+- **Port**: `8081`
+- **Database**: MySQL (`eventplatform_auth`)
 - **Swagger UI**: http://localhost:8081/swagger-ui.html
 
-### Ejecución
+### Run
 
 **Windows (PowerShell/CMD):**
 ```powershell
@@ -63,19 +309,19 @@ cd Workshop-3/java-backend
 .\mvnw.cmd spring-boot:run
 ```
 
-**Linux/Mac:**
+**Linux / macOS:**
 ```bash
 cd Workshop-3/java-backend
 ./mvnw spring-boot:run
 ```
 
-**Con Maven instalado:**
+**With Maven installed globally:**
 ```bash
 cd Workshop-3/java-backend
 mvn spring-boot:run
 ```
 
-### Verificar
+### Verify
 - Swagger UI: http://localhost:8081/swagger-ui.html
 - API Docs: http://localhost:8081/api-docs
 
@@ -83,72 +329,67 @@ mvn spring-boot:run
 
 ## 🐍 Backend Python (FastAPI)
 
-### Ubicación
+### Location
 ```
 Workshop-3/python-backend/
 ```
 
-### Configuración
-- **Puerto**: `8000`
-- **Base de datos**: PostgreSQL (`eventplatform`)
+### Configuration
+- **Port**: `8000`
+- **Database**: PostgreSQL (`eventplatform`)
 - **API Docs**: http://localhost:8000/docs
 
-### Ejecución
+### Run
 
-**Usando Poetry:**
-
+#### Option 1: Poetry (recommended)
 ```powershell
-# Instalar Poetry (si no está instalado)
+# Install Poetry globally if needed
 pip install poetry
 
-# Navegar al directorio
 cd Workshop-3/python-backend
-
-# Instalar dependencias
 poetry install
-
-# Ejecutar servidor (modo desarrollo)
 poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-**Nota:** Poetry gestiona automáticamente el entorno virtual. No necesitas crear ni activar un `.venv` manualmente.
+#### Option 2: Virtual environment + pip
+```bash
+cd Workshop-3/python-backend
+python -m venv .venv
+source .venv/bin/activate  # use .venv\\Scripts\\Activate.ps1 on PowerShell or .venv\\Scripts\\activate.bat on cmd
+pip install -r requirements.txt
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
 
-### Verificar
-- API Docs (Swagger): http://localhost:8000/docs
-- API Docs (ReDoc): http://localhost:8000/redoc
-- Health Check: http://localhost:8000/api/health
+### Verify
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+- Health check: http://localhost:8000/api/health
 
 ---
 
 ## ⚛️ Frontend React
 
-### Ubicación
+### Location
 ```
 Workshop-3/react-frontend/
 ```
 
-### Configuración
-- **Puerto**: `3000`
-- **Backend Java (Auth)**: http://localhost:8081/api
-- **Backend Python (Events)**: http://localhost:8000/api
+### Configuration
+- **Port**: `3000`
+- **Java Auth Backend**: http://localhost:8081/api
+- **Python Events Backend**: http://localhost:8000/api
 
-### Ejecución
-
+### Run
 ```powershell
-# Navegar al directorio
 cd Workshop-3/react-frontend
-
-# Instalar dependencias (solo la primera vez)
-npm install
-
-# Ejecutar servidor de desarrollo
+npm install        # only the first time
 npm start
 ```
 
-El servidor se iniciará automáticamente y abrirá el navegador en `http://localhost:3000`.
+This will launch the dev server and open http://localhost:3000 automatically.
 
-### Verificar
-- Aplicación: http://localhost:3000
+### Verify
+- App URL: http://localhost:3000
 
 ---
 
@@ -156,86 +397,103 @@ El servidor se iniciará automáticamente y abrirá el navegador en `http://loca
 
 Abre **tres terminales** diferentes:
 
-### Terminal 1 - Java Backend
+### Terminal 1 – Java Backend
 ```powershell
-cd Workshop-3\java-backend
+cd Workshop-3/java-backend
 .\mvnw.cmd spring-boot:run
 ```
 
-### Terminal 2 - Python Backend
+### Terminal 2 – Python Backend
+Use Poetry (recommended) or a virtual environment:
+
 ```powershell
-cd Workshop-3\python-backend
+cd Workshop-3/python-backend
+poetry install
 poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Terminal 3 - React Frontend
+If you prefer pip:
+
 ```powershell
-cd Workshop-3\react-frontend
+cd Workshop-3/python-backend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1  # or activate.bat on cmd
+pip install -r requirements.txt
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+### Terminal 3 – React Frontend
+```powershell
+cd Workshop-3/react-frontend
 npm start
 ```
 
 ---
 
-## 📊 Resumen de Puertos
+## 📊 Ports overview
 
-| Servicio | Puerto | URL |
-|----------|--------|-----|
-| React Frontend | 3000 | http://localhost:3000 |
-| Java Backend | 8081 | http://localhost:8081 |
-| Python Backend | 8000 | http://localhost:8000 |
+| Service | Port | URL |
+|---------|------|-----|
+| React frontend | 3000 | http://localhost:3000 |
+| Java backend | 8081 | http://localhost:8081 |
+| Python backend | 8000 | http://localhost:8000 |
 
 ---
 
 ## ⚠️ Solución de Problemas
 
-### Puerto ya en uso
+## ⚠️ Troubleshooting
 
-**Windows:**
+### Port already in use
+
 ```powershell
-# Buscar proceso usando el puerto
-netstat -ano | findstr :8081  # Para Java
-netstat -ano | findstr :8000  # Para Python
-netstat -ano | findstr :3000  # Para React
+# Find the PID listening on the port
+netstat -ano | findstr :8081  # Java
+netstat -ano | findstr :8000  # Python
+netstat -ano | findstr :3000  # React
 
-# Matar el proceso (reemplaza <PID> con el número encontrado)
+# Kill the process (replace <PID> with the actual number)
 taskkill /PID <PID> /F
 ```
 
-### Error: Poetry no encontrado
+### Virtual environment won't activate in PowerShell
 
 ```powershell
-# Instalar Poetry
-pip install poetry
-
-# Verificar instalación
-poetry --version
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+.\.venv\Scripts\Activate.ps1
 ```
 
-### Error: ModuleNotFoundError en Python
+### ModuleNotFoundError in Python
 
+**With Poetry:**
 ```powershell
-# Reinstalar dependencias con Poetry
 poetry install
 ```
 
-### Error: No se puede conectar a la base de datos
+**With pip:**
+```powershell
+# Activate the virtualenv first
+pip install -r requirements.txt
+```
 
-1. Verifica que MySQL/PostgreSQL estén corriendo
-2. Verifica las credenciales en los archivos de configuración
-3. Verifica que las bases de datos existan:
+### Cannot connect to the database
+
+1. Make sure MySQL/PostgreSQL services are running.  
+2. Verify credentials inside the Java and Python configuration files.  
+3. Confirm the databases exist:
    - MySQL: `eventplatform_auth`
    - PostgreSQL: `eventplatform`
 
 ---
 
-## 📝 Notas
+## 📝 Notes
 
-- **Orden recomendado para iniciar:**
-  1. Backend Java (puerto 8081)
-  2. Backend Python (puerto 8000)
-  3. Frontend React (puerto 3000)
+- **Recommended start order:**
+  1. Java backend (port 8081)
+  2. Python backend (port 8000)
+  3. React frontend (port 3000)
 
-- **Recarga automática:**
-  - React: Hot Reload automático al guardar archivos
-  - Python: Con `--reload` en uvicorn
-  - Java: Con Spring Boot DevTools (si está habilitado)
+- **Hot reloading:**
+  - React: built-in hot reload during development
+  - Python: use `--reload` when running uvicorn
+  - Java: Spring Boot DevTools reload (if enabled)

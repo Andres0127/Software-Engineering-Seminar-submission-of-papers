@@ -17,28 +17,28 @@ export const DashboardPage: React.FC = () => {
 
   const stats = [
     {
-      title: 'Total Eventos',
+      title: 'Total Events',
       value: '12',
       icon: Calendar,
       trend: '+12%',
       color: '#1e293b'
     },
     {
-      title: 'Tickets Vendidos',
+      title: 'Tickets Sold',
       value: '1,248',
       icon: Ticket,
       trend: '+28%',
       color: '#059669'
     },
     {
-      title: 'Usuarios Activos',
+      title: 'Active Users',
       value: '856',
       icon: Users,
       trend: '+15%',
       color: '#d97706'
     },
     {
-      title: 'Ubicaciones',
+      title: 'Locations',
       value: '8',
       icon: MapPin,
       trend: '+2%',
@@ -59,10 +59,10 @@ export const DashboardPage: React.FC = () => {
       }}>
         <div style={{ position: 'relative', zIndex: 1 }}>
           <h1 className="text-4xl font-bold mb-2">
-            ¡Bienvenido, {user?.name}!
+            Welcome, {user?.name}!
           </h1>
           <p style={{ fontSize: '18px', opacity: 0.9 }}>
-            Aquí tienes un resumen de tu plataforma de eventos.
+            Here is a summary of your event platform.
           </p>
           <div className="mt-4">
             <span className="badge" style={{ 
@@ -70,9 +70,9 @@ export const DashboardPage: React.FC = () => {
               color: 'var(--white)',
               textTransform: 'capitalize'
             }}>
-              {user?.userType === 'BUYER' && 'Comprador'}
-              {user?.userType === 'ORGANIZER' && 'Organizador'} 
-              {user?.userType === 'ADMIN' && 'Administrador'}
+              {user?.userType === 'BUYER' && 'Buyer'}
+              {user?.userType === 'ORGANIZER' && 'Organizer'} 
+              {user?.userType === 'ADMIN' && 'Admin'}
             </span>
           </div>
         </div>
@@ -142,14 +142,14 @@ export const DashboardPage: React.FC = () => {
             <Calendar className="w-8 h-8" style={{ color: 'var(--primary-600)' }} />
           </div>
           <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-            Gestionar Eventos
+            Manage Events
           </h3>
           <p className="text-gray-600 mb-6">
-            Crea, edita y administra tus eventos
+            Create, edit, and manage your events
           </p>
           <Link to="/events" className="btn-primary w-full">
             <Eye className="w-5 h-5 mr-2" />
-            Ver Eventos
+            View Events
           </Link>
         </div>
 
@@ -166,15 +166,15 @@ export const DashboardPage: React.FC = () => {
             <BarChart3 className="w-8 h-8" style={{ color: 'var(--success-600)' }} />
           </div>
           <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-            Reportes
+            Reports
           </h3>
           <p className="text-gray-600 mb-6">
-            Analiza el rendimiento de tus eventos
+            Analyze your events’ performance
           </p>
-          <button className="btn-secondary w-full">
-            <BarChart3 className="w-5 h-5 mr-2" />
-            Ver Reportes
-          </button>
+            <button className="btn-secondary w-full">
+              <BarChart3 className="w-5 h-5 mr-2" />
+              View Reports
+            </button>
         </div>
 
         <div className="card p-8 text-center hover:shadow-md transition-all">
@@ -190,14 +190,14 @@ export const DashboardPage: React.FC = () => {
             <Settings className="w-8 h-8 text-gray-600" />
           </div>
           <h3 className="text-2xl font-semibold text-gray-900 mb-3">
-            Configuración
+            Settings
           </h3>
           <p className="text-gray-600 mb-6">
-            Personaliza tu cuenta y preferencias
+            Personalize your account and preferences
           </p>
           <Link to="/settings" className="btn-outline w-full">
             <Settings className="w-5 h-5 mr-2" />
-            Configurar
+            Configure
           </Link>
         </div>
       </div>
@@ -215,10 +215,10 @@ export const DashboardPage: React.FC = () => {
           </div>
           <div>
             <h3 className="text-2xl font-semibold text-gray-900">
-              Información del Usuario
+              User information
             </h3>
             <p className="text-gray-600">
-              Detalles de tu cuenta y configuración
+              Account details and preferences
             </p>
           </div>
         </div>
@@ -230,18 +230,18 @@ export const DashboardPage: React.FC = () => {
               <p className="text-gray-900 font-medium">{user?.email}</p>
             </div>
             <div>
-              <span className="label">Rol</span>
+              <span className="label">Role</span>
               <p className="text-gray-900 font-medium">ROLE_ORGANIZER</p>
             </div>
           </div>
           <div className="space-y-4">
             <div>
-              <span className="label">Estado</span>
+              <span className="label">Status</span>
               <p className="text-success font-medium">ACTIVE</p>
             </div>
             {user?.organizationName && (
               <div>
-                <span className="label">Organización</span>
+                <span className="label">Organization</span>
                 <p className="text-gray-900 font-medium">{user.organizationName}</p>
               </div>
             )}

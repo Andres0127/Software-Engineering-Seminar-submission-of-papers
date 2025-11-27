@@ -1,45 +1,92 @@
-from pydantic import BaseModel, conint
 from datetime import datetime
-from typing import Optional
+from decimal import Decimal
+from enum import Enum
+from typing import List, Optional
 
-class EventBase(BaseModel):
-    name: str
-    date: datetime
-    category: str
-    capacity: conint(gt=0)
-    age_restriction: Optional[str] = None
-    max_tickets_per_purchase: conint(gt=0) = 10
-    media: Optional[str] = None
+from pydantic import BaseModel, ConfigDict, Field, conint
 
-class EventCreate(EventBase):
-    location_id: int
+from .category import CategoryResponse
+from .location import LocationResponse
+
+
+class EventStatus(str, Enum):
+    DRAFT = "DRAFT"
+    PUBLISHED = "PUBLISHED"
+    CANCELLED = "CANCELLED"
+
+
+class EventCreate(BaseModel):
+    title: str = Field(..., min_length=3)
+    description: Optional[str] = Field(None, max_length=1200)
+    startDate: datetime
+    endDate: Optional[datetime] = None
+    maxAttendees: conint(gt=0)
+    categoryId: Optional[int] = None
+    locationId: int
+    status: EventStatus = EventStatus.DRAFT
+    ticketPrice: Optional[Decimal] = None
+    maxTicketsPerPurchase: Optional[conint(gt=0)] = 10
+    ageRestriction: Optional[str] = None
+
+    class Config:
+        allow_population_by_field_name = True
+        schema_extra = {
+            "example": {
+                "title": "Innovation Summit",
+                "description": "A full-day program with talks and workshops.",
+                "startDate": "2025-12-15T09:00:00Z",
+                "endDate": "2025-12-15T17:00:00Z",
+                "maxAttendees": 250,
+                "categoryId": 1,
+                "locationId": 1,
+                "status": "DRAFT",
+                "ticketPrice": 120000,
+                "maxTicketsPerPurchase": 6,
+            }
+        }
+
 
 class EventResponse(BaseModel):
-    # Campos adaptados para el frontend React
     id: int
-    title: str  # mapeado desde 'name'
-    description: Optional[str] = "Descripción del evento"  # campo faltante
-    startDate: datetime  # mapeado desde 'date'  
-    endDate: Optional[datetime] = None  # calculado desde startDate + 2 horas
-    maxAttendees: int  # mapeado desde 'capacity'
-    ticketPrice: float = 50000.0  # precio por defecto (faltante en modelo)
-    status: str  # mapeado desde 'event_status'
-    categoryId: Optional[int] = 1  # por defecto
-    locationId: Optional[int] = None  # mapeado desde 'location_id'
-    organizerId: int  # mapeado desde 'organizer_id'
-    
-    # Campos originales del backend (opcionales)
-    name: Optional[str] = None
-    date: Optional[datetime] = None
-    category: Optional[str] = None
-    capacity: Optional[int] = None
-    event_status: Optional[str] = None
-    age_restriction: Optional[str] = None
-    max_tickets_per_purchase: Optional[int] = None
-    media: Optional[str] = None
-    organizer_id: Optional[int] = None
-    location_id: Optional[int] = None
-    created_at: Optional[datetime] = None
+    name: str
+    title: str
+    description: Optional[str] = None
+    startDate: datetime
+    endDate: Optional[datetime] = None
+    maxAttendees: int
+    ticketPrice: float = 0.0
+    status: str
+    categoryId: Optional[int] = None
+    locationId: Optional[int] = None
+    organizerId: int
+    category: Optional[CategoryResponse] = None
+    location: Optional[LocationResponse] = None
+    ageRestriction: Optional[str] = None
+    maxTicketsPerPurchase: Optional[int] = None
+    createdAt: Optional[datetime] = None
+    updatedAt: Optional[datetime] = None
 
     class Config:
         from_attributes = True
+
+
+class TicketTypeStatistics(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    ticket_type_id: int = Field(alias="ticketTypeId")
+    name: str
+    price: float
+    quantity: int
+    sold: int
+    remaining: int
+    revenue: float
+
+
+class EventStatistics(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    event_id: int = Field(alias="eventId")
+    tickets_sold: int = Field(alias="ticketsSold")
+    total_revenue: float = Field(alias="totalRevenue")
+    remaining_capacity: int = Field(alias="remainingCapacity")
+    ticket_types: List[TicketTypeStatistics] = Field(alias="ticketTypes")

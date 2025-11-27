@@ -1,0 +1,9 @@
+ALTER TABLE events
+    ADD COLUMN IF NOT EXISTS description TEXT;
+
+ALTER TABLE events
+    ADD COLUMN IF NOT EXISTS end_date TIMESTAMP;
+
+ALTER TABLE events
+    ADD COLUMN IF NOT EXISTS category_id INTEGER;
+

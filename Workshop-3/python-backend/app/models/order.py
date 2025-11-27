@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime, Enum as SQLEnum, Numeric
+from sqlalchemy import Column, String, Integer, DateTime, Numeric
 from .base import BaseModel
 
 class Order(BaseModel):
@@ -10,3 +10,6 @@ class Order(BaseModel):
     status = Column(String(20), default="pending")
     total_amount = Column(Numeric(10, 2))
     buyer_id = Column(Integer)
+    event_id = Column(Integer)
+    ticket_type_id = Column(Integer)
+    quantity = Column(Integer)

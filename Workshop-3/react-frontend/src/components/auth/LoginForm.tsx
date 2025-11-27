@@ -10,11 +10,11 @@ import { useAuthStore } from '../../store/authStore';
 const loginSchema = z.object({
   email: z
     .string()
-    .email('Ingrese un email válido')
-    .min(1, 'El email es requerido'),
+    .email('Please enter a valid email')
+    .min(1, 'Email is required'),
   password: z
     .string()
-    .min(6, 'La contraseña debe tener al menos 6 caracteres')
+    .min(6, 'Password must be at least 6 characters long')
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -34,10 +34,10 @@ export const LoginForm: React.FC = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await login(data.email, data.password);
-      toast.success('Bienvenido de vuelta');
+      toast.success('Welcome back');
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.message || 'Error al iniciar sesión');
+      toast.error(error.message || 'Unable to log in');
     }
   };
 
@@ -48,10 +48,10 @@ export const LoginForm: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              Iniciar sesión
+              Log in
             </h1>
             <p className="text-gray-600">
-              Ingrese sus credenciales para acceder
+              Enter your credentials to access your account
             </p>
           </div>
 
@@ -59,14 +59,14 @@ export const LoginForm: React.FC = () => {
             {/* Email Input */}
             <div>
               <label className="label">
-                Correo electrónico
+                Email
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   {...register('email')}
                   type="email"
-                  placeholder="correo@ejemplo.com"
+                  placeholder="name@example.com"
                   className="input pl-10"
                 />
               </div>
@@ -78,14 +78,14 @@ export const LoginForm: React.FC = () => {
             {/* Password Input */}
             <div>
               <label className="label">
-                Contraseña
+                Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   {...register('password')}
                   type="password"
-                  placeholder="Ingrese su contraseña"
+                  placeholder="Enter your password"
                   className="input pl-10"
                 />
               </div>
@@ -113,10 +113,10 @@ export const LoginForm: React.FC = () => {
                 {isLoading ? (
                   <div className="flex items-center justify-center">
                     <div className="loading-spinner mr-2"></div>
-                    Iniciando sesión...
+                    Signing in...
                   </div>
                 ) : (
-                  'Iniciar sesión'
+                  'Log in'
                 )}
               </button>
             </div>
@@ -124,13 +124,13 @@ export const LoginForm: React.FC = () => {
             {/* Register Link */}
             <div className="text-center pt-6 border-t border-gray-200">
               <p className="text-sm text-gray-600 mb-3">
-                ¿No tiene una cuenta?
+                Don't have an account yet?
               </p>
               <Link 
                 to="/register" 
                 className="btn-outline"
               >
-                Crear cuenta
+                Create an account
               </Link>
             </div>
           </form>

@@ -10,10 +10,14 @@ import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { EventsPage } from './pages/EventsPage';
 import { EventDetailPage } from './pages/EventDetailPage';
+import { CreateEventPage } from './pages/CreateEventPage';
+import { OrganizerEventsPage } from './pages/OrganizerEventsPage';
+import { CheckoutPage } from './pages/CheckoutPage';
 import { TicketPurchasePage } from './pages/TicketPurchasePage';
 import { TicketsPage } from './pages/TicketsPage';
+import { OrdersPage } from './pages/OrdersPage';
 
-// Componente para rutas protegidas por rol
+// Component that ensures routes are only accessible when the user has one of the allowed roles
 const RoleProtectedRoute: React.FC<{ 
   children: React.ReactNode; 
   allowedRoles: string[]; 
@@ -28,7 +32,7 @@ const RoleProtectedRoute: React.FC<{
   return <>{children}</>;
 };
 
-// Componente para redirección inteligente basada en rol
+// Component that redirects users based on their role
 const SmartRedirect: React.FC = () => {
   const { user } = useAuthStore();
   
@@ -49,7 +53,7 @@ function App() {
   const { checkAuth } = useAuthStore();
 
   useEffect(() => {
-    // Verificar autenticación al cargar la app
+    // Check authentication when the app loads
     checkAuth();
   }, [checkAuth]);
 
@@ -57,11 +61,11 @@ function App() {
     <div className="App">
       <Router>
         <Routes>
-          {/* Rutas públicas */}
+          {/* Public routes */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           
-          {/* Rutas protegidas */}
+          {/* Protected routes */}
           <Route
             path="/*"
             element={
@@ -70,13 +74,13 @@ function App() {
               </ProtectedRoute>
             }
           >
-            {/* Redirección inteligente basada en rol */}
+            {/* Role-based smart redirect */}
             <Route 
               index 
               element={<SmartRedirect />}
             />
             
-            {/* Dashboard solo para organizers y admins */}
+            {/* Dashboard accessible to organizers and admins */}
             <Route 
               path="dashboard" 
               element={
@@ -86,12 +90,30 @@ function App() {
               } 
             />
             
-            {/* Eventos - todos pueden ver */}
+            {/* Events – everyone can view */}
             <Route path="events" element={<EventsPage />} />
+            <Route
+              path="events/create"
+              element={
+                <RoleProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
+                  <CreateEventPage />
+                </RoleProtectedRoute>
+              }
+            />
             <Route path="events/:id" element={<EventDetailPage />} />
+            <Route path="events/:id/edit" element={<CreateEventPage />} />
             <Route path="events/:id/tickets" element={<TicketPurchasePage />} />
+            <Route path="events/:id/checkout" element={<CheckoutPage />} />
+            <Route
+              path="organizer"
+              element={
+                <RoleProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
+                  <OrganizerEventsPage />
+                </RoleProtectedRoute>
+              }
+            />
             
-            {/* Mis tickets - solo buyers y admins */}
+            {/* My tickets - restricted to buyers and admins */}
             <Route 
               path="tickets" 
               element={
@@ -100,19 +122,27 @@ function App() {
                 </RoleProtectedRoute>
               } 
             />
+            <Route 
+              path="orders" 
+              element={
+                <RoleProtectedRoute allowedRoles={['BUYER', 'ADMIN']}>
+                  <OrdersPage />
+                </RoleProtectedRoute>
+              } 
+            />
           </Route>
           
-          {/* Ruta por defecto */}
+          {/* Default route */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />
           
-          {/* Ruta 404 */}
+          {/* 404 fallback */}
           <Route 
             path="*" 
             element={
               <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: 'var(--gray-50)' }}>
                 <div className="text-center">
                   <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--gray-900)' }}>404</h1>
-                  <p style={{ color: 'var(--gray-600)' }}>Página no encontrada</p>
+                  <p style={{ color: 'var(--gray-600)' }}>Page not found</p>
                 </div>
               </div>
             } 
@@ -120,7 +150,7 @@ function App() {
         </Routes>
       </Router>
       
-      {/* Notificaciones toast */}
+      {/* Toast notifications */}
       <Toaster
         position="top-right"
         toastOptions={{

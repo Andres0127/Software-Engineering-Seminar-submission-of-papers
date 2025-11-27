@@ -4,6 +4,7 @@ from datetime import datetime
 
 Base = declarative_base()
 
+
 class BaseModel(Base):
     __abstract__ = True
 
