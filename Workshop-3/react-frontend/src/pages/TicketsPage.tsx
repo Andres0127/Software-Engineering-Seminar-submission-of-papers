@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Ticket, Calendar, MapPin, CreditCard, Download } from 'lucide-react';
+import QRCode from 'qrcode';
+import { Ticket, Calendar, MapPin, Download } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 
 import { BuyerTicket } from '../types';
@@ -9,6 +10,7 @@ export const TicketsPage: React.FC = () => {
   const [tickets, setTickets] = useState<BuyerTicket[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'upcoming' | 'past'>('all');
+  const [qrImages, setQrImages] = useState<Record<number, string>>({});
 
   useEffect(() => {
     loadUserTickets();
@@ -42,9 +44,44 @@ export const TicketsPage: React.FC = () => {
   }, [filter, tickets]);
 
   const downloadTicket = (ticket: BuyerTicket) => {
+    const qrImage = qrImages[ticket.id];
+    if (!qrImage) {
+      toast.error('QR code is still generating. Please wait a moment.');
+      return;
+    }
+
+    const link = document.createElement('a');
+    link.href = qrImage;
+    link.download = `${ticket.orderNumber || 'ticket'}-${ticket.id}.png`;
+    link.click();
     toast.success(`Downloading ticket for ${ticket.eventTitle}`);
-    // Placeholder for generating/downloading the PDF or showing the full QR
   };
+
+  useEffect(() => {
+    const generateQrImages = async () => {
+      const newImages: Record<number, string> = {};
+      await Promise.all(
+        tickets.map(async (ticket) => {
+          if (!ticket.qrCode) return;
+          try {
+            newImages[ticket.id] = await QRCode.toDataURL(ticket.qrCode, {
+              margin: 1,
+              scale: 4,
+            });
+          } catch (error) {
+            console.error('Failed to generate QR code', error);
+          }
+        })
+      );
+      if (Object.keys(newImages).length > 0) {
+        setQrImages((prev) => ({ ...prev, ...newImages }));
+      }
+    };
+
+    if (tickets.length > 0) {
+      generateQrImages();
+    }
+  }, [tickets]);
 
   if (loading) {
     return (
@@ -174,21 +211,24 @@ export const TicketsPage: React.FC = () => {
                       <span className="font-medium">{ticket.locationName || 'Location pending'}</span>
                     </div>
                   </div>
-                  <span
-                    className={
-                      ticket.status === 'confirmed'
-                        ? 'status-confirmed'
-                        : ticket.status === 'pending'
-                        ? 'status-pending'
-                        : 'status-cancelled'
-                    }
-                  >
-                    {ticket.status === 'confirmed'
-                      ? 'Confirmed'
-                      : ticket.status === 'pending'
-                      ? 'Pending'
-                      : 'Cancelled'}
-                  </span>
+                  {(() => {
+                    const statusKey = ticket.status?.toLowerCase() || '';
+                    const isConfirmed = statusKey === 'confirmed';
+                    const isPending = statusKey === 'pending';
+                    return (
+                      <span
+                        className={
+                          isConfirmed
+                            ? 'status-confirmed'
+                            : isPending
+                            ? 'status-pending'
+                            : 'status-cancelled'
+                        }
+                      >
+                        {isConfirmed ? 'Confirmed' : isPending ? 'Pending' : 'Cancelled'}
+                      </span>
+                    );
+                  })()}
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
@@ -212,12 +252,27 @@ export const TicketsPage: React.FC = () => {
                 </div>
 
                 <div className="flex items-center justify-between pt-6 border-t border-gray-200">
-                  <div className="flex items-center text-gray-500">
-                    <CreditCard className="w-4 h-4 mr-2" />
-                    <span className="text-sm">QR: {ticket.qrCode.slice(0, 10)}...</span>
+                  <div className="flex items-center gap-4">
+                    <div className="w-24 h-24 rounded-lg overflow-hidden bg-white border border-gray-200 shadow-sm">
+                      {qrImages[ticket.id] ? (
+                        <img
+                          alt="Ticket QR"
+                          src={qrImages[ticket.id]}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center text-xs text-gray-500 h-full">
+                          Generating QR
+                        </div>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium">QR code</p>
+                      <p className="text-xs text-gray-500">{ticket.qrCode?.slice(0, 20)}...</p>
+                    </div>
                   </div>
 
-                  {ticket.status === 'confirmed' && (
+                  {ticket.status?.toLowerCase() === 'confirmed' && (
                     <button
                       onClick={() => downloadTicket(ticket)}
                       className="btn-primary"

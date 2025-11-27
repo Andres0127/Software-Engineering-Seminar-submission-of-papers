@@ -11,7 +11,7 @@ from ..core.database import get_db
 from ..models.event import Event
 from ..models.order import Order
 from ..models.ticket import Ticket, TicketType
-from ..schemas.order import OrderCreate, OrderResponse
+from ..schemas.order import OrderCreate, OrderPayment, OrderResponse
 from ..utils.auth import get_current_user_id, require_buyer_or_admin
 
 router = APIRouter(prefix="/api/orders", tags=["orders"])
@@ -115,9 +115,59 @@ async def create_order(
             ticket_type_id=ticket_type.id,
             qr_code=uuid4().hex,
             order_id=order.id,
-            status="pending",
+            status="PENDING",
         )
         db.add(ticket)
+
+    db.commit()
+    db.refresh(order)
+
+    return order
+
+
+@router.post(
+    "/{order_id}/payment",
+    response_model=OrderResponse,
+    dependencies=[Depends(require_buyer_or_admin)],
+)
+async def confirm_order_payment(
+    order_id: int,
+    payment: OrderPayment,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id),
+):
+    order = db.query(Order).filter(Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.buyer_id != current_user_id:
+        raise HTTPException(status_code=403, detail="You do not have access to this order")
+
+    if order.status != "pending":
+        raise HTTPException(
+            status_code=400,
+            detail="Order payment cannot be processed again",
+        )
+
+    tickets = db.query(Ticket).filter(Ticket.order_id == order.id).all()
+
+    required_quantity = order.quantity or 0
+    missing_tickets = required_quantity - len(tickets)
+    for _ in range(max(0, missing_tickets)):
+        new_ticket = Ticket(
+            ticket_type_id=order.ticket_type_id,
+            qr_code=uuid4().hex,
+            order_id=order.id,
+            status="PENDING",
+        )
+        db.add(new_ticket)
+        tickets.append(new_ticket)
+
+    for ticket in tickets:
+        ticket.status = "CONFIRMED"
+
+    order.status = "confirmed"
+    order.expiration_date = datetime.utcnow()
 
     db.commit()
     db.refresh(order)

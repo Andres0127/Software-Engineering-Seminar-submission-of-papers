@@ -1,7 +1,9 @@
 from datetime import datetime
 from decimal import Decimal
 from typing import Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+
+from .utils import to_camel
 
 
 class TicketTypeBase(BaseModel):
@@ -11,17 +13,20 @@ class TicketTypeBase(BaseModel):
     description: Optional[str] = None
     benefits: Optional[str] = None
 
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
 
 class TicketTypeCreate(TicketTypeBase):
     event_id: int
+
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
 
 class TicketTypeResponse(TicketTypeBase):
     id: int
     event_id: int
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True, alias_generator=to_camel, populate_by_name=True)
 
 
 class TicketResponse(BaseModel):
@@ -31,8 +36,7 @@ class TicketResponse(BaseModel):
     seat_number: Optional[str] = None
     status: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True, alias_generator=to_camel, populate_by_name=True)
 
 
 class BuyerTicketResponse(BaseModel):
@@ -49,6 +53,5 @@ class BuyerTicketResponse(BaseModel):
     order_id: int
     order_number: str
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True, alias_generator=to_camel, populate_by_name=True)
 

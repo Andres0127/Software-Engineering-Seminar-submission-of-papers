@@ -1,11 +1,15 @@
 from datetime import datetime
 from decimal import Decimal
 
+from typing import Literal
+
+from .utils import to_camel
+
 from pydantic import BaseModel, ConfigDict, Field, conint
 
 
 class OrderCreate(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = ConfigDict(populate_by_name=True, alias_generator=to_camel)
 
     event_id: int = Field(..., alias="eventId")
     ticket_type_id: int = Field(..., alias="ticketTypeId")
@@ -14,7 +18,11 @@ class OrderCreate(BaseModel):
 
 
 class OrderResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        populate_by_name=True,
+        alias_generator=to_camel,
+    )
 
     id: int
     order_number: str
@@ -26,4 +34,13 @@ class OrderResponse(BaseModel):
     ticket_type_id: int | None = Field(None, alias="ticketTypeId")
     quantity: int | None = Field(None, alias="quantity")
 
+
+class OrderPayment(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
+    payment_method: Literal['CREDIT_CARD', 'DEBIT_CARD', 'PSE', 'CASH'] = Field(
+        ..., alias='paymentMethod'
+    )
+    transaction_id: str | None = Field(None, alias='transactionId')
+    payment_details: dict | None = Field(None, alias='paymentDetails')
 

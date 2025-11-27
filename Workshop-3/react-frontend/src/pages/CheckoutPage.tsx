@@ -82,11 +82,12 @@ export const CheckoutPage: React.FC = () => {
     setProcessing(true);
     try {
       for (const item of selectedItems) {
-        await TicketService.createOrder({
+        const order = await TicketService.createOrder({
           eventId: checkoutData.eventId,
           ticketTypeId: item.ticketType.id,
           quantity: item.quantity,
         });
+        await TicketService.confirmPayment(order.id, { paymentMethod: 'CREDIT_CARD' });
       }
       toast.success('Purchase recorded successfully');
       sessionStorage.removeItem('checkoutData');

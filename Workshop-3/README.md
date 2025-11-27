@@ -229,6 +229,15 @@ poetry install
    - MySQL: `eventplatform_auth`
    - PostgreSQL: `eventplatform`
 
+### Updating the ticket status enum
+
+If FastAPI raises `InvalidTextRepresentation` for `ticketstatus`, run the enum migration before restarting the backend:
+
+```powershell
+cd Workshop-3/python-backend
+psql -U postgres -d eventplatform -f scripts/08-update-ticket-status.sql
+```
+
 ---
 
 ## 📝 Notes
