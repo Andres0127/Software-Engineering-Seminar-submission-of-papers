@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import { Event, Category, Location, ApiResponse, EventStatistics } from '../types';
+import { Event, Category, Location, LocationZone, ApiResponse, EventStatistics } from '../types';
 import { AuthService } from './authService';
 
 // Configuration for Python Backend (Events)
@@ -85,12 +85,18 @@ export class EventService {
     startDate: string;
     endDate?: string;
     maxAttendees: number;
-    ticketPrice: number;
     categoryId: number;
     locationId: number;
     status?: 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
     maxTicketsPerPurchase?: number;
     ageRestriction?: string;
+    zones?: {
+      name: string;
+      price: number;
+      quantity: number;
+      description?: string;
+      benefits?: string;
+    }[];
   }): Promise<Event> {
     try {
       const response: AxiosResponse<Event> = await eventApi.post('/events/', eventData);
@@ -101,7 +107,18 @@ export class EventService {
   }
 
   // Actualizar evento (solo owner/admin)
-  static async updateEvent(eventId: number, eventData: Partial<Event>): Promise<Event> {
+  static async updateEvent(
+    eventId: number,
+    eventData: Partial<Event> & {
+      zones?: {
+        name: string;
+        price: number;
+        quantity: number;
+        description?: string;
+        benefits?: string;
+      }[];
+    }
+  ): Promise<Event> {
     try {
       const response: AxiosResponse<Event> = await eventApi.put(`/events/${eventId}`, eventData);
       return response.data;
@@ -146,6 +163,17 @@ export class EventService {
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Error fetching locations');
+    }
+  }
+
+  // Fetch zones predefined for a location
+  static async getLocationZones(locationId: number): Promise<LocationZone[]> {
+    try {
+      const response: AxiosResponse<LocationZone[]> = await eventApi.get(`/locations/${locationId}/zones`);
+      return response.data;
+    } catch (error: any) {
+      console.error('Error fetching location zones', error);
+      return [];
     }
   }
 

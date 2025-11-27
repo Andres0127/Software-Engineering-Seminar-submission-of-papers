@@ -230,3 +230,16 @@ def require_buyer_or_admin(payload: Dict[str, Any] = Depends(require_auth)) -> D
     return payload
 
 
+def require_buyer(payload: Dict[str, Any] = Depends(require_auth)) -> Dict[str, Any]:
+    """
+    Dependency to check if user is BUYER.
+    """
+    user_role = payload.get("role", "")
+    if user_role != "ROLE_BUYER":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Access denied. This endpoint requires BUYER role"
+        )
+    return payload
+
+

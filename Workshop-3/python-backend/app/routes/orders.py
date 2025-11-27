@@ -12,7 +12,7 @@ from ..models.event import Event
 from ..models.order import Order
 from ..models.ticket import Ticket, TicketType
 from ..schemas.order import OrderCreate, OrderPayment, OrderRefundRequest, OrderResponse
-from ..utils.auth import get_current_user_id, require_buyer_or_admin
+from ..utils.auth import get_current_user_id, require_buyer
 
 router = APIRouter(prefix="/api/orders", tags=["orders"])
 
@@ -37,7 +37,7 @@ def _sum_event_quantities(db: Session, event_id: int, statuses: List[str]) -> in
 @router.post(
     "/",
     response_model=OrderResponse,
-    dependencies=[Depends(require_buyer_or_admin)],
+    dependencies=[Depends(require_buyer)],
     status_code=status.HTTP_201_CREATED,
 )
 async def create_order(
@@ -128,7 +128,7 @@ async def create_order(
 @router.post(
     "/{order_id}/payment",
     response_model=OrderResponse,
-    dependencies=[Depends(require_buyer_or_admin)],
+    dependencies=[Depends(require_buyer)],
 )
 async def confirm_order_payment(
     order_id: int,
@@ -178,7 +178,7 @@ async def confirm_order_payment(
 @router.post(
     "/{order_id}/cancel",
     response_model=OrderResponse,
-    dependencies=[Depends(require_buyer_or_admin)],
+    dependencies=[Depends(require_buyer)],
 )
 async def cancel_order(
     order_id: int,
@@ -214,7 +214,7 @@ async def cancel_order(
 @router.post(
     "/{order_id}/refund",
     response_model=OrderResponse,
-    dependencies=[Depends(require_buyer_or_admin)],
+    dependencies=[Depends(require_buyer)],
 )
 async def request_order_refund(
     order_id: int,
@@ -251,7 +251,7 @@ async def request_order_refund(
 @router.get(
     "/my-orders",
     response_model=List[OrderResponse],
-    dependencies=[Depends(require_buyer_or_admin)],
+    dependencies=[Depends(require_buyer)],
 )
 async def get_my_orders(
     db: Session = Depends(get_db),

@@ -3,7 +3,9 @@ from sqlalchemy.orm import Session
 from typing import List
 from ..core.database import get_db
 from ..schemas.location import LocationCreate, LocationResponse
+from ..schemas.location_zone import LocationZoneResponse
 from ..models.location import Location
+from ..models.location_zone import LocationZone
 
 router = APIRouter(prefix="/api/locations", tags=["locations"])
 
@@ -28,5 +30,14 @@ async def get_location(location_id: int, db: Session = Depends(get_db)):
 @router.get("/", response_model=List[LocationResponse])
 async def list_locations(db: Session = Depends(get_db)):
     return db.query(Location).all()
+
+
+@router.get("/{location_id}/zones", response_model=List[LocationZoneResponse])
+async def list_location_zones(location_id: int, db: Session = Depends(get_db)):
+    return (
+        db.query(LocationZone)
+        .filter(LocationZone.location_id == location_id)
+        .all()
+    )
 
 

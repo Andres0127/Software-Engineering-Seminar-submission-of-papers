@@ -245,7 +245,7 @@ export const EventDetailPage: React.FC = () => {
         </div>
 
         {/* Main purchase button */}
-        {event.status === 'PUBLISHED' && user?.userType !== 'ADMIN' && (
+        {event.status === 'PUBLISHED' && user?.userType === 'BUYER' && (
           <div className="text-center">
             <Link
               to={`/events/${event.id}/tickets`}
@@ -297,6 +297,44 @@ export const EventDetailPage: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Ticket zones */}
+      {event.ticketTypes && event.ticketTypes.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border p-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xl font-semibold text-gray-900">Ticket zones</h3>
+            <span className="text-sm text-gray-500">
+              {event.ticketTypes.length} options
+            </span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {event.ticketTypes.map((zone) => (
+              <div
+                key={zone.id}
+                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-gray-50"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-gray-900">{zone.name}</h4>
+                  <span className="text-sm text-gray-600">
+                    {zone.quantity} seats
+                  </span>
+                </div>
+                <div className="text-3xl font-bold text-green-600 mb-1">
+                  {formatPrice(zone.price)}
+                </div>
+                <p className="text-sm text-gray-600 mb-3">
+                  {zone.description || 'No description provided.'}
+                </p>
+                {zone.benefits && (
+                  <p className="text-xs text-gray-500">
+                    <span className="font-semibold">Benefits:</span> {zone.benefits}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Final CTA */}
       {event.status === 'PUBLISHED' && user?.userType !== 'ADMIN' && (

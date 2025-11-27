@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Category, Event, Location } from '../types';
+import { Category, Event, Location, LocationZone } from '../types';
 import { EventService } from '../services/eventService';
 
 interface FormState {
@@ -10,7 +10,6 @@ interface FormState {
   startDate: string;
   endDate: string;
   maxAttendees: number;
-  ticketPrice: number;
   categoryId: string;
   locationId: string;
   status: 'DRAFT' | 'PUBLISHED' | 'CANCELLED';
@@ -24,13 +23,26 @@ const INITIAL_FORM: FormState = {
   startDate: '',
   endDate: '',
   maxAttendees: 50,
-  ticketPrice: 120000,
   categoryId: '',
   locationId: '',
   status: 'DRAFT',
   maxTicketsPerPurchase: 10,
   ageRestriction: '',
 };
+
+interface ZoneForm {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+  description: string;
+  benefits: string;
+}
+
+const createZoneId = () =>
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
 
 const toDateInputValue = (value: string) => {
   if (!value) return '';
@@ -50,6 +62,18 @@ export const CreateEventPage: React.FC = () => {
   const { id } = useParams<{ id?: string }>();
   const eventId = id ? parseInt(id, 10) : undefined;
   const isEditMode = !!eventId;
+  const createZone = (overrides: Partial<ZoneForm> = {}): ZoneForm => ({
+    id: createZoneId(),
+    name: 'General Admission',
+    price: 0,
+    quantity: form.maxAttendees,
+    description: '',
+    benefits: '',
+    ...overrides,
+  });
+  const [zones, setZones] = useState<ZoneForm[]>([createZone()]);
+  const [locationZoneTemplates, setLocationZoneTemplates] = useState<LocationZone[]>([]);
+  const [templateLocationId, setTemplateLocationId] = useState<string>('');
 
   const isLoading = metaLoading || eventLoading;
 
@@ -74,6 +98,32 @@ export const CreateEventPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    if (!form.locationId) {
+      setLocationZoneTemplates([]);
+      setTemplateLocationId('');
+      return;
+    }
+
+    let cancelled = false;
+    EventService.getLocationZones(Number(form.locationId))
+      .then((data) => {
+        if (!cancelled) {
+          setLocationZoneTemplates(data);
+        }
+      })
+      .catch((error: any) => {
+        console.error('Unable to load location zones', error);
+        if (!cancelled) {
+          setLocationZoneTemplates([]);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [form.locationId]);
+
+  useEffect(() => {
     if (!eventId) return;
 
     const loadEvent = async () => {
@@ -86,13 +136,24 @@ export const CreateEventPage: React.FC = () => {
           startDate: toDateInputValue(eventData.startDate),
           endDate: eventData.endDate ? toDateInputValue(eventData.endDate) : '',
           maxAttendees: eventData.maxAttendees,
-          ticketPrice: eventData.ticketPrice,
           categoryId: eventData.categoryId?.toString() || '',
           locationId: eventData.locationId?.toString() || '',
           status: eventData.status as FormState['status'],
           maxTicketsPerPurchase: eventData.maxTicketsPerPurchase ?? 10,
           ageRestriction: eventData.ageRestriction || '',
         });
+        setZones(
+          eventData.ticketTypes && eventData.ticketTypes.length > 0
+            ? eventData.ticketTypes.map((ticketType) => ({
+                id: ticketType.id.toString(),
+                name: ticketType.name,
+                price: ticketType.price,
+                quantity: ticketType.quantity,
+                description: ticketType.description || '',
+                benefits: ticketType.benefits || '',
+              }))
+            : [createZone({ quantity: eventData.maxAttendees })]
+        );
       } catch (error: any) {
         console.error('Error loading event', error);
         toast.error('Unable to load the event for editing');
@@ -103,6 +164,35 @@ export const CreateEventPage: React.FC = () => {
 
     loadEvent();
   }, [eventId]);
+
+  useEffect(() => {
+    if (isEditMode) return;
+    const locationId = form.locationId;
+    if (!locationId) {
+      setZones([createZone()]);
+      setTemplateLocationId('');
+      return;
+    }
+
+    if (locationId === templateLocationId) return;
+
+    if (locationZoneTemplates.length > 0) {
+      setZones(
+        locationZoneTemplates.map((template) => ({
+          id: createZoneId(),
+          name: template.name,
+          price: template.price,
+          quantity: template.quantity,
+          description: template.description || '',
+          benefits: template.benefits || '',
+        }))
+      );
+    } else {
+      setZones([createZone()]);
+    }
+
+    setTemplateLocationId(locationId);
+  }, [locationZoneTemplates, form.locationId, isEditMode, templateLocationId]);
 
   const statusOptions = useMemo(
     () => ['DRAFT', 'PUBLISHED', 'CANCELLED'],
@@ -115,11 +205,38 @@ export const CreateEventPage: React.FC = () => {
     const { name, value } = event.target;
     setForm((prev) => ({
       ...prev,
-      [name]:
-        name === 'maxAttendees' || name === 'ticketPrice'
+        [name]:
+        name === 'maxAttendees' || name === 'maxTicketsPerPurchase'
           ? Number(value)
           : value,
     }));
+  };
+
+  const updateZoneField = (zoneId: string, field: keyof ZoneForm, value: string | number) => {
+    setZones((prev) =>
+      prev.map((zone) =>
+        zone.id === zoneId
+          ? {
+              ...zone,
+              [field]:
+                field === 'price' || field === 'quantity'
+                  ? Number(value)
+                  : value,
+            }
+          : zone
+      )
+    );
+  };
+
+  const addZone = () => {
+    setZones((prev) => [
+      ...prev,
+      createZone({ name: `Zone ${prev.length + 1}` }),
+    ]);
+  };
+
+  const removeZone = (zoneId: string) => {
+    setZones((prev) => (prev.length > 1 ? prev.filter((zone) => zone.id !== zoneId) : prev));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -133,18 +250,26 @@ export const CreateEventPage: React.FC = () => {
     setSaving(true);
     setSaving(true);
 
+    const zonePayloads = zones.map((zone) => ({
+      name: zone.name,
+      price: zone.price,
+      quantity: zone.quantity,
+      description: zone.description || undefined,
+      benefits: zone.benefits || undefined,
+    }));
+
     const payload = {
       title: form.title,
       description: form.description,
       startDate: form.startDate ? new Date(form.startDate).toISOString() : new Date().toISOString(),
       endDate: form.endDate ? new Date(form.endDate).toISOString() : undefined,
       maxAttendees: form.maxAttendees,
-      ticketPrice: form.ticketPrice,
       categoryId: Number(form.categoryId),
       locationId: Number(form.locationId),
       status: form.status,
       maxTicketsPerPurchase: form.maxTicketsPerPurchase,
       ageRestriction: form.ageRestriction,
+      zones: zonePayloads,
     };
 
     try {
@@ -259,7 +384,7 @@ export const CreateEventPage: React.FC = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <label className="label" htmlFor="maxAttendees">Capacity</label>
             <input
@@ -268,20 +393,6 @@ export const CreateEventPage: React.FC = () => {
               type="number"
               value={form.maxAttendees}
               min={10}
-              onChange={handleChange}
-              className="input"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="label" htmlFor="ticketPrice">Ticket Price (COP)</label>
-            <input
-              id="ticketPrice"
-              name="ticketPrice"
-              type="number"
-              value={form.ticketPrice}
-              min={0}
               onChange={handleChange}
               className="input"
               required
@@ -300,6 +411,101 @@ export const CreateEventPage: React.FC = () => {
               className="input"
               required
             />
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900">Ticket zones</h3>
+              <p className="text-gray-600 text-sm">
+                Define each zone (e.g., VIP, General) with price and capacity.
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={addZone}
+              className="btn-outline text-sm"
+            >
+              Add zone
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {zones.map((zone, index) => (
+              <div
+                key={zone.id}
+                className="border border-gray-200 rounded-lg p-4 bg-gray-50 space-y-3"
+              >
+                <div className="flex items-center justify-between">
+                  <p className="font-semibold text-gray-900">
+                    Zone {index + 1}
+                  </p>
+                  {zones.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeZone(zone.id)}
+                      className="text-xs text-red-500 hover:underline"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="label">Name</label>
+                    <input
+                      type="text"
+                      value={zone.name}
+                      onChange={(e) => updateZoneField(zone.id, 'name', e.target.value)}
+                      className="input"
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Price (COP)</label>
+                    <input
+                      type="number"
+                      min={0}
+                      value={zone.price}
+                      onChange={(e) => updateZoneField(zone.id, 'price', e.target.value)}
+                      className="input"
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Quantity</label>
+                    <input
+                      type="number"
+                      min={1}
+                      value={zone.quantity}
+                      onChange={(e) => updateZoneField(zone.id, 'quantity', e.target.value)}
+                      className="input"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="label">Description</label>
+                    <textarea
+                      value={zone.description}
+                      onChange={(e) => updateZoneField(zone.id, 'description', e.target.value)}
+                      className="input"
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Benefits</label>
+                    <textarea
+                      value={zone.benefits}
+                      onChange={(e) => updateZoneField(zone.id, 'benefits', e.target.value)}
+                      className="input"
+                      rows={2}
+                    />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

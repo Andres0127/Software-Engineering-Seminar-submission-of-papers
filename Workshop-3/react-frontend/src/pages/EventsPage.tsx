@@ -359,12 +359,14 @@ export const EventsPage: React.FC = () => {
                 >
                   View details
                 </Link>
-                <Link
-                  to={`/events/${event.id || 'unknown'}/tickets`}
-                  className="btn-primary"
-                >
-                  Buy
-                </Link>
+                {user?.userType === 'BUYER' && (
+                  <Link
+                    to={`/events/${event.id || 'unknown'}/tickets`}
+                    className="btn-primary"
+                  >
+                    Buy
+                  </Link>
+                )}
               </div>
             </div>
           </div>

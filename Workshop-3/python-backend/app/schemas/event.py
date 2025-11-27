@@ -7,12 +7,21 @@ from pydantic import BaseModel, ConfigDict, Field, conint
 
 from .category import CategoryResponse
 from .location import LocationResponse
+from .ticket import TicketTypeResponse
 
 
 class EventStatus(str, Enum):
     DRAFT = "DRAFT"
     PUBLISHED = "PUBLISHED"
     CANCELLED = "CANCELLED"
+
+
+class TicketZonePayload(BaseModel):
+    name: str
+    price: Decimal
+    quantity: conint(gt=0)
+    description: Optional[str] = None
+    benefits: Optional[str] = None
 
 
 class EventCreate(BaseModel):
@@ -27,6 +36,7 @@ class EventCreate(BaseModel):
     ticketPrice: Optional[Decimal] = None
     maxTicketsPerPurchase: Optional[conint(gt=0)] = 10
     ageRestriction: Optional[str] = None
+    zones: Optional[List[TicketZonePayload]] = Field(None)
 
     class Config:
         allow_population_by_field_name = True
@@ -65,13 +75,14 @@ class EventResponse(BaseModel):
     maxTicketsPerPurchase: Optional[int] = None
     createdAt: Optional[datetime] = None
     updatedAt: Optional[datetime] = None
+    ticketTypes: List['TicketTypeResponse'] = Field(default_factory=list, alias='ticketTypes')
 
     class Config:
         from_attributes = True
 
 
 class TicketTypeStatistics(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     ticket_type_id: int = Field(alias="ticketTypeId")
     name: str
@@ -83,7 +94,7 @@ class TicketTypeStatistics(BaseModel):
 
 
 class EventStatistics(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     event_id: int = Field(alias="eventId")
     tickets_sold: int = Field(alias="ticketsSold")

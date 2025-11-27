@@ -48,6 +48,16 @@ export interface Location {
   capacity: number;
 }
 
+export interface LocationZone {
+  id: number;
+  locationId: number;
+  name: string;
+  price: number;
+  quantity: number;
+  description?: string;
+  benefits?: string;
+}
+
 export interface Event {
   id: number;
   title: string;
@@ -64,6 +74,7 @@ export interface Event {
   location?: Location;
   ageRestriction?: string;
   maxTicketsPerPurchase?: number;
+  ticketTypes?: TicketType[];
 }
 
 // Ticket and order types

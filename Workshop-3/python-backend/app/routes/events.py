@@ -13,7 +13,14 @@ from ..models.location import Location
 from ..models.order import Order
 from ..models.ticket import Ticket, TicketType
 from ..schemas.category import CategoryResponse
-from ..schemas.event import EventCreate, EventResponse, EventStatistics, EventStatus, TicketTypeStatistics
+from ..schemas.event import (
+    EventCreate,
+    EventResponse,
+    EventStatistics,
+    EventStatus,
+    TicketTypeStatistics,
+    TicketZonePayload,
+)
 from ..schemas.location import LocationResponse
 from ..schemas.ticket import TicketTypeResponse
 from ..utils.auth import (
@@ -60,6 +67,44 @@ def _validate_event_dates(start_date: datetime, end_date: Optional[datetime]) ->
     return end_date or (start_date + timedelta(hours=2))
 
 
+def _get_ticket_types_for_event(db: Session, event_id: int) -> List[TicketTypeResponse]:
+    ticket_types = (
+        db.query(TicketType)
+        .filter(TicketType.event_id == event_id)
+        .order_by(TicketType.price.asc())
+        .all()
+    )
+    return [TicketTypeResponse.model_validate(ticket) for ticket in ticket_types]
+
+
+def _has_event_orders(db: Session, event_id: int) -> bool:
+    count = (
+        db.query(func.count(Order.id))
+        .filter(Order.event_id == event_id)
+        .scalar()
+    )
+    return bool(count)
+
+
+def _sync_ticket_types(
+    db: Session, event: Event, zones: List[TicketZonePayload]
+) -> None:
+    db.query(TicketType).filter(TicketType.event_id == event.id).delete(
+        synchronize_session=False
+    )
+    for zone in zones:
+        ticket_type = TicketType(
+            name=zone.name.strip() or "General Admission",
+            price=zone.price,
+            quantity=zone.quantity,
+            description=zone.description,
+            benefits=zone.benefits,
+            event_id=event.id,
+        )
+        db.add(ticket_type)
+    db.flush()
+
+
 def _build_event_response(event: Event, db: Session) -> EventResponse:
     category = None
     location = None
@@ -72,14 +117,9 @@ def _build_event_response(event: Event, db: Session) -> EventResponse:
         location = db.query(Location).filter(Location.id == event.location_id).first()
 
     ticket_price = 0.0
-    ticket_type = (
-        db.query(TicketType)
-        .filter(TicketType.event_id == event.id)
-        .order_by(TicketType.price.asc())
-        .first()
-    )
-    if ticket_type and ticket_type.price is not None:
-        ticket_price = float(ticket_type.price)
+    ticket_types = _get_ticket_types_for_event(db, event.id)
+    if ticket_types:
+        ticket_price = min((tt.price for tt in ticket_types if tt.price is not None), default=0.0)
 
     location_capacity = location.capacity if location and location.capacity is not None else 0
     max_attendees = event.capacity or location_capacity or 0
@@ -104,6 +144,7 @@ def _build_event_response(event: Event, db: Session) -> EventResponse:
         maxTicketsPerPurchase=getattr(event, "max_tickets_per_purchase", None),
         createdAt=event.created_at,
         updatedAt=event.updated_at,
+        ticketTypes=ticket_types,
     )
 
 
@@ -155,22 +196,26 @@ async def create_event(
     )
 
     db.add(db_event)
+    db.flush()
+
+    zones = payload.zones or []
+    if not zones and payload.ticketPrice is not None:
+        ticket_quantity = payload.maxAttendees or (location.capacity if location else 0) or 1
+        zones = [
+            TicketZonePayload(
+                name="General Admission",
+                price=payload.ticketPrice,
+                quantity=ticket_quantity,
+                description=payload.description or "General admission ticket",
+                benefits="",
+            )
+        ]
+
+    if zones:
+        _sync_ticket_types(db, db_event, zones)
+
     db.commit()
     db.refresh(db_event)
-
-    if payload.ticketPrice is not None:
-        ticket_quantity = payload.maxAttendees or (location.capacity if location else 0) or 1
-        ticket_type = TicketType(
-            name="General Admission",
-            price=payload.ticketPrice,
-            quantity=ticket_quantity,
-            description=payload.description or "General admission ticket",
-            benefits="",
-            event_id=db_event.id,
-        )
-        db.add(ticket_type)
-        db.commit()
-        db.refresh(ticket_type)
 
     return _build_event_response(db_event, db)
 
@@ -284,6 +329,14 @@ async def list_events(
         ticket_type.quantity = payload.maxAttendees or ticket_type.quantity
         ticket_type.description = payload.description or ticket_type.description
 
+    if payload.zones:
+        if _has_event_orders(db, event.id):
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot update ticket zones after sales have started.",
+            )
+        _sync_ticket_types(db, event, payload.zones)
+
     db.commit()
     db.refresh(event)
 
@@ -341,10 +394,13 @@ async def get_event(event_id: int, db: Session = Depends(get_db)):
     return _build_event_response(event, db)
 
 
-@router.put("/{event_id}", response_model=EventResponse)
-async def update_event(
+@router.get(
+    "/{event_id}/statistics",
+    response_model=EventStatistics,
+    dependencies=[Depends(require_organizer_or_admin)],
+)
+async def get_event_statistics(
     event_id: int,
-    payload: EventCreate,
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user_id),
     current_user_role: str = Depends(get_current_user_role),
@@ -394,7 +450,7 @@ async def update_event(
 
         ticket_stats.append(
             TicketTypeStatistics(
-                ticket_type_id=ticket_type.id,
+                ticketTypeId=ticket_type.id,
                 name=ticket_type.name,
                 price=float(ticket_type.price or 0),
                 quantity=ticket_type.quantity,
@@ -411,6 +467,48 @@ async def update_event(
         remaining_capacity=int(remaining_capacity),
         ticket_types=ticket_stats,
     )
+
+
+@router.put("/{event_id}", response_model=EventResponse)
+async def update_event(
+    event_id: int,
+    payload: EventCreate,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id),
+    current_user_role: str = Depends(get_current_user_role),
+):
+    event = db.query(Event).filter(Event.id == event_id).first()
+    if not event:
+        raise HTTPException(status_code=404, detail="Event not found")
+
+    if current_user_role != "ROLE_ADMIN" and event.organizer_id != current_user_id:
+        raise HTTPException(
+            status_code=403,
+            detail="Access denied. You can only view statistics for your own events.",
+        )
+
+    event.name = payload.title.strip()
+    event.description = payload.description
+    event.date = payload.startDate
+    event.end_date = payload.endDate
+    event.capacity = payload.maxAttendees
+    event.location_id = payload.locationId
+    event.event_status = _normalize_status(payload.status.value)
+    event.age_restriction = payload.ageRestriction
+    event.max_tickets_per_purchase = payload.maxTicketsPerPurchase or 10
+
+    if payload.zones:
+        if _has_event_orders(db, event.id):
+            raise HTTPException(
+                status_code=400,
+                detail="Cannot update ticket zones after sales have started.",
+            )
+        _sync_ticket_types(db, event, payload.zones)
+
+    db.commit()
+    db.refresh(event)
+
+    return _build_event_response(event, db)
 
 
 @router.get("/{event_id}/tickets", response_model=List[TicketTypeResponse])

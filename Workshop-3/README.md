@@ -306,6 +306,15 @@ Default credentials (tweak `python-backend/app/core/config.py` or `.env` if nece
 - Password: `*****`
 - Port: `5432`
 
+To work with location-specific zones, run the new migration:
+
+```powershell
+cd Workshop-3/python-backend
+psql -U postgres -d eventplatform -f scripts/10-create-location-zones.sql
+```
+
+The backend exposes `GET /api/locations/{location_id}/zones` so the frontend can fetch each venue's predefined zone templates.
+
 ---
 
 ## ☕ Backend Java (Spring Boot)

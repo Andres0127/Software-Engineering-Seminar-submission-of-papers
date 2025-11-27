@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Calendar, Users, BarChart3, Ticket } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -26,6 +26,7 @@ export const OrganizerEventsPage: React.FC = () => {
   const [eventStats, setEventStats] = useState<Record<number, EventStatistics>>({});
   const [actionLoading, setActionLoading] = useState<number | null>(null);
   const [statsLoading, setStatsLoading] = useState(false);
+  const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -44,41 +45,41 @@ export const OrganizerEventsPage: React.FC = () => {
     loadEvents();
   }, []);
 
-  useEffect(() => {
+  const loadStats = useCallback(async () => {
     if (events.length === 0) {
       setEventStats({});
       return;
     }
 
-    let cancelled = false;
+    setStatsLoading(true);
+    const map: Record<number, EventStatistics> = {};
 
-    const loadStats = async () => {
-      setStatsLoading(true);
-      const map: Record<number, EventStatistics> = {};
+    await Promise.all(
+      events.map(async (event) => {
+        try {
+          const stats = await EventService.getEventStatistics(event.id);
+          map[event.id] = stats;
+        } catch (error) {
+          console.error('Error fetching event statistics', error);
+        }
+      })
+    );
 
-      await Promise.all(
-        events.map(async (event) => {
-          try {
-            const stats = await EventService.getEventStatistics(event.id);
-            map[event.id] = stats;
-          } catch (error) {
-            console.error('Error fetching event statistics', error);
-          }
-        })
-      );
-
-      if (!cancelled) {
-        setEventStats(map);
-        setStatsLoading(false);
-      }
-    };
-
-    loadStats();
-
-    return () => {
-      cancelled = true;
-    };
+    setEventStats(map);
+    setLastRefresh(new Date());
+    setStatsLoading(false);
   }, [events]);
+
+  useEffect(() => {
+    loadStats();
+  }, [loadStats]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      loadStats();
+    }, 15000);
+    return () => clearInterval(interval);
+  }, [loadStats]);
 
   const refreshEvents = async () => {
     try {
@@ -168,7 +169,7 @@ export const OrganizerEventsPage: React.FC = () => {
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="flex flex-wrap gap-3 items-center justify-between">
         {stats.map((stat) => (
           <div key={stat.title} className="card p-6">
             <div className="flex items-center justify-between">
@@ -180,6 +181,11 @@ export const OrganizerEventsPage: React.FC = () => {
             </div>
           </div>
         ))}
+        <div className="text-xs text-gray-500 italic">
+          {lastRefresh
+            ? `Last updated: ${lastRefresh.toLocaleTimeString()}`
+            : 'Updating stats...'}
+        </div>
       </div>
 
       <div className="space-y-4">
@@ -228,14 +234,14 @@ export const OrganizerEventsPage: React.FC = () => {
                       <span className="label">Start</span>
                       <p>{formatDate(event.startDate)}</p>
                     </div>
-                    <div className="space-y-1">
-                      <span className="label">Location</span>
-                      <p>{event.location?.name || 'Location pending'}</p>
-                    </div>
-                    <div className="space-y-1">
-                      <span className="label">Capacity</span>
-                      <p>{event.maxAttendees} people</p>
-                    </div>
+            <div className="space-y-1">
+              <span className="label">Location</span>
+              <p>{event.location?.name || 'Location pending'}</p>
+            </div>
+            <div className="space-y-1">
+              <span className="label">Capacity</span>
+              <p>{event.maxAttendees} people</p>
+            </div>
                   </div>
 
                   {eventStat ? (
@@ -261,18 +267,37 @@ export const OrganizerEventsPage: React.FC = () => {
                     </p>
                   )}
 
-                  {eventStat?.ticketTypes?.length ? (
-                    <div className="border border-dashed border-gray-200 rounded-lg p-4">
-                      <p className="text-xs uppercase text-gray-500 mb-2">Lead ticket type</p>
-                      <p className="font-semibold text-gray-900">{eventStat.ticketTypes[0].name}</p>
-                      <p className="text-sm text-gray-600">
-                        Sold: {eventStat.ticketTypes[0].sold} / {eventStat.ticketTypes[0].quantity}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Revenue: {formatCurrency(eventStat.ticketTypes[0].revenue)}
-                      </p>
-                    </div>
-                  ) : null}
+                    {eventStat?.ticketTypes?.length ? (
+                      <div className="border border-dashed border-gray-200 rounded-lg p-4 space-y-3">
+                        <p className="text-xs uppercase text-gray-500">Sales by zone</p>
+                        <div className="overflow-auto">
+                          <table className="w-full text-left text-sm text-gray-700">
+                            <thead>
+                              <tr className="text-xs uppercase tracking-wide text-gray-500">
+                                <th className="px-2 py-1">Zone</th>
+                                <th className="px-2 py-1">Price</th>
+                                <th className="px-2 py-1">Sold</th>
+                                <th className="px-2 py-1">Remaining</th>
+                                <th className="px-2 py-1">Revenue</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {eventStat.ticketTypes.map((zone) => (
+                                <tr key={zone.ticketTypeId} className="border-t border-gray-100">
+                                  <td className="px-2 py-2 font-semibold">{zone.name}</td>
+                                  <td className="px-2 py-2">{formatCurrency(zone.price)}</td>
+                                  <td className="px-2 py-2">{zone.sold}</td>
+                                  <td className="px-2 py-2">{zone.remaining}</td>
+                                  <td className="px-2 py-2 text-success">
+                                    {formatCurrency(zone.revenue)}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    ) : null}
 
                   <div className="flex items-center justify-between">
                     <Link to={`/events/${event.id}`} className="btn-outline">
