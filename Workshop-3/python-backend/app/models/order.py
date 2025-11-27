@@ -13,3 +13,4 @@ class Order(BaseModel):
     event_id = Column(Integer)
     ticket_type_id = Column(Integer)
     quantity = Column(Integer)
+    refund_reason = Column(String(500))

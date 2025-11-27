@@ -33,6 +33,7 @@ class OrderResponse(BaseModel):
     event_id: int | None = Field(None, alias="eventId")
     ticket_type_id: int | None = Field(None, alias="ticketTypeId")
     quantity: int | None = Field(None, alias="quantity")
+    refund_reason: str | None = Field(None, alias="refundReason")
 
 
 class OrderPayment(BaseModel):
@@ -43,4 +44,10 @@ class OrderPayment(BaseModel):
     )
     transaction_id: str | None = Field(None, alias='transactionId')
     payment_details: dict | None = Field(None, alias='paymentDetails')
+
+
+class OrderRefundRequest(BaseModel):
+    model_config = ConfigDict(populate_by_name=True, alias_generator=to_camel)
+
+    reason: str = Field(..., alias="reason")
 

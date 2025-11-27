@@ -9,10 +9,14 @@ import toast from 'react-hot-toast';
 export const EventsPage: React.FC = () => {
   const [events, setEvents] = useState<Event[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
+    search: '',
     categoryId: '',
+    locationId: '',
     startDate: '',
+    endDate: '',
     maxPrice: ''
   });
   const { user } = useAuthStore();
@@ -23,13 +27,15 @@ export const EventsPage: React.FC = () => {
         setLoading(true);
         
         // Load events and categories in parallel
-        const [eventsData, categoriesData] = await Promise.all([
+        const [eventsData, categoriesData, locationsData] = await Promise.all([
           EventService.getEvents(),
-          EventService.getCategories()
+          EventService.getCategories(),
+          EventService.getLocations()
         ]);
-        
+
         setEvents(eventsData);
         setCategories(categoriesData);
+        setLocations(locationsData);
       } catch (error: any) {
         console.error('Error loading data:', error);
         toast.error('Unable to load events. Showing curated samples.');
@@ -82,6 +88,11 @@ export const EventsPage: React.FC = () => {
           }
         ]);
 
+        setLocations([
+          { id: 1, name: 'Innovation Hall', address: '123 Tech Blvd, Boston, MA 02110', capacity: 800 },
+          { id: 2, name: 'Summit Center', address: '450 Business Way, Chicago, IL 60601', capacity: 600 },
+          { id: 3, name: 'Harmony Garden', address: '89 Concert Avenue, Austin, TX 73301', capacity: 400 }
+        ]);
         setCategories([
           { id: 1, name: 'Technology', description: 'Conferences about emerging technology and innovation.' },
           { id: 2, name: 'Business', description: 'Summits covering strategy, finance, and leadership.' },
@@ -99,9 +110,12 @@ export const EventsPage: React.FC = () => {
     try {
       setLoading(true);
       const filteredEvents = await EventService.getEvents({
+        search: filters.search || undefined,
         categoryId: filters.categoryId ? parseInt(filters.categoryId) : undefined,
+        locationId: filters.locationId ? parseInt(filters.locationId) : undefined,
         startDate: filters.startDate || undefined,
-        // Note: maxPrice filter would need to be implemented in backend
+        endDate: filters.endDate || undefined,
+        maxPrice: filters.maxPrice ? Number(filters.maxPrice) : undefined
       });
       setEvents(filteredEvents);
     } catch (error: any) {
@@ -109,6 +123,18 @@ export const EventsPage: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      search: '',
+      categoryId: '',
+      locationId: '',
+      startDate: '',
+      endDate: '',
+      maxPrice: ''
+    });
+    handleFilterChange();
   };
 
   const formatDate = (dateString: string) => {
@@ -170,63 +196,97 @@ export const EventsPage: React.FC = () => {
       </div>
 
       {/* Filtros */}
-      <div className="card p-8">
-        <div className="mb-6">
+      <div className="card p-8 space-y-6">
+        <div>
           <h3 className="text-2xl font-semibold text-gray-900 mb-2">Filter events</h3>
           <p className="text-gray-600">Find exactly what you're looking for</p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div>
-            <label className="label">
-              Category
-            </label>
-            <select 
+            <label className="label">Search</label>
+            <input
+              type="search"
+              placeholder="Keywords, titles, venues..."
+              value={filters.search}
+              onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+              className="input"
+            />
+          </div>
+          <div>
+            <label className="label">Location</label>
+            <select
+              value={filters.locationId}
+              onChange={(e) => setFilters((prev) => ({ ...prev, locationId: e.target.value }))}
+              className="select"
+            >
+              <option value="">All locations</option>
+              {locations.map((location) => (
+                <option key={location.id} value={location.id.toString()}>
+                  {location.name}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label className="label">Category</label>
+            <select
               value={filters.categoryId}
-              onChange={(e) => setFilters(prev => ({ ...prev, categoryId: e.target.value }))}
+              onChange={(e) => setFilters((prev) => ({ ...prev, categoryId: e.target.value }))}
               className="select"
             >
               <option value="">All categories</option>
-              {categories.map(category => (
+              {categories.map((category) => (
                 <option key={category.id} value={category.id.toString()}>
                   {category.name}
                 </option>
               ))}
             </select>
           </div>
-          
+
           <div>
-            <label className="label">
-              Date
-            </label>
+            <label className="label">Start date</label>
             <input
               type="date"
               value={filters.startDate}
-              onChange={(e) => setFilters(prev => ({ ...prev, startDate: e.target.value }))}
+              onChange={(e) => setFilters((prev) => ({ ...prev, startDate: e.target.value }))}
               className="input"
             />
           </div>
-          
+
           <div>
-            <label className="label">
-              Max price
-            </label>
+            <label className="label">End date</label>
+            <input
+              type="date"
+              value={filters.endDate}
+              onChange={(e) => setFilters((prev) => ({ ...prev, endDate: e.target.value }))}
+              className="input"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label className="label">Max price</label>
             <input
               type="number"
               placeholder="Enter amount"
               value={filters.maxPrice}
-              onChange={(e) => setFilters(prev => ({ ...prev, maxPrice: e.target.value }))}
+              onChange={(e) => setFilters((prev) => ({ ...prev, maxPrice: e.target.value }))}
               className="input"
             />
           </div>
-          
-          <div className="flex items-end">
-          <button 
-            onClick={handleFilterChange}
-            className="btn-primary w-full"
-          >
-            Filter
-          </button>
+
+          <div className="md:col-span-2 flex items-end gap-3">
+            <button onClick={handleFilterChange} className="btn-primary w-full">
+              Filter
+            </button>
+            <button onClick={handleClearFilters} className="btn-outline w-full">
+              Clear filters
+            </button>
           </div>
         </div>
       </div>

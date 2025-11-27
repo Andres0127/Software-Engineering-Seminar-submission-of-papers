@@ -120,6 +120,16 @@ Poetry isolates dependencies, so `requirements.txt` is not used for local develo
 - ReDoc: http://localhost:8000/redoc
 - Health check: http://localhost:8000/api/health
 
+### Order cancellation and refunds
+
+- `POST /api/orders/{id}/cancel` — cancels pending orders and invalidates linked tickets.
+- `POST /api/orders/{id}/refund` — accepts a `reason`, marks confirmed orders as refund requested, and cancels tickets (helpful for US-4.2/4.3).
+- If you are resuming a database that predates the refund column, run:
+
+```powershell
+psql -U postgres -d eventplatform -f scripts/09-add-refund-reason.sql
+```
+
 ---
 
 ## ⚛️ React Frontend

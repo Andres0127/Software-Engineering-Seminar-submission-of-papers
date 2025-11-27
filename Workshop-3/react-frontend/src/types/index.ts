@@ -87,6 +87,7 @@ export interface Order {
   eventId?: number;
   ticketTypeId?: number;
   quantity?: number;
+  refundReason?: string;
 }
 
 export interface TicketTypeStats {

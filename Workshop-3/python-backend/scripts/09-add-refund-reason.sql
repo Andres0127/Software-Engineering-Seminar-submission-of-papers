@@ -1,0 +1,7 @@
+BEGIN;
+
+ALTER TABLE orders
+    ADD COLUMN IF NOT EXISTS refund_reason TEXT;
+
+COMMIT;
+

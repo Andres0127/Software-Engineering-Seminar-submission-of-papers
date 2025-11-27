@@ -11,7 +11,7 @@ from ..models.category import Category
 from ..models.event import Event
 from ..models.location import Location
 from ..models.order import Order
-from ..models.ticket import TicketType
+from ..models.ticket import Ticket, TicketType
 from ..schemas.category import CategoryResponse
 from ..schemas.event import EventCreate, EventResponse, EventStatistics, EventStatus, TicketTypeStatistics
 from ..schemas.location import LocationResponse
@@ -182,6 +182,8 @@ async def list_events(
     category_id: Optional[int] = Query(None, alias="categoryId"),
     location_id: Optional[int] = Query(None, alias="locationId"),
     start_date: Optional[datetime] = Query(None, alias="startDate"),
+    end_date: Optional[datetime] = Query(None, alias="endDate"),
+    max_price: Decimal | None = Query(None, alias="maxPrice"),
     status: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=50),
@@ -198,11 +200,23 @@ async def list_events(
     if start_date:
         query = query.filter(Event.date >= start_date)
 
+    if end_date:
+        query = query.filter(Event.date <= end_date)
+
     if search:
         search_term = f"%{search}%"
         query = query.filter(
             or_(Event.name.ilike(search_term), Event.description.ilike(search_term))
         )
+
+    if max_price is not None:
+        subquery = (
+            db.query(TicketType.event_id)
+            .filter(TicketType.price <= max_price)
+            .distinct()
+            .subquery()
+        )
+        query = query.filter(Event.id.in_(subquery))
 
     events = (
         query.order_by(Event.date.asc())

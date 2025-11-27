@@ -41,6 +41,7 @@ export class EventService {
     locationId?: number;
     startDate?: string;
     endDate?: string;
+    maxPrice?: number;
     status?: string;
     search?: string;
     page?: number;
@@ -55,11 +56,9 @@ export class EventService {
           }
         });
       }
-      
-      const response: AxiosResponse<Event[]> = await eventApi.get(
-        `/events?${params.toString()}`
-      );
-      
+
+      const query = params.toString() ? `?${params.toString()}` : '';
+      const response: AxiosResponse<Event[]> = await eventApi.get(`/events${query}`);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Unable to fetch events');

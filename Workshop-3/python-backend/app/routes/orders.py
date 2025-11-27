@@ -11,7 +11,7 @@ from ..core.database import get_db
 from ..models.event import Event
 from ..models.order import Order
 from ..models.ticket import Ticket, TicketType
-from ..schemas.order import OrderCreate, OrderPayment, OrderResponse
+from ..schemas.order import OrderCreate, OrderPayment, OrderRefundRequest, OrderResponse
 from ..utils.auth import get_current_user_id, require_buyer_or_admin
 
 router = APIRouter(prefix="/api/orders", tags=["orders"])
@@ -168,6 +168,79 @@ async def confirm_order_payment(
 
     order.status = "confirmed"
     order.expiration_date = datetime.utcnow()
+
+    db.commit()
+    db.refresh(order)
+
+    return order
+
+
+@router.post(
+    "/{order_id}/cancel",
+    response_model=OrderResponse,
+    dependencies=[Depends(require_buyer_or_admin)],
+)
+async def cancel_order(
+    order_id: int,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id),
+):
+    order = db.query(Order).filter(Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.buyer_id != current_user_id:
+        raise HTTPException(status_code=403, detail="You do not have access to this order")
+
+    if (order.status or "").upper() != "PENDING":
+        raise HTTPException(
+            status_code=400,
+            detail="Only pending orders can be cancelled",
+        )
+
+    tickets = db.query(Ticket).filter(Ticket.order_id == order.id).all()
+    for ticket in tickets:
+        ticket.status = "CANCELLED"
+
+    order.status = "CANCELLED"
+    order.refund_reason = None
+
+    db.commit()
+    db.refresh(order)
+
+    return order
+
+
+@router.post(
+    "/{order_id}/refund",
+    response_model=OrderResponse,
+    dependencies=[Depends(require_buyer_or_admin)],
+)
+async def request_order_refund(
+    order_id: int,
+    payload: OrderRefundRequest,
+    db: Session = Depends(get_db),
+    current_user_id: int = Depends(get_current_user_id),
+):
+    order = db.query(Order).filter(Order.id == order_id).first()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    if order.buyer_id != current_user_id:
+        raise HTTPException(status_code=403, detail="You do not have access to this order")
+
+    if (order.status or "").upper() != "CONFIRMED":
+        raise HTTPException(
+            status_code=400,
+            detail="Only confirmed orders can be refunded",
+        )
+
+    tickets = db.query(Ticket).filter(Ticket.order_id == order.id).all()
+    for ticket in tickets:
+        ticket.status = "CANCELLED"
+
+    order.status = "REFUND_REQUESTED"
+    order.refund_reason = payload.reason.strip()
 
     db.commit()
     db.refresh(order)
