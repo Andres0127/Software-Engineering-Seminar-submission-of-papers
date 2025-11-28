@@ -23,5 +23,3 @@ def get_db():
 
 def init_db() -> None:
     Base.metadata.create_all(bind=engine)
-
-

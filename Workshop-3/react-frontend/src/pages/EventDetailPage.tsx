@@ -31,7 +31,7 @@ export const EventDetailPage: React.FC = () => {
   useEffect(() => {
     const fetchEvent = async () => {
       if (!id) {
-        setError('ID de evento no válido');
+      setError('Invalid event ID');
         setLoading(false);
         return;
       }
@@ -41,8 +41,8 @@ export const EventDetailPage: React.FC = () => {
         const eventData = await EventService.getEventById(parseInt(id));
         setEvent(eventData);
       } catch (err: any) {
-        setError(err.message);
-        toast.error(err.message);
+          setError(err.message);
+          toast.error(err.message);
       } finally {
         setLoading(false);
       }
@@ -53,7 +53,7 @@ export const EventDetailPage: React.FC = () => {
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString('es-ES', {
+    return date.toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
@@ -63,20 +63,20 @@ export const EventDetailPage: React.FC = () => {
   };
 
   const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('es-CO', {
+    return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'COP'
     }).format(price);
   };
 
   const handleDeleteEvent = async () => {
-    if (!event || !window.confirm('¿Estás seguro de que quieres eliminar este evento?')) {
+    if (!event || !window.confirm('Are you sure you want to delete this event?')) {
       return;
     }
 
     try {
       await EventService.deleteEvent(event.id);
-      toast.success('Evento eliminado correctamente');
+      toast.success('Event deleted successfully');
       navigate('/organizer');
     } catch (err: any) {
       toast.error(err.message);
@@ -97,7 +97,7 @@ export const EventDetailPage: React.FC = () => {
     } else {
       // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
-      toast.success('Enlace copiado al portapapeles');
+      toast.success('Link copied to clipboard');
     }
   };
 
@@ -119,14 +119,14 @@ export const EventDetailPage: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            {error || 'Evento no encontrado'}
+            {error || 'Event not found'}
           </h1>
           <Link
             to="/events"
             className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
-            <span>Volver a eventos</span>
+            <span>Back to events</span>
           </Link>
         </div>
       </div>
@@ -135,24 +135,24 @@ export const EventDetailPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      {/* Navegación superior */}
+      {/* Top navigation */}
       <div className="flex items-center justify-between">
         <Link
           to="/events"
           className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Volver a eventos</span>
+          <span>Back to events</span>
         </Link>
 
         <div className="flex items-center space-x-3">
-          <button
-            onClick={handleShareEvent}
-            className="inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <Share2 className="w-4 h-4" />
-            <span>Compartir</span>
-          </button>
+            <button
+              onClick={handleShareEvent}
+              className="inline-flex items-center space-x-2 px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              <Share2 className="w-4 h-4" />
+              <span>Share</span>
+            </button>
 
           {canEditEvent && (
             <div className="flex space-x-2">
@@ -161,7 +161,7 @@ export const EventDetailPage: React.FC = () => {
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
               >
                 <Edit className="w-4 h-4" />
-                <span>Editar</span>
+                <span>Edit</span>
               </Link>
               
               <button
@@ -169,14 +169,14 @@ export const EventDetailPage: React.FC = () => {
                 className="inline-flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
               >
                 <Trash2 className="w-4 h-4" />
-                <span>Eliminar</span>
+                <span>Delete</span>
               </button>
             </div>
           )}
         </div>
       </div>
 
-      {/* Header del evento */}
+        {/* Event header */}
       <div className="bg-white rounded-lg shadow-sm border p-8">
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
@@ -191,8 +191,8 @@ export const EventDetailPage: React.FC = () => {
                   ? 'bg-yellow-100 text-yellow-800'
                   : 'bg-red-100 text-red-800'
               }`}>
-                {event.status === 'PUBLISHED' ? 'Publicado' : 
-                 event.status === 'DRAFT' ? 'Borrador' : 'Cancelado'}
+                {event.status === 'PUBLISHED' ? 'Published' : 
+                 event.status === 'DRAFT' ? 'Draft' : 'Canceled'}
               </span>
             </div>
             
@@ -205,16 +205,16 @@ export const EventDetailPage: React.FC = () => {
             <div className="text-3xl font-bold text-green-600 mb-2">
               {formatPrice(event.ticketPrice)}
             </div>
-            <div className="text-sm text-gray-600">por persona</div>
+            <div className="text-sm text-gray-600">per person</div>
           </div>
         </div>
 
-        {/* Información clave del evento */}
+        {/* Key event information */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div className="flex items-center space-x-3">
             <Calendar className="w-6 h-6 text-blue-600" />
             <div>
-              <div className="font-medium text-gray-900">Fecha de inicio</div>
+              <div className="font-medium text-gray-900">Start date</div>
               <div className="text-sm text-gray-600">{formatDate(event.startDate)}</div>
             </div>
           </div>
@@ -222,7 +222,7 @@ export const EventDetailPage: React.FC = () => {
           <div className="flex items-center space-x-3">
             <Clock className="w-6 h-6 text-blue-600" />
             <div>
-              <div className="font-medium text-gray-900">Fecha de fin</div>
+              <div className="font-medium text-gray-900">End date</div>
               <div className="text-sm text-gray-600">{formatDate(event.endDate)}</div>
             </div>
           </div>
@@ -238,29 +238,29 @@ export const EventDetailPage: React.FC = () => {
           <div className="flex items-center space-x-3">
             <Users className="w-6 h-6 text-blue-600" />
             <div>
-              <div className="font-medium text-gray-900">Capacidad</div>
-              <div className="text-sm text-gray-600">{event.maxAttendees} personas</div>
+              <div className="font-medium text-gray-900">Capacity</div>
+              <div className="text-sm text-gray-600">{event.maxAttendees} people</div>
             </div>
           </div>
         </div>
 
-        {/* Botón de compra principal */}
-        {event.status === 'PUBLISHED' && user?.userType !== 'ADMIN' && (
+        {/* Main purchase button */}
+        {event.status === 'PUBLISHED' && user?.userType === 'BUYER' && (
           <div className="text-center">
             <Link
               to={`/events/${event.id}/tickets`}
               className="inline-flex items-center space-x-3 bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
             >
               <ShoppingCart className="w-6 h-6" />
-              <span>Comprar Tickets</span>
+              <span>Buy tickets</span>
             </Link>
           </div>
         )}
       </div>
 
-      {/* Descripción del evento */}
+      {/* Event description */}
       <div className="bg-white rounded-lg shadow-sm border p-8">
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Sobre este evento</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-6">About this event</h2>
         <div className="prose prose-gray max-w-none">
           <p className="text-gray-700 leading-relaxed whitespace-pre-line">
             {event.description}
@@ -268,49 +268,87 @@ export const EventDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Información adicional */}
+      {/* Additional information */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Ubicación */}
+        {/* Location */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
             <MapPin className="w-6 h-6 mr-2 text-blue-600" />
-            Ubicación
+            Location
           </h3>
           <div className="space-y-2">
             <div className="font-medium text-gray-900">{event.location?.name}</div>
             <div className="text-gray-600">{event.location?.address}</div>
             <div className="text-sm text-gray-500">
-              Capacidad: {event.location?.capacity} personas
+              Capacity: {event.location?.capacity} attendees
             </div>
           </div>
         </div>
 
-        {/* Organizador */}
+        {/* Organizer */}
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
             <Users className="w-6 h-6 mr-2 text-blue-600" />
-            Organizador
+            Organizer
           </h3>
           <div className="space-y-2">
-            <div className="font-medium text-gray-900">Organizador #{event.organizerId}</div>
-            <div className="text-gray-600">Información de contacto disponible tras la compra</div>
+            <div className="font-medium text-gray-900">Organizer #{event.organizerId}</div>
+            <div className="text-gray-600">Contact information available after purchase</div>
           </div>
         </div>
       </div>
 
-      {/* CTA final */}
+      {/* Ticket zones */}
+      {event.ticketTypes && event.ticketTypes.length > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border p-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-2xl font-semibold text-gray-900">Ticket zones</h3>
+            <span className="text-sm text-gray-500">
+              {event.ticketTypes.length} options
+            </span>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {event.ticketTypes.map((zone) => (
+              <div
+                key={zone.id}
+                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-gray-50"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <h4 className="font-semibold text-gray-900">{zone.name}</h4>
+                  <span className="text-sm text-gray-600">
+                    {zone.quantity} seats
+                  </span>
+                </div>
+                <div className="text-3xl font-bold text-green-600 mb-1">
+                  {formatPrice(zone.price)}
+                </div>
+                <p className="text-sm text-gray-600 mb-3">
+                  {zone.description || 'No description provided.'}
+                </p>
+                {zone.benefits && (
+                  <p className="text-xs text-gray-500">
+                    <span className="font-semibold">Benefits:</span> {zone.benefits}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Final CTA */}
       {event.status === 'PUBLISHED' && user?.userType !== 'ADMIN' && (
         <div className="bg-blue-50 rounded-lg p-8 text-center">
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">¿Listo para asistir?</h3>
+          <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to attend?</h3>
           <p className="text-gray-600 mb-6">
-            Únete a este increíble evento y vive una experiencia única
+            Join this amazing event and live an unforgettable experience
           </p>
           <Link
             to={`/events/${event.id}/tickets`}
             className="inline-flex items-center space-x-3 bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
           >
             <ShoppingCart className="w-6 h-6" />
-            <span>Comprar Tickets Ahora</span>
+            <span>Buy tickets now</span>
           </Link>
         </div>
       )}

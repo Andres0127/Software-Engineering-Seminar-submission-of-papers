@@ -10,25 +10,25 @@ import { useAuthStore } from '../../store/authStore';
 const registerSchema = z.object({
   name: z
     .string()
-    .min(2, 'El nombre debe tener al menos 2 caracteres')
-    .max(100, 'El nombre es muy largo'),
+    .min(2, 'Name must have at least 2 characters')
+    .max(100, 'Name is too long'),
   email: z
     .string()
-    .email('Ingrese un email válido')
-    .min(1, 'El email es requerido'),
+    .email('Please enter a valid email')
+    .min(1, 'Email is required'),
   password: z
     .string()
-    .min(8, 'La contraseña debe tener al menos 8 caracteres')
-    .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-    .regex(/[a-z]/, 'Debe contener al menos una minúscula')
-    .regex(/[0-9]/, 'Debe contener al menos un número')
-    .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un carácter especial'),
+    .min(8, 'Password must have at least 8 characters')
+    .regex(/[A-Z]/, 'Include at least one uppercase letter')
+    .regex(/[a-z]/, 'Include at least one lowercase letter')
+    .regex(/[0-9]/, 'Include at least one number')
+    .regex(/[^A-Za-z0-9]/, 'Include at least one special character'),
   confirmPassword: z.string(),
   userType: z.string(),
   phoneNumber: z.string().optional(),
   organizationName: z.string().optional()
 }).refine(data => data.password === data.confirmPassword, {
-  message: 'Las contraseñas no coinciden',
+  message: 'Passwords do not match',
   path: ['confirmPassword']
 });
 
@@ -56,10 +56,10 @@ export const RegisterForm: React.FC = () => {
     try {
       const { confirmPassword, ...registerData } = data;
       await registerUser(registerData);
-      toast.success('Cuenta creada exitosamente');
+      toast.success('Account created successfully');
       navigate('/dashboard');
     } catch (error: any) {
-      toast.error(error.message || 'Error al crear la cuenta');
+      toast.error(error.message || 'Error creating the account');
     }
   };
 
@@ -70,10 +70,10 @@ export const RegisterForm: React.FC = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <h1 className="text-2xl font-semibold text-gray-900 mb-2">
-              Crear cuenta
+              Create account
             </h1>
             <p className="text-gray-600">
-              Complete la información para registrarse
+              Fill in the information to sign up
             </p>
           </div>
 
@@ -81,14 +81,14 @@ export const RegisterForm: React.FC = () => {
             {/* Name Input */}
             <div>
               <label className="label">
-                Nombre completo
+                Full name
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   {...register('name')}
                   type="text"
-                  placeholder="Ingrese su nombre completo"
+                  placeholder="Enter your full name"
                   className="input pl-10"
                 />
               </div>
@@ -100,14 +100,14 @@ export const RegisterForm: React.FC = () => {
             {/* Email Input */}
             <div>
               <label className="label">
-                Correo electrónico
+                Email address
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   {...register('email')}
                   type="email"
-                  placeholder="correo@ejemplo.com"
+                  placeholder="email@example.com"
                   className="input pl-10"
                 />
               </div>
@@ -119,14 +119,14 @@ export const RegisterForm: React.FC = () => {
             {/* Password Input */}
             <div>
               <label className="label">
-                Contraseña
+                Password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   {...register('password')}
                   type="password"
-                  placeholder="Mínimo 8 caracteres"
+                  placeholder="Minimum 8 characters"
                   className="input pl-10"
                 />
               </div>
@@ -138,14 +138,14 @@ export const RegisterForm: React.FC = () => {
             {/* Confirm Password Input */}
             <div>
               <label className="label">
-                Confirmar contraseña
+                Confirm password
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   {...register('confirmPassword')}
                   type="password"
-                  placeholder="Repita su contraseña"
+                  placeholder="Repeat your password"
                   className="input pl-10"
                 />
               </div>
@@ -157,7 +157,7 @@ export const RegisterForm: React.FC = () => {
             {/* Phone Input */}
             <div>
               <label className="label">
-                Teléfono <span className="text-muted">(opcional)</span>
+                Phone <span className="text-muted">(optional)</span>
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
@@ -176,15 +176,15 @@ export const RegisterForm: React.FC = () => {
             {/* User Type Select */}
             <div>
               <label className="label">
-                Tipo de usuario
+                User type
               </label>
               <select
                 {...register('userType')}
                 className="select"
               >
-                <option value="BUYER">Comprador de tickets</option>
-                <option value="ORGANIZER">Organizador de eventos</option>
-                <option value="ADMIN">Administrador</option>
+                <option value="BUYER">Ticket buyer</option>
+                <option value="ORGANIZER">Event organizer</option>
+                <option value="ADMIN">Admin</option>
               </select>
             </div>
 
@@ -192,14 +192,14 @@ export const RegisterForm: React.FC = () => {
             {userType === 'ORGANIZER' && (
               <div className="animate-fadeIn">
                 <label className="label">
-                  Nombre de la organización
+                  Organization name
                 </label>
                 <div className="relative">
                   <Building className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     {...register('organizationName')}
                     type="text"
-                    placeholder="Nombre de su empresa u organización"
+                  placeholder="Your company or organization name"
                     className="input pl-10"
                   />
                 </div>
@@ -217,12 +217,12 @@ export const RegisterForm: React.FC = () => {
                 className="btn-primary w-full"
               >
                 {isLoading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="loading-spinner mr-2"></div>
-                    Creando cuenta...
-                  </div>
+                    <div className="flex items-center justify-center">
+                      <div className="loading-spinner mr-2"></div>
+                      Creating account...
+                    </div>
                 ) : (
-                  'Crear cuenta'
+                  'Create account'
                 )}
               </button>
             </div>
@@ -230,13 +230,13 @@ export const RegisterForm: React.FC = () => {
             {/* Login Link */}
             <div className="text-center pt-6 border-t border-gray-200">
               <p className="text-sm text-gray-600 mb-3">
-                ¿Ya tiene una cuenta?
+                Already have an account?
               </p>
               <Link 
                 to="/login" 
                 className="btn-outline"
               >
-                Iniciar sesión
+                Log in
               </Link>
             </div>
           </form>

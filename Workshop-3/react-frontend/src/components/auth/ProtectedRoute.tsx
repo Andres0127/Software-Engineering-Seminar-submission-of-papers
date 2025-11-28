@@ -15,7 +15,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   const location = useLocation();
   const { isAuthenticated, user, isLoading } = useAuthStore();
 
-  // Mostrar loading mientras se verifica la autenticación
+  // Show loading indicator while authentication is being verified
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -24,21 +24,21 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
-  // Redirigir al login si no está autenticado
+  // Redirect to login if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 
-  // Verificar rol si es requerido
+  // Verify role if required
   if (requiredRole && user?.role !== requiredRole) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-secondary-50">
         <div className="text-center p-8">
           <h2 className="text-2xl font-bold text-secondary-900 mb-2">
-            Acceso Denegado
+            Access Denied
           </h2>
           <p className="text-secondary-600">
-            No tienes permisos para acceder a esta página.
+            You do not have permission to access this page.
           </p>
         </div>
       </div>

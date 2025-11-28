@@ -16,10 +16,10 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   const handleLogout = async () => {
     try {
       await logout();
-      toast.success('Sesión cerrada exitosamente');
+      toast.success('Logged out successfully');
       navigate('/login');
     } catch (error) {
-      toast.error('Error al cerrar sesión');
+      toast.error('Error during logout');
     }
   };
 
@@ -79,9 +79,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                       {user.name}
                     </span>
                     <span className="text-xs text-gray-500">
-                      {user.userType === 'BUYER' && 'Comprador'}
-                      {user.userType === 'ORGANIZER' && 'Organizador'}
-                      {user.userType === 'ADMIN' && 'Administrador'}
+                      {user.userType === 'BUYER' && 'Buyer'}
+                      {user.userType === 'ORGANIZER' && 'Organizer'}
+                      {user.userType === 'ADMIN' && 'Admin'}
                     </span>
                   </div>
                   <ChevronDown className={`w-4 h-4 text-gray-500 transition-transform ${isUserMenuOpen ? 'rotate-180' : ''}`} />
@@ -114,7 +114,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           >
                             <User className="w-4 h-4 mr-3" />
-                            Mi Perfil
+                            My Profile
                           </Link>
                           <Link
                             to="/settings"
@@ -122,7 +122,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                           >
                             <Settings className="w-4 h-4 mr-3" />
-                            Configuración
+                            Settings
                           </Link>
                         </div>
 
@@ -136,7 +136,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                             className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
                           >
                             <LogOut className="w-4 h-4 mr-3" />
-                            Cerrar Sesión
+                            Log out
                           </button>
                         </div>
                       </div>

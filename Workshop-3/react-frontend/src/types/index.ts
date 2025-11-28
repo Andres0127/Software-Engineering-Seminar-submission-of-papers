@@ -1,4 +1,4 @@
-// Tipos de usuario y autenticación
+// User and authentication types
 export interface User {
   id: number;
   name: string;
@@ -34,7 +34,7 @@ export interface AuthResponse {
   expiresIn: number;
 }
 
-// Tipos de eventos y categorías
+// Event and category types
 export interface Category {
   id: number;
   name: string;
@@ -46,6 +46,16 @@ export interface Location {
   name: string;
   address: string;
   capacity: number;
+}
+
+export interface LocationZone {
+  id: number;
+  locationId: number;
+  name: string;
+  price: number;
+  quantity: number;
+  description?: string;
+  benefits?: string;
 }
 
 export interface Event {
@@ -62,9 +72,12 @@ export interface Event {
   organizerId: number;
   category?: Category;
   location?: Location;
+  ageRestriction?: string;
+  maxTicketsPerPurchase?: number;
+  ticketTypes?: TicketType[];
 }
 
-// Tipos de tickets y órdenes
+// Ticket and order types
 export interface TicketType {
   id: number;
   name: string;
@@ -79,12 +92,49 @@ export interface Order {
   id: number;
   orderNumber: string;
   purchaseDate: string;
-  status: 'PENDING' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED';
+  status: 'PENDING' | 'CONFIRMED' | 'COMPLETED' | 'CANCELLED' | 'REFUNDED';
   totalAmount: number;
   buyerId: number;
+  eventId?: number;
+  ticketTypeId?: number;
+  quantity?: number;
+  refundReason?: string;
 }
 
-// Tipos de API
+export interface TicketTypeStats {
+  ticketTypeId: number;
+  name: string;
+  price: number;
+  quantity: number;
+  sold: number;
+  remaining: number;
+  revenue: number;
+}
+
+export interface EventStatistics {
+  eventId: number;
+  ticketsSold: number;
+  totalRevenue: number;
+  remainingCapacity: number;
+  ticketTypes: TicketTypeStats[];
+}
+
+export interface BuyerTicket {
+  id: number;
+  qrCode: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | string;
+  ticketTypeId: number;
+  ticketTypeName: string;
+  ticketPrice: number;
+  eventId: number;
+  eventTitle: string;
+  eventStart: string;
+  locationName?: string;
+  orderId: number;
+  orderNumber: string;
+}
+
+// API types
 export interface ApiResponse<T> {
   data: T;
   message?: string;
@@ -97,7 +147,7 @@ export interface ApiError {
   timestamp: string;
 }
 
-// Tipos de formularios
+// Form state definitions
 export interface FormState {
   isSubmitting: boolean;
   error?: string;

@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 
 /**
  * Register Request DTO
@@ -25,7 +26,11 @@ public class RegisterRequest {
     @Email(message = "Email must be valid")
     private String email;
 
-    @Pattern(regexp = "^\\+?[1-9]\\d{1,14}$", message = "Invalid phone number format")
+    @Pattern(
+        regexp = "^$|^\\+?[1-9]\\d{1,14}$", 
+        message = "Invalid phone number format. Use E.164 format (e.g., +573001234567) or leave empty"
+    )
+    @Length(max = 20, message = "Phone number must not exceed 20 characters")
     private String phoneNumber;
 
     @NotBlank(message = "Password is required")

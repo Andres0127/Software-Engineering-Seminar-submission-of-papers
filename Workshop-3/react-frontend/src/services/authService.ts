@@ -1,7 +1,7 @@
 import axios, { AxiosResponse } from 'axios';
 import { LoginRequest, RegisterRequest, AuthResponse, User } from '../types';
 
-// Configuración base de axios
+// Base axios configuration
 const API_BASE_URL = 'http://localhost:8081/api'; // Backend Java (Auth)
 
 const authApi = axios.create({
@@ -11,7 +11,7 @@ const authApi = axios.create({
   },
 });
 
-// Interceptor para agregar token a las requests
+// Interceptor to attach the auth token to requests
 authApi.interceptors.request.use((config) => {
   const token = localStorage.getItem('authToken');
   if (token) {
@@ -20,12 +20,12 @@ authApi.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor para manejar respuestas y errores
+// Interceptor to handle responses and errors
 authApi.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expirado o inválido
+      // Token expired or invalid
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       window.location.href = '/login';
@@ -40,7 +40,7 @@ export class AuthService {
     try {
       const response = await authApi.post('/auth/login', credentials);
       
-      // Adaptamos la respuesta del backend Java al formato esperado por el frontend
+      // Normalize the Java backend response to the frontend format
       const backendData = response.data;
       const adaptedResponse: AuthResponse = {
         token: backendData.token,
@@ -59,7 +59,7 @@ export class AuthService {
         expiresIn: backendData.expiresIn || 86400000
       };
       
-      // Guardar token y usuario en localStorage
+      // Persist token and user in localStorage
       if (adaptedResponse.token) {
         localStorage.setItem('authToken', adaptedResponse.token);
         localStorage.setItem('user', JSON.stringify(adaptedResponse.user));
@@ -67,7 +67,7 @@ export class AuthService {
       
       return adaptedResponse;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error en el login');
+      throw new Error(error.response?.data?.message || 'Error during login');
     }
   }
 
@@ -76,7 +76,7 @@ export class AuthService {
     try {
       const response = await authApi.post('/auth/register', userData);
       
-      // Adaptamos la respuesta del backend Java al formato esperado por el frontend
+      // Normalize the Java backend response to the frontend format
       const backendData = response.data;
       const adaptedResponse: AuthResponse = {
         token: backendData.token,
@@ -95,7 +95,7 @@ export class AuthService {
         expiresIn: backendData.expiresIn || 86400000
       };
       
-      // Auto-login después del registro
+      // Auto-login after registration
       if (adaptedResponse.token) {
         localStorage.setItem('authToken', adaptedResponse.token);
         localStorage.setItem('user', JSON.stringify(adaptedResponse.user));
@@ -103,17 +103,17 @@ export class AuthService {
       
       return adaptedResponse;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error en el registro');
+      throw new Error(error.response?.data?.message || 'Error during registration');
     }
   }
 
-  // Obtener usuario actual
+  // Fetch the current user
   static async getCurrentUser(): Promise<User> {
     try {
       const response: AxiosResponse<User> = await authApi.get('/auth/me');
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al obtener usuario');
+      throw new Error(error.response?.data?.message || 'Error fetching current user');
     }
   }
 
@@ -124,23 +124,23 @@ export class AuthService {
     } catch (error) {
       // Ignorar errores de logout del servidor
     } finally {
-      // Limpiar storage local siempre
+      // Always clear local storage
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
     }
   }
 
-  // Verificar si el usuario está autenticado
+  // Check if the user is authenticated
   static isAuthenticated(): boolean {
     return !!localStorage.getItem('authToken');
   }
 
-  // Obtener token del localStorage
+  // Retrieve token from localStorage
   static getToken(): string | null {
     return localStorage.getItem('authToken');
   }
 
-  // Obtener usuario del localStorage
+  // Retrieve stored user from localStorage
   static getStoredUser(): User | null {
     const userStr = localStorage.getItem('user');
     if (userStr) {

@@ -35,23 +35,11 @@ export const TicketPurchasePage: React.FC = () => {
         
         const [eventData, ticketTypesData] = await Promise.all([
           EventService.getEventById(parseInt(id)),
-          TicketService.getTicketTypes(parseInt(id)).catch(() => [])
+          TicketService.getTicketTypes(parseInt(id)),
         ]);
         
         setEvent(eventData);
         setTicketTypes(ticketTypesData);
-        
-        // Si no hay tipos de tickets específicos, crear uno básico
-        if (ticketTypesData.length === 0 && eventData) {
-          setTicketTypes([{
-            id: 1,
-            name: 'Ticket General',
-            price: eventData.ticketPrice,
-            quantity: eventData.maxAttendees,
-            description: 'Entrada general al evento',
-            eventId: eventData.id
-          }]);
-        }
         
       } catch (error: any) {
         toast.error(error.message);
@@ -65,7 +53,7 @@ export const TicketPurchasePage: React.FC = () => {
   }, [id, navigate]);
 
   useEffect(() => {
-    // Calcular total
+    // Calculate total
     const total = Object.entries(selectedTickets).reduce((sum, [ticketTypeId, quantity]) => {
       const ticketType = ticketTypes.find(t => t.id === parseInt(ticketTypeId));
       return sum + (ticketType ? ticketType.price * quantity : 0);
@@ -76,7 +64,7 @@ export const TicketPurchasePage: React.FC = () => {
   const updateTicketQuantity = async (ticketTypeId: number, newQuantity: number) => {
     if (newQuantity < 0) return;
     
-    // Si es mayor a 0, verificar disponibilidad
+    // When selecting more than zero, verify availability
     if (newQuantity > 0) {
       try {
         const availability = await TicketService.checkTicketAvailability(
@@ -90,7 +78,7 @@ export const TicketPurchasePage: React.FC = () => {
           return;
         }
       } catch (error) {
-        // Si falla la verificación, permitir por ahora
+        // If the check fails, allow it temporarily
         console.warn('No se pudo verificar disponibilidad');
       }
     }
@@ -106,6 +94,11 @@ export const TicketPurchasePage: React.FC = () => {
   };
 
   const handleProceedToCheckout = () => {
+    if (ticketTypes.length === 0) {
+      toast.error('This event currently has no ticket types available.');
+      return;
+    }
+
     if (getTotalSelectedTickets() === 0) {
       toast.error('Selecciona al menos un ticket');
       return;
@@ -116,7 +109,8 @@ export const TicketPurchasePage: React.FC = () => {
       eventId: parseInt(id!),
       selectedTickets,
       totalAmount,
-      event
+      event,
+      ticketTypes,
     };
 
     // Guardar en sessionStorage para pasar al checkout
@@ -154,9 +148,9 @@ export const TicketPurchasePage: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Evento no encontrado</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Event not found</h1>
           <Link to="/events" className="text-blue-600 hover:text-blue-800">
-            Volver a eventos
+            Back to events
           </Link>
         </div>
       </div>
@@ -165,18 +159,18 @@ export const TicketPurchasePage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      {/* Navegación */}
+      {/* Navigation */}
       <div className="flex items-center justify-between">
         <Link
           to={`/events/${id}`}
           className="inline-flex items-center space-x-2 text-gray-600 hover:text-gray-900 transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span>Volver al evento</span>
+          <span>Back to event</span>
         </Link>
       </div>
 
-      {/* Información del evento */}
+      {/* Event details */}
       <div className="bg-white rounded-lg shadow-sm border p-6">
         <div className="flex items-start space-x-6">
           <div className="flex-1">
@@ -195,18 +189,18 @@ export const TicketPurchasePage: React.FC = () => {
               
               <div className="flex items-center space-x-2">
                 <Users className="w-4 h-4" />
-                <span>{event.maxAttendees} personas máx.</span>
+                <span>{event.maxAttendees} attendees max.</span>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Selección de tickets */}
+      {/* Ticket selection */}
       <div className="bg-white rounded-lg shadow-sm border">
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-semibold text-gray-900">Seleccionar Tickets</h2>
-          <p className="text-gray-600 mt-1">Elige la cantidad de tickets que deseas comprar</p>
+          <div className="p-6 border-b">
+          <h2 className="text-xl font-semibold text-gray-900">Select tickets</h2>
+          <p className="text-gray-600 mt-1">Choose how many tickets you'd like to purchase</p>
         </div>
 
         <div className="p-6 space-y-4">
@@ -226,7 +220,7 @@ export const TicketPurchasePage: React.FC = () => {
                     {formatPrice(ticketType.price)}
                   </div>
                   <div className="text-sm text-gray-500">
-                    {ticketType.quantity} disponibles
+                    {ticketType.quantity} available
                   </div>
                 </div>
               </div>
@@ -276,13 +270,13 @@ export const TicketPurchasePage: React.FC = () => {
         </div>
       </div>
 
-      {/* Resumen y checkout */}
+      {/* Summary and checkout */}
       {getTotalSelectedTickets() > 0 && (
         <div className="bg-white rounded-lg shadow-sm border p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="text-lg font-semibold text-gray-900">Resumen de compra</h3>
-              <p className="text-gray-600">{getTotalSelectedTickets()} ticket(s) seleccionado(s)</p>
+              <h3 className="text-lg font-semibold text-gray-900">Purchase summary</h3>
+              <p className="text-gray-600">{getTotalSelectedTickets()} ticket(s) selected</p>
             </div>
             
             <div className="text-right">
@@ -298,19 +292,19 @@ export const TicketPurchasePage: React.FC = () => {
             className="w-full bg-blue-600 text-white py-4 px-6 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center space-x-2"
           >
             <CreditCard className="w-6 h-6" />
-            <span>Proceder al Pago</span>
+            <span>Proceed to payment</span>
           </button>
         </div>
       )}
 
-      {/* Información importante */}
+      {/* Important information */}
       <div className="bg-blue-50 rounded-lg p-6">
-        <h3 className="font-semibold text-blue-900 mb-3">Información importante</h3>
+        <h3 className="font-semibold text-blue-900 mb-3">Important information</h3>
         <ul className="space-y-2 text-sm text-blue-800">
-          <li>• Los tickets son válidos únicamente para la fecha y hora del evento</li>
-          <li>• Revisa bien tu selección antes de proceder al pago</li>
-          <li>• Los reembolsos están sujetos a las políticas del evento</li>
-          <li>• Recibirás un email de confirmación después del pago</li>
+          <li>• Tickets are valid only for the scheduled date and time</li>
+          <li>• Double-check your selection before proceeding to payment</li>
+          <li>• Refunds are subject to the event’s policy</li>
+          <li>• You will receive a confirmation email after payment</li>
         </ul>
       </div>
     </div>

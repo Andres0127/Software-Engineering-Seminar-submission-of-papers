@@ -1,8 +1,8 @@
 import axios, { AxiosResponse } from 'axios';
-import { TicketType, Order } from '../types';
+import { TicketType, Order, BuyerTicket } from '../types';
 import { AuthService } from './authService';
 
-// Configuración para Python Backend (Tickets & Orders)
+// Configuration for Python Backend (Tickets & Orders)
 const PYTHON_API_BASE_URL = 'http://localhost:8000/api';
 
 const ticketApi = axios.create({
@@ -12,7 +12,7 @@ const ticketApi = axios.create({
   },
 });
 
-// Interceptor para agregar token JWT
+// Interceptor to attach JWT token
 ticketApi.interceptors.request.use((config) => {
   const token = AuthService.getToken();
   if (token) {
@@ -21,7 +21,7 @@ ticketApi.interceptors.request.use((config) => {
   return config;
 });
 
-// Interceptor para manejar errores
+// Interceptor to handle errors
 ticketApi.interceptors.response.use(
   (response) => response,
   (error) => {
@@ -34,22 +34,21 @@ ticketApi.interceptors.response.use(
 );
 
 export class TicketService {
-  // Obtener tipos de tickets de un evento
+  // Get ticket types for an event
   static async getTicketTypes(eventId: number): Promise<TicketType[]> {
     try {
       const response: AxiosResponse<TicketType[]> = await ticketApi.get(`/events/${eventId}/tickets`);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al obtener tipos de tickets');
+      throw new Error(error.response?.data?.message || 'Error fetching ticket types');
     }
   }
 
-  // Crear una orden de compra
+  // Create a purchase order
   static async createOrder(orderData: {
     eventId: number;
     ticketTypeId: number;
     quantity: number;
-    totalAmount: number;
     buyerInfo?: {
       firstName: string;
       lastName: string;
@@ -58,14 +57,14 @@ export class TicketService {
     };
   }): Promise<Order> {
     try {
-      const response: AxiosResponse<Order> = await ticketApi.post('/orders', orderData);
+      const response: AxiosResponse<Order> = await ticketApi.post('/orders/', orderData);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al crear la orden');
+      throw new Error(error.response?.data?.message || 'Error creating the order');
     }
   }
 
-  // Confirmar pago de orden
+  // Confirm order payment
   static async confirmPayment(orderId: number, paymentData: {
     paymentMethod: 'CREDIT_CARD' | 'DEBIT_CARD' | 'PSE' | 'CASH';
     transactionId?: string;
@@ -75,49 +74,59 @@ export class TicketService {
       const response: AxiosResponse<Order> = await ticketApi.post(`/orders/${orderId}/payment`, paymentData);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al procesar el pago');
+      throw new Error(error.response?.data?.message || 'Error processing payment');
     }
   }
 
-  // Obtener órdenes del usuario
+  // Get the user's orders
   static async getMyOrders(): Promise<Order[]> {
     try {
       const response: AxiosResponse<Order[]> = await ticketApi.get('/orders/my-orders');
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al obtener órdenes');
+      throw new Error(error.response?.data?.message || 'Error fetching orders');
     }
   }
 
-  // Obtener detalle de una orden
+  // Get tickets acquired by the user
+  static async getMyTickets(): Promise<BuyerTicket[]> {
+    try {
+      const response: AxiosResponse<BuyerTicket[]> = await ticketApi.get('/tickets/my-tickets');
+      return response.data;
+    } catch (error: any) {
+      throw new Error(error.response?.data?.message || 'Error fetching tickets');
+    }
+  }
+
+  // Fetch details of an order
   static async getOrderById(orderId: number): Promise<Order> {
     try {
       const response: AxiosResponse<Order> = await ticketApi.get(`/orders/${orderId}`);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al obtener la orden');
+      throw new Error(error.response?.data?.message || 'Error fetching the order');
     }
   }
 
-  // Cancelar una orden
+  // Cancel an order
   static async cancelOrder(orderId: number): Promise<void> {
     try {
       await ticketApi.post(`/orders/${orderId}/cancel`);
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al cancelar la orden');
+      throw new Error(error.response?.data?.message || 'Error canceling the order');
     }
   }
 
-  // Solicitar reembolso
+  // Request a refund
   static async requestRefund(orderId: number, reason: string): Promise<void> {
     try {
       await ticketApi.post(`/orders/${orderId}/refund`, { reason });
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al solicitar reembolso');
+      throw new Error(error.response?.data?.message || 'Error requesting a refund');
     }
   }
 
-  // Verificar disponibilidad de tickets
+  // Check ticket availability
   static async checkTicketAvailability(eventId: number, ticketTypeId: number, quantity: number): Promise<{
     available: boolean;
     remainingTickets: number;
@@ -126,7 +135,7 @@ export class TicketService {
       const response = await ticketApi.get(`/events/${eventId}/tickets/${ticketTypeId}/availability?quantity=${quantity}`);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error al verificar disponibilidad');
+      throw new Error(error.response?.data?.message || 'Error checking availability');
     }
   }
 }
