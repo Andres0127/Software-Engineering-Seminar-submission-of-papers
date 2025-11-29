@@ -11,10 +11,10 @@ export const MainLayout: React.FC = () => {
       <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
       
       <div className="flex">
-        <Sidebar />
+        <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
         
-        <main className="flex-1 p-8">
-          <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
+        <main className="flex-1 p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto">
             <Outlet />
           </div>
         </main>

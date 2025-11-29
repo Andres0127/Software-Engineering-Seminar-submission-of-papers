@@ -33,9 +33,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
   };
 
   return (
-    <header className="header bg-white border-b border-gray-200">
+    <header className="header bg-white border-b border-gray-200 sticky top-0 z-30" style={{ boxShadow: 'var(--shadow-xs)' }}>
       <div className="px-6 py-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
           {/* Logo */}
           <div className="flex items-center space-x-4">
             {/* Mobile menu button */}
@@ -43,13 +43,14 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               <button
                 onClick={onMenuClick}
                 className="btn-secondary p-2 md:hidden"
+                aria-label="Toggle menu"
               >
                 <Menu className="w-5 h-5" />
               </button>
             )}
             
-            <Link to="/dashboard" className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
+            <Link to="/events" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center shadow-sm">
                 <Calendar className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-semibold text-gray-900">

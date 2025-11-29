@@ -109,7 +109,10 @@ export const EventDetailPage: React.FC = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full"></div>
+        <div className="text-center">
+          <div className="loading-spinner mx-auto mb-4" style={{ width: '48px', height: '48px', borderWidth: '4px', borderColor: 'var(--primary-600)', borderTopColor: 'transparent' }}></div>
+          <p className="text-gray-600">Loading event details...</p>
+        </div>
       </div>
     );
   }
@@ -123,7 +126,7 @@ export const EventDetailPage: React.FC = () => {
           </h1>
           <Link
             to="/events"
-            className="inline-flex items-center space-x-2 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors"
+            className="btn-primary inline-flex items-center space-x-2"
           >
             <ArrowLeft className="w-5 h-5" />
             <span>Back to events</span>
@@ -158,7 +161,7 @@ export const EventDetailPage: React.FC = () => {
             <div className="flex space-x-2">
               <Link
                 to={`/events/${event.id}/edit`}
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                className="btn-secondary inline-flex items-center space-x-2"
               >
                 <Edit className="w-4 h-4" />
                 <span>Edit</span>
@@ -166,7 +169,7 @@ export const EventDetailPage: React.FC = () => {
               
               <button
                 onClick={handleDeleteEvent}
-                className="inline-flex items-center space-x-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="btn-secondary inline-flex items-center space-x-2 text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
               >
                 <Trash2 className="w-4 h-4" />
                 <span>Delete</span>
@@ -177,19 +180,19 @@ export const EventDetailPage: React.FC = () => {
       </div>
 
         {/* Event header */}
-      <div className="bg-white rounded-lg shadow-sm border p-8">
+      <div className="card p-8">
         <div className="flex items-start justify-between mb-6">
           <div className="flex-1">
             <div className="flex items-center space-x-3 mb-4">
-              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+              <span className="badge-primary inline-flex items-center px-3 py-1 rounded-full text-sm font-medium">
                 {event.category?.name}
               </span>
               <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                 event.status === 'PUBLISHED' 
-                  ? 'bg-green-100 text-green-800' 
+                  ? 'bg-green-100 text-green-600' 
                   : event.status === 'DRAFT'
-                  ? 'bg-yellow-100 text-yellow-800'
-                  : 'bg-red-100 text-red-800'
+                  ? 'bg-yellow-100 text-yellow-600'
+                  : 'bg-red-100 text-red-600'
               }`}>
                 {event.status === 'PUBLISHED' ? 'Published' : 
                  event.status === 'DRAFT' ? 'Draft' : 'Canceled'}
@@ -202,7 +205,7 @@ export const EventDetailPage: React.FC = () => {
           </div>
 
           <div className="text-right">
-            <div className="text-3xl font-bold text-green-600 mb-2">
+            <div className="text-3xl font-bold text-success mb-2">
               {formatPrice(event.ticketPrice)}
             </div>
             <div className="text-sm text-gray-600">per person</div>
@@ -211,35 +214,35 @@ export const EventDetailPage: React.FC = () => {
 
         {/* Key event information */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="flex items-center space-x-3">
-            <Calendar className="w-6 h-6 text-blue-600" />
+          <div className="info-item">
+            <Calendar className="w-6 h-6 text-primary-600" style={{ marginTop: '2px' }} />
             <div>
-              <div className="font-medium text-gray-900">Start date</div>
-              <div className="text-sm text-gray-600">{formatDate(event.startDate)}</div>
+              <div className="info-label">Start date</div>
+              <div className="info-value">{formatDate(event.startDate)}</div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <Clock className="w-6 h-6 text-blue-600" />
+          <div className="info-item">
+            <Clock className="w-6 h-6 text-primary-600" style={{ marginTop: '2px' }} />
             <div>
-              <div className="font-medium text-gray-900">End date</div>
-              <div className="text-sm text-gray-600">{formatDate(event.endDate)}</div>
+              <div className="info-label">End date</div>
+              <div className="info-value">{formatDate(event.endDate)}</div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <MapPin className="w-6 h-6 text-blue-600" />
+          <div className="info-item">
+            <MapPin className="w-6 h-6 text-primary-600" style={{ marginTop: '2px' }} />
             <div>
-              <div className="font-medium text-gray-900">{event.location?.name}</div>
-              <div className="text-sm text-gray-600">{event.location?.address}</div>
+              <div className="info-label">{event.location?.name}</div>
+              <div className="info-value">{event.location?.address}</div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <Users className="w-6 h-6 text-blue-600" />
+          <div className="info-item">
+            <Users className="w-6 h-6 text-primary-600" style={{ marginTop: '2px' }} />
             <div>
-              <div className="font-medium text-gray-900">Capacity</div>
-              <div className="text-sm text-gray-600">{event.maxAttendees} people</div>
+              <div className="info-label">Capacity</div>
+              <div className="info-value">{event.maxAttendees} people</div>
             </div>
           </div>
         </div>
@@ -249,7 +252,7 @@ export const EventDetailPage: React.FC = () => {
           <div className="text-center">
             <Link
               to={`/events/${event.id}/tickets`}
-              className="inline-flex items-center space-x-3 bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
+              className="btn-primary inline-flex items-center space-x-3 px-8 py-4 text-lg font-semibold"
             >
               <ShoppingCart className="w-6 h-6" />
               <span>Buy tickets</span>
@@ -259,7 +262,7 @@ export const EventDetailPage: React.FC = () => {
       </div>
 
       {/* Event description */}
-      <div className="bg-white rounded-lg shadow-sm border p-8">
+      <div className="card p-8">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">About this event</h2>
         <div className="prose prose-gray max-w-none">
           <p className="text-gray-700 leading-relaxed whitespace-pre-line">
@@ -271,9 +274,9 @@ export const EventDetailPage: React.FC = () => {
       {/* Additional information */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Location */}
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="card p-6">
           <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <MapPin className="w-6 h-6 mr-2 text-blue-600" />
+            <MapPin className="w-6 h-6 mr-2 text-primary-600" />
             Location
           </h3>
           <div className="space-y-2">
@@ -286,9 +289,9 @@ export const EventDetailPage: React.FC = () => {
         </div>
 
         {/* Organizer */}
-        <div className="bg-white rounded-lg shadow-sm border p-6">
+        <div className="card p-6">
           <h3 className="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-            <Users className="w-6 h-6 mr-2 text-blue-600" />
+            <Users className="w-6 h-6 mr-2 text-primary-600" />
             Organizer
           </h3>
           <div className="space-y-2">
@@ -300,7 +303,7 @@ export const EventDetailPage: React.FC = () => {
 
       {/* Ticket zones */}
       {event.ticketTypes && event.ticketTypes.length > 0 && (
-        <div className="bg-white rounded-lg shadow-sm border p-8 space-y-4">
+        <div className="card p-8 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-2xl font-semibold text-gray-900">Ticket zones</h3>
             <span className="text-sm text-gray-500">
@@ -311,7 +314,7 @@ export const EventDetailPage: React.FC = () => {
             {event.ticketTypes.map((zone) => (
               <div
                 key={zone.id}
-                className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow bg-gray-50"
+                className="card p-4 hover:shadow-md transition-all"
               >
                 <div className="flex items-center justify-between mb-2">
                   <h4 className="font-semibold text-gray-900">{zone.name}</h4>
@@ -319,7 +322,7 @@ export const EventDetailPage: React.FC = () => {
                     {zone.quantity} seats
                   </span>
                 </div>
-                <div className="text-3xl font-bold text-green-600 mb-1">
+                <div className="text-3xl font-bold text-success mb-1">
                   {formatPrice(zone.price)}
                 </div>
                 <p className="text-sm text-gray-600 mb-3">
@@ -338,14 +341,14 @@ export const EventDetailPage: React.FC = () => {
 
       {/* Final CTA */}
       {event.status === 'PUBLISHED' && user?.userType !== 'ADMIN' && (
-        <div className="bg-blue-50 rounded-lg p-8 text-center">
+        <div className="card p-8 text-center" style={{ background: 'linear-gradient(135deg, var(--primary-50) 0%, var(--blue-50) 100%)' }}>
           <h3 className="text-2xl font-bold text-gray-900 mb-4">Ready to attend?</h3>
           <p className="text-gray-600 mb-6">
             Join this amazing event and live an unforgettable experience
           </p>
           <Link
             to={`/events/${event.id}/tickets`}
-            className="inline-flex items-center space-x-3 bg-blue-600 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition-colors"
+            className="btn-primary inline-flex items-center space-x-3 px-8 py-4 text-lg font-semibold"
           >
             <ShoppingCart className="w-6 h-6" />
             <span>Buy tickets now</span>

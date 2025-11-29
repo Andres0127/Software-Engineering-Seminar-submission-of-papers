@@ -158,7 +158,7 @@ export const EventsPage: React.FC = () => {
   if (loading) {
     return (
       <div className="flex flex-col items-center justify-center" style={{ minHeight: '400px', gap: '24px' }}>
-        <div className="loading-spinner" style={{ width: '32px', height: '32px', borderWidth: '3px' }}></div>
+        <div className="loading-spinner mx-auto" style={{ width: '48px', height: '48px', borderWidth: '4px', borderColor: 'var(--primary-600)', borderTopColor: 'transparent' }}></div>
         <div className="text-center">
           <h3 className="text-2xl font-semibold text-gray-900 mb-2">
             Loading events...
@@ -293,8 +293,12 @@ export const EventsPage: React.FC = () => {
 
       {/* Events list */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {events.map((event) => (
-          <div key={event.id} className="event-card">
+        {events.map((event, index) => (
+          <div 
+            key={event.id} 
+            className="event-card animate-fadeIn"
+            style={{ animationDelay: `${index * 0.05}s` }}
+          >
             {/* Event image */}
             <div className="event-image">
               <div className="event-badge">
@@ -303,15 +307,15 @@ export const EventsPage: React.FC = () => {
               <div className="event-price">
                 {formatPrice(event.ticketPrice)}
               </div>
-              <Calendar className="w-12 h-12 text-white" />
+              <Calendar className="w-12 h-12 text-white" style={{ opacity: 0.3 }} />
             </div>
 
-            <div className="p-6">
+            <div className="p-6 flex-1 flex flex-col">
               {/* Title and description */}
-              <h3 className="text-xl font-semibold text-gray-900 mb-3">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3 leading-tight">
                 {event.title}
               </h3>
-              <p className="text-gray-600 mb-4" style={{ fontSize: '14px', lineHeight: '1.5' }}>
+              <p className="text-gray-600 mb-4 flex-1" style={{ fontSize: '14px', lineHeight: '1.6' }}>
                 {event.description.length > 120 
                   ? `${event.description.substring(0, 120)}...` 
                   : event.description
@@ -320,20 +324,20 @@ export const EventsPage: React.FC = () => {
 
               {/* Event information */}
               <div className="space-y-3 mb-6">
-            <div className="info-item">
-              <Calendar className="info-icon" />
-              <div>
-                <div className="info-label">Date</div>
-                <div className="info-value">
-                  {formatDate(event.startDate)}
+                <div className="info-item">
+                  <Calendar className="info-icon" />
+                  <div>
+                    <div className="info-label">Date</div>
+                    <div className="info-value">
+                      {formatDate(event.startDate)}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
                 
                 <div className="info-item">
                   <MapPin className="info-icon" />
                   <div>
-                <div className="info-label">Location</div>
+                    <div className="info-label">Location</div>
                     <div className="info-value">
                       {event.location?.name || 'To be defined'}
                     </div>
@@ -352,10 +356,10 @@ export const EventsPage: React.FC = () => {
               </div>
 
               {/* Action buttons */}
-              <div className="flex space-x-3">
+              <div className="flex space-x-3 mt-auto">
                 <Link
                   to={`/events/${event.id || 'unknown'}`}
-                  className="btn-secondary flex-1"
+                  className="btn-secondary flex-1 text-center"
                 >
                   View details
                 </Link>
@@ -374,15 +378,14 @@ export const EventsPage: React.FC = () => {
       </div>
 
       {events.length === 0 && !loading && (
-        <div className="card text-center py-16">
+        <div className="card text-center py-16 animate-fadeIn">
           <div className="mb-6" style={{ margin: '0 auto 24px auto' }}>
             <div 
-              className="rounded-full flex items-center justify-center mb-4"
+              className="rounded-full flex items-center justify-center mb-4 mx-auto"
               style={{ 
                 width: '96px', 
                 height: '96px', 
                 backgroundColor: 'var(--primary-600)', 
-                margin: '0 auto'
               }}
             >
               <Calendar className="w-12 h-12 text-white" />
@@ -392,7 +395,7 @@ export const EventsPage: React.FC = () => {
           <h3 className="text-2xl font-bold text-gray-900 mb-4">
             No events available
           </h3>
-          <p className="text-gray-600 mb-8" style={{ maxWidth: '400px', margin: '0 auto 32px auto' }}>
+          <p className="text-gray-600 mb-8 mx-auto" style={{ maxWidth: '400px' }}>
             There are no events matching your filters.
           </p>
           
