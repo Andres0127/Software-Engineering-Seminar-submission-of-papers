@@ -130,7 +130,7 @@ export const CheckoutPage: React.FC = () => {
             <p className="text-gray-500">{checkoutData.event.description}</p>
           <div className="space-y-1 text-gray-600 text-sm">
             <p>
-              <span className="font-semibold">Start:</span> {new Date(checkoutData.event.startDate).toLocaleString('es-CO')}
+              <span className="font-semibold">Start:</span> {new Date(checkoutData.event.startDate).toLocaleString('en-US')}
             </p>
             <p>
               <span className="font-semibold">Location:</span> {checkoutData.event.location?.name || 'Location not set'}
@@ -153,11 +153,11 @@ export const CheckoutPage: React.FC = () => {
                 <div>
                   <p className="text-lg font-semibold text-gray-900">{item.ticketType.name}</p>
                   <p className="text-sm text-gray-600">
-                    {item.quantity} × {item.ticketType.price.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}
+                    {item.quantity} × {item.ticketType.price.toLocaleString('en-US', { style: 'currency', currency: 'COP' })}
                   </p>
                 </div>
                 <p className="text-lg font-semibold text-gray-900">
-                  {item.subtotal.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}
+                  {item.subtotal.toLocaleString('en-US', { style: 'currency', currency: 'COP' })}
                 </p>
               </div>
             ))}
@@ -166,7 +166,7 @@ export const CheckoutPage: React.FC = () => {
           <div className="mt-6 flex items-center justify-between border-t pt-4">
             <p className="text-lg font-semibold text-gray-900">Total</p>
             <p className="text-2xl font-bold text-green-600">
-              {grandTotal.toLocaleString('es-CO', { style: 'currency', currency: 'COP' })}
+              {grandTotal.toLocaleString('en-US', { style: 'currency', currency: 'COP' })}
             </p>
           </div>
 

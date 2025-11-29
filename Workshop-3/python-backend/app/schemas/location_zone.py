@@ -16,3 +16,6 @@ class LocationZoneResponse(BaseModel):
     class Config:
         from_attributes = True
 
+
+
+

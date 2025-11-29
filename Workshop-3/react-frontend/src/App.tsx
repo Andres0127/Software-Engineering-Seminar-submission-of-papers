@@ -45,7 +45,7 @@ const SmartRedirect: React.FC = () => {
     return <Navigate to="/events" replace />;
   }
   
-  // Organizers y Admins van al dashboard
+  // Organizers and Admins go to dashboard
   return <Navigate to="/dashboard" replace />;
 };
 

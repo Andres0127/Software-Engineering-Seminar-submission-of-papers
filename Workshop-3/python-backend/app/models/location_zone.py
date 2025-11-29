@@ -16,3 +16,6 @@ class LocationZone(BaseModel):
 
     location = relationship("Location", back_populates="zones")
 
+
+
+

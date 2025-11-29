@@ -1,9 +1,0 @@
-ALTER TABLE orders
-    ADD COLUMN IF NOT EXISTS event_id INTEGER;
-
-ALTER TABLE orders
-    ADD COLUMN IF NOT EXISTS ticket_type_id INTEGER;
-
-ALTER TABLE orders
-    ADD COLUMN IF NOT EXISTS quantity INTEGER;
-

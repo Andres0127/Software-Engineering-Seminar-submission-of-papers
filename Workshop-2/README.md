@@ -77,6 +77,46 @@ Each screen reflects a key stage of the user journey, focusing on clarity, consi
 
 ---
 
+---
+
+## Improved Diagrams (Updated for Workshop 3)
+
+Based on the current microservices implementation, improved versions of the diagrams have been created to reflect the actual architecture:
+
+### Improved Class Diagram
+- **File**: [ClassDiagram_Improved.md](./ClassDiagram_Improved.md)
+- **Key Improvements**:
+  - Microservices separation (Java Auth Service vs Python Business Service)
+  - Location Zones for zone-based ticket pricing
+  - Enhanced TicketType with multiple types per event
+  - Refund support in Order entity
+  - Detailed status enumerations
+
+### Improved Architecture Diagram
+- **File**: [ArchitectureDiagram_Improved.md](./ArchitectureDiagram_Improved.md)
+- **Key Improvements**:
+  - Actual technology stack (React, Java Spring Boot, Python FastAPI)
+  - Service communication patterns (JWT-based authentication)
+  - Database separation (MySQL for auth, PostgreSQL for business)
+  - Future scalability considerations (API Gateway, Redis, CDN)
+
+### Improved Deployment Diagram
+- **File**: [DeploymentDiagram_Improved.md](./DeploymentDiagram_Improved.md)
+- **Key Improvements**:
+  - Multi-environment support (Dev, Docker, Staging, Production)
+  - Horizontal scaling strategies
+  - Cloud-native architecture
+  - Monitoring and observability setup
+
+### Comparison Document
+- **File**: [DIAGRAMS_IMPROVEMENTS.md](./DIAGRAMS_IMPROVEMENTS.md)
+- Detailed comparison between original and improved diagrams
+- Implementation details and recommendations
+
+**Note**: The improved diagrams are in Mermaid format and can be viewed in any Mermaid-compatible viewer or converted to images using the Mermaid CLI.
+
+---
+
 ## Summary
 
 This deliverable consolidates the **conceptual and structural design** of the Event Management Platform, integrating:
@@ -85,4 +125,6 @@ This deliverable consolidates the **conceptual and structural design** of the Ev
 - BPMN process design emphasizing real-world interactions.  
 - UI mockups demonstrating the final user experience.
 
-These artifacts collectively form the foundation for the platform’s future **implementation and testing phases**.
+These artifacts collectively form the foundation for the platform's future **implementation and testing phases**.
+
+The improved diagrams reflect the current microservices implementation and provide accurate documentation for the development team.

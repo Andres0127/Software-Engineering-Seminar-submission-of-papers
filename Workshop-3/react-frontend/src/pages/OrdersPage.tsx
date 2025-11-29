@@ -163,7 +163,7 @@ export const OrdersPage: React.FC = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 text-sm text-gray-600">
                   <div>
                     <span className="label">Date</span>
-                    <p>{new Date(order.purchaseDate).toLocaleString('es-CO')}</p>
+                    <p>{new Date(order.purchaseDate).toLocaleString('en-US')}</p>
                   </div>
                   <div>
                     <span className="label">Event</span>

@@ -32,14 +32,26 @@ Default credentials (adjust `java-backend/src/main/resources/application.propert
 
 ### PostgreSQL (Python Backend)
 
-```sql
-CREATE DATABASE eventplatform;
+**Quick Setup (Recommended for new installations):**
+
+```bash
+# Step 1: Create the database
+psql -U postgres -f Workshop-3/python-backend/scripts/00-create-database-only.sql
+
+# Step 2: Create all tables and schema
+psql -U postgres -d eventplatform -f Workshop-3/python-backend/scripts/00-create-complete-database.sql
 ```
+
+This creates the entire database schema with all tables, enums, and indexes in one go.
+
+**Note:** All migration scripts have been consolidated into the complete database script. For existing databases with data, you'll need to manually migrate or create a fresh database.
 
 Default credentials (tweak `python-backend/app/core/config.py` or `.env` if necessary):
 - User: `postgres`
 - Password: `*****`
 - Port: `5432`
+
+**See `python-backend/scripts/README_DATABASE.md` for detailed instructions.**
 
 ---
 
@@ -280,7 +292,7 @@ Install the following before you begin:
 
 ---
 
-## 🗄️ Configuración de Bases de Datos
+## 🗄️ Database Setup
 
 ### MySQL (Java Backend)
 
@@ -421,9 +433,9 @@ This will launch the dev server and open http://localhost:3000 automatically.
 
 ---
 
-## 🔄 Ejecutar Todo el Sistema
+## 🔄 Run All Services Side-by-Side
 
-Abre **tres terminales** diferentes:
+Open **three different terminals**:
 
 ### Terminal 1 – Java Backend
 ```powershell
@@ -467,8 +479,6 @@ npm start
 | Python backend | 8000 | http://localhost:8000 |
 
 ---
-
-## ⚠️ Solución de Problemas
 
 ## ⚠️ Troubleshooting
 
