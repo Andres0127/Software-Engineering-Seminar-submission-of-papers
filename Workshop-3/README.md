@@ -34,15 +34,66 @@ Default credentials (adjust `java-backend/src/main/resources/application.propert
 
 **Quick Setup (Recommended for new installations):**
 
-```bash
-# Step 1: Create the database
-psql -U postgres -f Workshop-3/python-backend/scripts/00-create-database-only.sql
+**Database Setup (Two SQL scripts):**
 
-# Step 2: Create all tables and schema
-psql -U postgres -d eventplatform -f Workshop-3/python-backend/scripts/00-create-complete-database.sql
+```powershell
+# Windows (PowerShell)
+cd Workshop-3/python-backend/scripts
+# Step 1: Create database
+psql -U postgres -f 01-create-database.sql
+# Step 2: Create schema and data
+psql -U postgres -d eventplatform -f 02-setup-schema-and-data.sql
 ```
 
-This creates the entire database schema with all tables, enums, and indexes in one go.
+```bash
+# Linux/macOS
+cd Workshop-3/python-backend/scripts
+# Step 1: Create database
+psql -U postgres -f 01-create-database.sql
+# Step 2: Create schema and data
+psql -U postgres -d eventplatform -f 02-setup-schema-and-data.sql
+```
+
+**See `python-backend/scripts/README_DATABASE.md` for detailed instructions.**
+
+This single SQL file (`00-complete-setup.sql`) contains everything: database schema, enums, tables, indexes, and test data.
+
+**Option 2: Automated script (Windows):**
+
+```powershell
+cd Workshop-3/python-backend/scripts
+.\setup-database.ps1
+```
+
+**Option 2: Automated script (easiest - Linux/macOS):**
+
+```bash
+cd Workshop-3/python-backend/scripts
+chmod +x setup-database.sh
+./setup-database.sh
+```
+
+**Option 3: Manual single command:**
+
+```bash
+psql -U postgres -c "CREATE DATABASE eventplatform;" && psql -U postgres -d eventplatform -f Workshop-3/python-backend/scripts/00-setup-complete-database.sql
+```
+
+**Option 4: Manual two steps:**
+
+```bash
+# Step 1: Create database
+psql -U postgres -c "CREATE DATABASE eventplatform;"
+
+# Step 2: Create schema and load test data
+psql -U postgres -d eventplatform -f Workshop-3/python-backend/scripts/00-setup-complete-database.sql
+```
+
+This single script creates the entire database schema (tables, enums, indexes) and inserts complete test data for frontend testing:
+- 10 categories (Music, Theater, Sports, Conferences, Comedy, Dance, Art, Food & Drink, Technology, Education)
+- 14 locations in Bogotá (stadiums, theaters, arenas, convention centers)
+- 22 events across all categories
+- 32 ticket types with various pricing options
 
 **Note:** All migration scripts have been consolidated into the complete database script. For existing databases with data, you'll need to manually migrate or create a fresh database.
 

@@ -2,125 +2,106 @@
 
 ## Quick Start - Complete Database Creation
 
-For new collaborators or fresh installations, use the **complete database creation script**:
+### Two SQL Scripts (Simple and Recommended)
 
-### Single Script Setup (Recommended)
+**Two scripts for easy setup:**
 
-**Step 1: Create the database**
+1. **`01-create-database.sql`** - Creates the database
+2. **`02-setup-schema-and-data.sql`** - Creates schema, tables, and inserts test data
 
-```bash
+**Execute in order:**
+
+```powershell
 # Windows (PowerShell)
-psql -U postgres -f scripts/00-create-database-only.sql
+# Step 1: Create database
+cd Workshop-3/python-backend/scripts
+psql -U postgres -f 01-create-database.sql
 
-# Linux/macOS
-psql -U postgres -f scripts/00-create-database-only.sql
+# Step 2: Create schema and data
+psql -U postgres -d eventplatform -f 02-setup-schema-and-data.sql
 ```
-
-**Step 2: Create all tables and schema**
 
 ```bash
-# Windows (PowerShell)
-psql -U postgres -d eventplatform -f scripts/00-create-complete-database.sql
-
 # Linux/macOS
-psql -U postgres -d eventplatform -f scripts/00-create-complete-database.sql
+# Step 1: Create database
+cd Workshop-3/python-backend/scripts
+psql -U postgres -f 01-create-database.sql
+
+# Step 2: Create schema and data
+psql -U postgres -d eventplatform -f 02-setup-schema-and-data.sql
 ```
 
-**Alternative: All in one command**
+**What's included:**
+- Database creation
+- All ENUM types (ticketstatus, usertype, userstatus, notificationtype)
+- All 12 tables with relationships
+- All indexes
+- Test data (10 categories, 14 locations, 22 events, 32 ticket types)
 
-```bash
-# Windows (PowerShell)
-psql -U postgres -c "CREATE DATABASE eventplatform;" && psql -U postgres -d eventplatform -f scripts/00-create-complete-database.sql
+### Scripts Overview
 
-# Linux/macOS
-psql -U postgres -c "CREATE DATABASE eventplatform;" && psql -U postgres -d eventplatform -f scripts/00-create-complete-database.sql
-```
+**`01-create-database.sql`** - Creates the database:
+- Drops existing database if it exists
+- Creates new `eventplatform` database
+- Uses `template0` to avoid collation conflicts
 
-**Or connect to PostgreSQL interactively:**
-
-```bash
-# Connect to PostgreSQL
-psql -U postgres
-
-# Create database
-\i scripts/00-create-database-only.sql
-
-# Connect to the new database
-\c eventplatform
-
-# Create all tables
-\i scripts/00-create-complete-database.sql
-```
-
-### What the Script Does
-
-The `00-create-complete-database.sql` script:
-
-1. ✅ Creates the `eventplatform` database
-2. ✅ Creates all ENUM types:
-   - `ticketstatus` (PENDING, CONFIRMED, CANCELLED)
-   - `usertype` (admin, organizer, buyer)
-   - `userstatus` (active, inactive, suspended)
-   - `notificationtype` (email, sms, push)
-3. ✅ Creates all tables with complete schema:
-   - users
-   - categories
-   - locations
-   - location_zones
-   - events
-   - ticket_types
-   - orders
-   - tickets
-   - payments
-   - reviews
-   - notifications
-   - audit_logs
-4. ✅ Creates all indexes for optimal performance
-5. ✅ Sets up all foreign key relationships
+**`02-setup-schema-and-data.sql`** - Creates everything else:
+1. ✅ Creates all ENUM types
+2. ✅ Creates all 12 tables with complete schema
+3. ✅ Creates all indexes for optimal performance
+4. ✅ Sets up all foreign key relationships
+5. ✅ Inserts all test data (categories, locations, events, ticket types)
 
 ### Important Notes
 
-- **This script replaces all previous migration scripts** (04, 05, 08, 09, 10)
-- **Use this script for new installations only**
-- **If you already have data**, use the individual migration scripts instead
-- The script will **drop and recreate** the database if you uncomment the DROP statement
-
-### For Existing Databases
-
-If you already have a database with existing data that needs to be migrated, you'll need to manually apply the schema changes. The migration scripts have been consolidated into the complete database script. For production migrations, consider:
-
-1. Creating a backup of your existing database
-2. Reviewing the `00-create-complete-database.sql` script to identify the changes needed
-3. Applying changes incrementally to preserve existing data
+- **Run scripts in order:** First `01-create-database.sql`, then `02-setup-schema-and-data.sql`
+- **Database will be dropped:** The first script will delete the existing database if it exists
+- **All data in English:** Test data is in English for frontend testing
+- **No special characters:** Addresses use ASCII characters only to avoid encoding issues
 
 ### Verification
 
-After running the script, verify the database was created correctly:
+After running both scripts, verify the setup:
 
 ```sql
 -- Connect to the database
-\c eventplatform
+psql -U postgres -d eventplatform
 
--- List all tables
+-- Check tables
 \dt
 
--- List all types
+-- Check types
 \dT
 
--- Check a specific table structure
-\d events
+-- Count records
+SELECT 'Categories' as table_name, COUNT(*) as count FROM categories
+UNION ALL
+SELECT 'Locations', COUNT(*) FROM locations
+UNION ALL
+SELECT 'Events', COUNT(*) FROM events
+UNION ALL
+SELECT 'Ticket Types', COUNT(*) FROM ticket_types;
 ```
+
+Expected results:
+- Categories: 10
+- Locations: 14
+- Events: 22
+- Ticket Types: 32
 
 ### Troubleshooting
 
 **Error: "database already exists"**
-- The database already exists. Either drop it first or use a different database name.
+- The first script will drop and recreate it. This is normal.
 
 **Error: "permission denied"**
 - Make sure you're using a PostgreSQL superuser account (usually `postgres`).
 
-**Error: "relation already exists"**
-- Some tables already exist. Drop the database first or use migration scripts instead.
+**Error: "no existe el tipo ticketstatus"**
+- Make sure you ran `02-setup-schema-and-data.sql` after creating the database.
+
+**Error: "character encoding"**
+- The scripts use ASCII characters only. If you see encoding errors, make sure your PostgreSQL client is set to UTF-8.
 
 ### Database Connection
 
@@ -130,4 +111,3 @@ Default connection settings (adjust in `app/core/config.py` if needed):
 - **Database**: eventplatform
 - **User**: postgres
 - **Password**: (your PostgreSQL password)
-

@@ -5,8 +5,10 @@ from app.routes import events, tickets, orders, locations, categories
 from app.models import Base
 from app.core.database import engine
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+# Database tables are created by the SQL script (00-setup-complete-database.sql)
+# Do not use Base.metadata.create_all() as it cannot create PostgreSQL ENUMs
+# Run the setup script first: scripts/setup-database.ps1 or setup-database.sh
+# Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
     title=settings.PROJECT_NAME,

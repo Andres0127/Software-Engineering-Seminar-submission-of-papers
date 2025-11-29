@@ -68,7 +68,7 @@ class EventResponse(BaseModel):
     status: str
     categoryId: Optional[int] = None
     locationId: Optional[int] = None
-    organizerId: int
+    organizerId: Optional[int] = None
     category: Optional[CategoryResponse] = None
     location: Optional[LocationResponse] = None
     ageRestriction: Optional[str] = None

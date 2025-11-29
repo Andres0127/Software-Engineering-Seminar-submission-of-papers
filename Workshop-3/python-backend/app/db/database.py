@@ -22,4 +22,8 @@ def get_db():
 
 
 def init_db() -> None:
-    Base.metadata.create_all(bind=engine)
+    # Database tables are created by the SQL script (00-setup-complete-database.sql)
+    # Do not use Base.metadata.create_all() as it cannot create PostgreSQL ENUMs
+    # Run the setup script first: scripts/setup-database.ps1 or setup-database.sh
+    # Base.metadata.create_all(bind=engine)
+    pass
