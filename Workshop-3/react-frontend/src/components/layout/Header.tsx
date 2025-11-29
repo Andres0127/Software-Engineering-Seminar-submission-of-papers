@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, Settings, Bell, ChevronDown, Menu, Calendar } from 'lucide-react';
+import { User, LogOut, Settings, ChevronDown, Menu, Calendar } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
+import NotificationPanel from '../notifications/NotificationPanel';
 import toast from 'react-hot-toast';
 
 interface HeaderProps {
@@ -60,9 +61,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           {/* Right Section */}
           <div className="flex items-center space-x-3">
             {/* Notifications */}
-            <button className="btn-secondary p-2">
-              <Bell className="w-5 h-5" />
-            </button>
+            <NotificationPanel />
 
             {/* User Menu */}
             {user && (

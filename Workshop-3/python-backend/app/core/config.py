@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     JWT_ALGORITHMS: List[str] = ["HS256", "HS384", "HS512"]
 
     # Database
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/eventplatform"
+    DATABASE_URL: str = "postgresql://postgres:200127@localhost:5432/eventplatform"
 
     # CORS
     CORS_ORIGINS: List[str] = ["http://localhost:3000"]

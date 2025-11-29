@@ -1,0 +1,210 @@
+.payment-method-selector {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.payment-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.payment-subtitle {
+  font-size: 1rem;
+  color: #666;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.payment-methods-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 2rem;
+  gap: 1rem;
+}
+
+.spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #6366f1;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.payment-methods-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.payment-method-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: white;
+  border: 2px solid #e5e7eb;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: left;
+}
+
+.payment-method-card:hover {
+  border-color: #6366f1;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.15);
+  transform: translateY(-2px);
+}
+
+.payment-method-card.selected {
+  border-color: #6366f1;
+  background: linear-gradient(135deg, #f0f1ff 0%, #ffffff 100%);
+  box-shadow: 0 4px 16px rgba(99, 102, 241, 0.2);
+}
+
+.method-icon-wrapper {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(99, 102, 241, 0.3);
+}
+
+.method-icon {
+  width: 28px;
+  height: 28px;
+  color: white;
+}
+
+.method-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.method-name {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 0.25rem 0;
+}
+
+.method-description {
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.4;
+}
+
+.method-details {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.method-time {
+  font-size: 0.8125rem;
+  color: #10b981;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.method-fee {
+  font-size: 0.8125rem;
+  color: #ef4444;
+  font-weight: 500;
+  background: #fee2e2;
+  padding: 0.125rem 0.5rem;
+  border-radius: 4px;
+}
+
+.method-arrow {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  color: #9ca3af;
+  transition: transform 0.3s ease;
+}
+
+.payment-method-card:hover .method-arrow {
+  transform: translateX(4px);
+  color: #6366f1;
+}
+
+.payment-method-card.selected .method-arrow {
+  color: #6366f1;
+}
+
+.payment-security-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+  border: 1px solid #a7f3d0;
+  border-radius: 8px;
+  margin-top: 2rem;
+}
+
+.security-icon {
+  color: #10b981;
+  flex-shrink: 0;
+}
+
+.security-text {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: #065f46;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .payment-method-selector {
+    padding: 1rem;
+  }
+
+  .payment-title {
+    font-size: 1.5rem;
+  }
+
+  .payment-methods-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .payment-method-card {
+    padding: 1rem;
+  }
+
+  .method-icon-wrapper {
+    width: 48px;
+    height: 48px;
+  }
+
+  .method-icon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .method-name {
+    font-size: 1rem;
+  }
+}

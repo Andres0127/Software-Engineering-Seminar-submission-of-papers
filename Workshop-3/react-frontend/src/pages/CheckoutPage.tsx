@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, ShoppingCart } from 'lucide-react';
 
 import { TicketService } from '../services/ticketService';
 import { Event, TicketType } from '../types';
+import PaymentFlow from '../components/payments/PaymentFlow';
 
 interface CheckoutSession {
   eventId: number;
@@ -25,6 +26,9 @@ export const CheckoutPage: React.FC = () => {
   const navigate = useNavigate();
   const [checkoutData, setCheckoutData] = useState<CheckoutSession | null>(null);
   const [processing, setProcessing] = useState(false);
+  const [orderId, setOrderId] = useState<number | null>(null);
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
+  const [showPayment, setShowPayment] = useState(false);
 
   useEffect(() => {
     const stored = sessionStorage.getItem('checkoutData');
@@ -37,7 +41,7 @@ export const CheckoutPage: React.FC = () => {
     try {
       const parsed: CheckoutSession = JSON.parse(stored);
       if (Number(id) !== parsed.eventId) {
-      toast.error('Checkout data does not match the selected event.');
+        toast.error('Checkout data does not match the selected event.');
         navigate('/events');
         return;
       }
@@ -73,7 +77,7 @@ export const CheckoutPage: React.FC = () => {
     return selectedItems.reduce((sum, item) => sum + item.subtotal, 0);
   }, [checkoutData, selectedItems]);
 
-  const handleConfirm = async () => {
+  const handleProceedToPayment = async () => {
     if (!checkoutData || selectedItems.length === 0) {
       toast.error('Select at least one ticket to continue.');
       return;
@@ -81,20 +85,21 @@ export const CheckoutPage: React.FC = () => {
 
     setProcessing(true);
     try {
-      for (const item of selectedItems) {
-        const order = await TicketService.createOrder({
-          eventId: checkoutData.eventId,
-          ticketTypeId: item.ticketType.id,
-          quantity: item.quantity,
-        });
-        await TicketService.confirmPayment(order.id, { paymentMethod: 'CREDIT_CARD' });
-      }
-      toast.success('Purchase recorded successfully');
-      sessionStorage.removeItem('checkoutData');
-      navigate('/orders');
+      // Crear la orden en el backend
+      // Por ahora, tomamos el primer item. Si hay múltiples, deberías combinarlos
+      const firstItem = selectedItems[0];
+      const order = await TicketService.createOrder({
+        eventId: checkoutData.eventId,
+        ticketTypeId: firstItem.ticketType.id,
+        quantity: firstItem.quantity,
+      });
+
+      setOrderId(order.id);
+      setOrderNumber(order.orderNumber || `ORD-${order.id}`);
+      setShowPayment(true);
     } catch (error: any) {
       console.error('Error creating order', error);
-      toast.error(error.response?.data?.detail || error.message || 'Unable to complete the purchase');
+      toast.error(error.response?.data?.detail || error.message || 'Unable to create order');
     } finally {
       setProcessing(false);
     }
@@ -104,12 +109,24 @@ export const CheckoutPage: React.FC = () => {
     return null;
   }
 
+  // Si ya tenemos orden y mostramos el flujo de pago
+  if (showPayment && orderId && orderNumber) {
+    return (
+      <PaymentFlow
+        orderId={orderId}
+        orderAmount={grandTotal}
+        orderNumber={orderNumber}
+      />
+    );
+  }
+
+  // Vista de revisión de la orden
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-6">
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Checkout</h1>
-          <p className="text-gray-600 mt-1">Review your purchase before confirming.</p>
+          <p className="text-gray-600 mt-1">Review your purchase before proceeding to payment.</p>
         </div>
         <button
           onClick={() => navigate(`/events/${id}`)}
@@ -127,7 +144,7 @@ export const CheckoutPage: React.FC = () => {
             <span className="text-sm text-gray-500">{checkoutData.event.status}</span>
           </div>
           <h2 className="text-xl font-semibold text-gray-900">{checkoutData.event.title}</h2>
-            <p className="text-gray-500">{checkoutData.event.description}</p>
+          <p className="text-gray-500">{checkoutData.event.description}</p>
           <div className="space-y-1 text-gray-600 text-sm">
             <p>
               <span className="font-semibold">Start:</span> {new Date(checkoutData.event.startDate).toLocaleString('en-US')}
@@ -153,11 +170,11 @@ export const CheckoutPage: React.FC = () => {
                 <div>
                   <p className="text-lg font-semibold text-gray-900">{item.ticketType.name}</p>
                   <p className="text-sm text-gray-600">
-                    {item.quantity} × {item.ticketType.price.toLocaleString('en-US', { style: 'currency', currency: 'COP' })}
+                    {item.quantity} × ${item.ticketType.price.toLocaleString('es-CO')} COP
                   </p>
                 </div>
                 <p className="text-lg font-semibold text-gray-900">
-                  {item.subtotal.toLocaleString('en-US', { style: 'currency', currency: 'COP' })}
+                  ${item.subtotal.toLocaleString('es-CO')} COP
                 </p>
               </div>
             ))}
@@ -166,16 +183,26 @@ export const CheckoutPage: React.FC = () => {
           <div className="mt-6 flex items-center justify-between border-t pt-4">
             <p className="text-lg font-semibold text-gray-900">Total</p>
             <p className="text-2xl font-bold text-green-600">
-              {grandTotal.toLocaleString('en-US', { style: 'currency', currency: 'COP' })}
+              ${grandTotal.toLocaleString('es-CO')} COP
             </p>
           </div>
 
           <button
-            onClick={handleConfirm}
+            onClick={handleProceedToPayment}
             disabled={processing}
-            className="mt-6 w-full inline-flex items-center justify-center gap-2 bg-primary-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-60"
+            className="mt-6 w-full inline-flex items-center justify-center gap-2 bg-primary-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-60 transition-all"
           >
-            {processing ? 'Processing purchase...' : 'Confirm purchase'}
+            {processing ? (
+              <>
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Creating order...
+              </>
+            ) : (
+              <>
+                <ShoppingCart className="w-5 h-5" />
+                Proceed to payment
+              </>
+            )}
           </button>
         </div>
       </div>

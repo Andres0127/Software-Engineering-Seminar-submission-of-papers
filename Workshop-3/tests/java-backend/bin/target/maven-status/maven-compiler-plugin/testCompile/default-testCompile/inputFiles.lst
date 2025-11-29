@@ -1,6 +1,9 @@
-/Users/blessd/Desktop/Github/Software-Engineering-Seminar-submission-of-papers/Workshop-3/tests/java-backend/src/test/java/com/eventplatform/controller/AuthControllerTest.java
-/Users/blessd/Desktop/Github/Software-Engineering-Seminar-submission-of-papers/Workshop-3/tests/java-backend/src/test/java/com/eventplatform/security/JwtTokenProviderTest.java
-/Users/blessd/Desktop/Github/Software-Engineering-Seminar-submission-of-papers/Workshop-3/tests/java-backend/src/test/java/com/eventplatform/service/AuthServiceTest.java
-/Users/blessd/Desktop/Github/Software-Engineering-Seminar-submission-of-papers/Workshop-3/tests/java-backend/src/test/java/com/eventplatform/security/TestSecurityUtils.java
-/Users/blessd/Desktop/Github/Software-Engineering-Seminar-submission-of-papers/Workshop-3/tests/java-backend/src/test/java/com/eventplatform/controller/UserControllerTest.java
-/Users/blessd/Desktop/Github/Software-Engineering-Seminar-submission-of-papers/Workshop-3/tests/java-backend/src/test/java/com/eventplatform/service/UserServiceTest.java
+C:\Users\usuario\Documents\GitHub\Software-Engineering-Seminar-submission-of-papers\Workshop-3\tests\java-backend\src\test\java\com\eventplatform\acceptance\RunCucumberAcceptanceTest.java
+C:\Users\usuario\Documents\GitHub\Software-Engineering-Seminar-submission-of-papers\Workshop-3\tests\java-backend\src\test\java\com\eventplatform\acceptance\AuthStepDefinitions.java
+C:\Users\usuario\Documents\GitHub\Software-Engineering-Seminar-submission-of-papers\Workshop-3\tests\java-backend\src\test\java\com\eventplatform\security\TestSecurityUtils.java
+C:\Users\usuario\Documents\GitHub\Software-Engineering-Seminar-submission-of-papers\Workshop-3\tests\java-backend\src\test\java\com\eventplatform\service\AuthServiceTest.java
+C:\Users\usuario\Documents\GitHub\Software-Engineering-Seminar-submission-of-papers\Workshop-3\tests\java-backend\src\test\java\com\eventplatform\security\JwtTokenProviderTest.java
+C:\Users\usuario\Documents\GitHub\Software-Engineering-Seminar-submission-of-papers\Workshop-3\tests\java-backend\src\test\java\com\eventplatform\controller\AuthControllerTest.java
+C:\Users\usuario\Documents\GitHub\Software-Engineering-Seminar-submission-of-papers\Workshop-3\tests\java-backend\src\test\java\com\eventplatform\acceptance\CucumberSpringConfiguration.java
+C:\Users\usuario\Documents\GitHub\Software-Engineering-Seminar-submission-of-papers\Workshop-3\tests\java-backend\src\test\java\com\eventplatform\controller\UserControllerTest.java
+C:\Users\usuario\Documents\GitHub\Software-Engineering-Seminar-submission-of-papers\Workshop-3\tests\java-backend\src\test\java\com\eventplatform\service\UserServiceTest.java

@@ -1,0 +1,96 @@
+.digital-wallet-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.wallet-form-header {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 16px;
+  border-left: 4px solid;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.wallet-icon-large {
+  width: 72px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  font-size: 2.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.wallet-form-header h2 {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.wallet-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.input-hint {
+  font-size: 0.8125rem;
+  color: #666;
+  margin: 0.5rem 0 0 0;
+}
+
+.wallet-info-box {
+  background: #f9fafb;
+  border-left: 4px solid;
+  border-radius: 12px;
+  padding: 1.25rem;
+}
+
+.wallet-info-box h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 0 0 0.75rem 0;
+}
+
+.wallet-info-box ol {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: #374151;
+}
+
+.wallet-info-box li {
+  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+
+.wallet-info-box li:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 768px) {
+  .digital-wallet-form-container {
+    padding: 1rem;
+  }
+
+  .wallet-form-header {
+    padding: 1rem;
+  }
+
+  .wallet-icon-large {
+    width: 60px;
+    height: 60px;
+    font-size: 2rem;
+  }
+
+  .wallet-form-header h2 {
+    font-size: 1.5rem;
+  }
+}

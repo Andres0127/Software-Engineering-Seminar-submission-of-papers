@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routes import events, tickets, orders, locations, categories
+from app.routes import events, tickets, orders, locations, categories, payments, notifications
 from app.models import Base
 from app.core.database import engine
 
@@ -31,6 +31,8 @@ app.include_router(tickets.router)
 app.include_router(orders.router)
 app.include_router(locations.router)
 app.include_router(categories.router)
+app.include_router(payments.router)
+app.include_router(notifications.router)
 
 @app.get("/")
 async def root():

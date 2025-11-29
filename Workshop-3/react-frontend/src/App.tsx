@@ -5,7 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { useAuthStore } from './store/authStore';
 import { ProtectedRoute } from './components/auth/ProtectedRoute';
 import { MainLayout } from './components/layout/MainLayout';
-import { LoginPage } from './pages/LoginPage';
+import LoginPage from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { EventsPage } from './pages/EventsPage';
@@ -16,6 +16,7 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { TicketPurchasePage } from './pages/TicketPurchasePage';
 import { TicketsPage } from './pages/TicketsPage';
 import { OrdersPage } from './pages/OrdersPage';
+import RefundRequestsPage from './pages/RefundRequestsPage';
 
 // Component that ensures routes are only accessible when the user has one of the allowed roles
 const RoleProtectedRoute: React.FC<{ 
@@ -127,6 +128,16 @@ function App() {
               element={
                 <RoleProtectedRoute allowedRoles={['BUYER', 'ADMIN']}>
                   <OrdersPage />
+                </RoleProtectedRoute>
+              } 
+            />
+            
+            {/* Refund requests - restricted to organizers and admins */}
+            <Route 
+              path="refunds" 
+              element={
+                <RoleProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
+                  <RefundRequestsPage />
                 </RoleProtectedRoute>
               } 
             />

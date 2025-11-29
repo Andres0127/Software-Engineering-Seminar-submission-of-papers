@@ -27,6 +27,7 @@ class OrderResponse(BaseModel):
     id: int
     order_number: str
     purchase_date: datetime
+    expiration_date: datetime | None = None
     status: str
     total_amount: Decimal
     buyer_id: int
@@ -34,6 +35,8 @@ class OrderResponse(BaseModel):
     ticket_type_id: int | None = Field(None, alias="ticketTypeId")
     quantity: int | None = Field(None, alias="quantity")
     refund_reason: str | None = Field(None, alias="refundReason")
+    created_at: datetime
+    updated_at: datetime
 
 
 class OrderPayment(BaseModel):
