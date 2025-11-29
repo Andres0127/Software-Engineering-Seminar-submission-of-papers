@@ -8,18 +8,15 @@ class Notification(BaseModel):
     
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     type = Column(String(50), nullable=False)  # payment_success, payment_failed, refund_requested, refund_approved, refund_rejected
-    title = Column(String(200), nullable=False)
-    message = Column(Text, nullable=False)
-    related_entity_type = Column(String(50))  # order, payment, ticket
-    related_entity_id = Column(Integer)
-    data = Column(JSONB)  # Additional data
+    message = Column(Text)  # Nullable to match database schema
+    sent_at = Column(DateTime)  # Matches database schema
     is_read = Column(Boolean, default=False)
-    read_at = Column(DateTime)
     
     def mark_as_read(self):
         """Mark notification as read"""
         self.is_read = True
-        self.read_at = datetime.utcnow()
+        if not self.sent_at:
+            self.sent_at = datetime.utcnow()
 
 class NotificationType:
     """Notification types"""

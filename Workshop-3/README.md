@@ -17,7 +17,144 @@ Install the following before running the services:
 
 ---
 
-## 🗄️ Database Setup
+## 🐳 Docker Setup (Recomendado - Más Fácil)
+
+La forma más sencilla de ejecutar todo el proyecto es usando Docker. No necesitas instalar Java, Python, Node.js, MySQL o PostgreSQL localmente.
+
+### Prerequisitos para Docker
+
+- ✅ **Docker Desktop** instalado y ejecutándose
+- ✅ **Docker Compose** (incluido en Docker Desktop)
+
+### Scripts Disponibles
+
+#### 1. Script Interactivo (Recomendado)
+
+Ejecuta el script interactivo que incluye un menú con todas las opciones:
+
+```batch
+cd Workshop-3
+dockerizar-proyecto.bat
+```
+
+Este script te permite:
+- ✅ Crear y construir todos los contenedores
+- ✅ Iniciar/detener contenedores
+- ✅ Ver logs de servicios
+- ✅ Reconstruir contenedores
+- ✅ Limpiar todo el proyecto
+- ✅ Entrar a contenedores
+- ✅ Y más opciones...
+
+#### 2. Script de Línea de Comandos
+
+Para ejecutar comandos rápidos desde la terminal:
+
+```batch
+cd Workshop-3
+docker-comandos.bat build-up    # Construir e iniciar
+docker-comandos.bat up          # Solo iniciar
+docker-comandos.bat down        # Detener
+docker-comandos.bat logs        # Ver logs
+docker-comandos.bat ps          # Ver estado
+docker-comandos.bat clean       # Limpiar todo
+```
+
+#### 3. Script Original (Simple)
+
+Para una creación rápida de contenedores:
+
+```batch
+cd Workshop-3
+crear-contenedores.bat
+```
+
+### Pasos Rápidos con Docker
+
+1. **Asegúrate de que Docker Desktop esté ejecutándose**
+
+2. **Construir e iniciar todo:**
+   ```batch
+   dockerizar-proyecto.bat
+   ```
+   Selecciona la opción `[1]` del menú.
+
+   O desde línea de comandos:
+   ```batch
+   docker-comandos.bat build-up
+   ```
+
+3. **Verificar que todo esté funcionando:**
+   - React Frontend: http://localhost:3000
+   - Java Backend API: http://localhost:8081
+   - Python Backend API: http://localhost:8000
+   - Java Swagger: http://localhost:8081/swagger-ui.html
+   - Python Docs: http://localhost:8000/docs
+
+### Puertos de los Servicios
+
+| Servicio | Puerto | URL |
+|----------|--------|-----|
+| React Frontend | 3000 | http://localhost:3000 |
+| Java Backend | 8081 | http://localhost:8081 |
+| Python Backend | 8000 | http://localhost:8000 |
+| MySQL (Java) | 3307 | localhost:3307 |
+| PostgreSQL (Python) | 5433 | localhost:5433 |
+
+**Nota:** Los puertos 3307 y 5433 se usan para evitar conflictos con instalaciones locales de MySQL y PostgreSQL.
+
+### Comandos Útiles de Docker
+
+```batch
+# Ver estado de contenedores
+docker-compose ps
+
+# Ver logs en tiempo real
+docker-compose logs -f
+
+# Ver logs de un servicio específico
+docker-compose logs -f java-backend
+docker-compose logs -f python-backend
+docker-compose logs -f react-frontend
+
+# Detener contenedores
+docker-compose down
+
+# Detener y eliminar volúmenes (elimina datos de BD)
+docker-compose down -v
+
+# Reiniciar un servicio específico
+docker-compose restart java-backend
+
+# Entrar a un contenedor
+docker-compose exec java-backend /bin/sh
+docker-compose exec python-backend /bin/sh
+docker-compose exec mysql /bin/bash
+```
+
+### Solución de Problemas con Docker
+
+**Error: "Docker no está disponible"**
+- Asegúrate de que Docker Desktop esté instalado y ejecutándose
+- Verifica que Docker esté en el PATH del sistema
+
+**Error: "Puerto ya en uso"**
+- Verifica qué proceso está usando el puerto: `netstat -ano | findstr :8081`
+- Detén otros contenedores o servicios que puedan estar usando esos puertos
+
+**Los contenedores no inician correctamente**
+- Revisa los logs: `docker-compose logs`
+- Intenta reconstruir: `docker-compose build --no-cache`
+- Limpia todo y vuelve a construir: `docker-comandos.bat clean` luego `docker-comandos.bat build-up`
+
+**Los datos de la base de datos no persisten**
+- Los volúmenes de Docker almacenan los datos
+- Si ejecutaste `docker-compose down -v`, los datos se perdieron
+- Los volúmenes persisten entre reinicios, a menos que uses `-v`
+
+---
+
+## 🗄️ Database Setup (Configuración Manual)
 
 ### MySQL (Java Backend)
 

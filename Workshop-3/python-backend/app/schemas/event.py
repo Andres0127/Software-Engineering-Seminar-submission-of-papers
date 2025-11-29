@@ -25,22 +25,9 @@ class TicketZonePayload(BaseModel):
 
 
 class EventCreate(BaseModel):
-    title: str = Field(..., min_length=3)
-    description: Optional[str] = Field(None, max_length=1200)
-    startDate: datetime
-    endDate: Optional[datetime] = None
-    maxAttendees: conint(gt=0)
-    categoryId: Optional[int] = None
-    locationId: int
-    status: EventStatus = EventStatus.DRAFT
-    ticketPrice: Optional[Decimal] = None
-    maxTicketsPerPurchase: Optional[conint(gt=0)] = 10
-    ageRestriction: Optional[str] = None
-    zones: Optional[List[TicketZonePayload]] = Field(None)
-
-    class Config:
-        allow_population_by_field_name = True
-        schema_extra = {
+    model_config = ConfigDict(
+        populate_by_name=True,
+        json_schema_extra={
             "example": {
                 "title": "Innovation Summit",
                 "description": "A full-day program with talks and workshops.",
@@ -54,9 +41,25 @@ class EventCreate(BaseModel):
                 "maxTicketsPerPurchase": 6,
             }
         }
+    )
+
+    title: str = Field(..., min_length=3)
+    description: Optional[str] = Field(None, max_length=1200)
+    startDate: datetime
+    endDate: Optional[datetime] = None
+    maxAttendees: conint(gt=0)
+    categoryId: Optional[int] = None
+    locationId: int
+    status: EventStatus = EventStatus.DRAFT
+    ticketPrice: Optional[Decimal] = None
+    maxTicketsPerPurchase: Optional[conint(gt=0)] = 10
+    ageRestriction: Optional[str] = None
+    zones: Optional[List[TicketZonePayload]] = Field(None)
 
 
 class EventResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     name: str
     title: str
@@ -76,9 +79,6 @@ class EventResponse(BaseModel):
     createdAt: Optional[datetime] = None
     updatedAt: Optional[datetime] = None
     ticketTypes: List['TicketTypeResponse'] = Field(default_factory=list, alias='ticketTypes')
-
-    class Config:
-        from_attributes = True
 
 
 class TicketTypeStatistics(BaseModel):

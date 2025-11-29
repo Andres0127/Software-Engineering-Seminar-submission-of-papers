@@ -60,7 +60,12 @@ export class TicketService {
       const response: AxiosResponse<Order> = await ticketApi.post('/orders/', orderData);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error creating the order');
+      // FastAPI returns errors in response.data.detail
+      const errorMessage = error.response?.data?.detail || error.response?.data?.message || error.message || 'Error creating the order';
+      // Preserve the original error so CheckoutPage can access response.data.detail
+      const newError: any = new Error(errorMessage);
+      newError.response = error.response;
+      throw newError;
     }
   }
 

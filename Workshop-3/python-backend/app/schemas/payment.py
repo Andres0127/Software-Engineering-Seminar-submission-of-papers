@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr, validator
+from pydantic import BaseModel, Field, EmailStr, validator, ConfigDict
 from typing import Optional, Dict, Any
 from datetime import datetime
 from decimal import Decimal
@@ -117,6 +117,8 @@ class PaymentRequest(BaseModel):
 
 class PaymentResponse(BaseModel):
     """Respuesta del procesamiento de pago"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     order_id: int
     transaction_id: str
@@ -128,9 +130,6 @@ class PaymentResponse(BaseModel):
     payment_date: datetime
     authorization_code: Optional[str]
     payment_details: Optional[Dict[str, Any]]
-    
-    class Config:
-        from_attributes = True
 
 
 class PaymentConfirmation(BaseModel):

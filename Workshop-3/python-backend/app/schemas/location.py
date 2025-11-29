@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class LocationBase(BaseModel):
     name: str
@@ -9,9 +9,8 @@ class LocationCreate(LocationBase):
     pass
 
 class LocationResponse(LocationBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
-
-    class Config:
-        from_attributes = True
 
 

@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List
 from uuid import uuid4
+import logging
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
@@ -15,6 +16,8 @@ from ..models.ticket import Ticket, TicketType
 from ..schemas.order import OrderCreate, OrderPayment, OrderRefundRequest, OrderResponse
 from ..services.notification_service import NotificationService
 from ..utils.auth import get_current_user_id, require_buyer, require_organizer_or_admin
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/orders", tags=["orders"])
 
@@ -47,20 +50,30 @@ async def create_order(
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user_id),
 ):
+    # Log the incoming payload for debugging
+    logger.info(f"Creating order - event_id: {payload.event_id}, ticket_type_id: {payload.ticket_type_id}, quantity: {payload.quantity}, user_id: {current_user_id}")
+    
     event = db.query(Event).filter(Event.id == payload.event_id).first()
     if not event:
+        logger.warning(f"Event not found: {payload.event_id}")
         raise HTTPException(status_code=404, detail="Event not found")
 
-    if (event.event_status or "draft").upper() != "PUBLISHED":
+    event_status = (event.event_status or "draft").upper()
+    logger.info(f"Event status: {event_status}, Event date: {event.date}")
+    
+    if event_status != "PUBLISHED":
+        logger.warning(f"Event {payload.event_id} is not published. Status: {event_status}")
         raise HTTPException(
             status_code=400,
-            detail="Tickets can only be purchased for published events.",
+            detail=f"Tickets can only be purchased for published events. Current status: {event_status}",
         )
 
     if event.date and event.date < datetime.utcnow():
+        event_date_str = event.date.strftime("%Y-%m-%d %H:%M:%S") if event.date else "N/A"
+        logger.warning(f"Event {payload.event_id} has already started. Date: {event_date_str}, Current: {datetime.utcnow()}")
         raise HTTPException(
             status_code=400,
-            detail="The event has already started or ticket sales are closed.",
+            detail=f"El evento ya ha comenzado o las ventas de boletos están cerradas. Fecha del evento: {event_date_str}",
         )
 
     ticket_type = (

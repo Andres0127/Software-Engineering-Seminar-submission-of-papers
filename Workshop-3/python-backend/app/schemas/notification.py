@@ -1,19 +1,15 @@
 """
 Schemas for notifications
 """
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from datetime import datetime
-from typing import Optional, Dict, Any
+from typing import Optional
 
 
 class NotificationBase(BaseModel):
     """Base notification schema"""
     type: str
-    title: str
-    message: str
-    related_entity_type: Optional[str] = None
-    related_entity_id: Optional[int] = None
-    data: Optional[Dict[str, Any]] = None
+    message: Optional[str] = None
 
 
 class NotificationCreate(NotificationBase):
@@ -23,15 +19,14 @@ class NotificationCreate(NotificationBase):
 
 class NotificationResponse(NotificationBase):
     """Schema for notification responses"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     user_id: int
     is_read: bool
-    read_at: Optional[datetime] = None
+    sent_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class NotificationMarkRead(BaseModel):
