@@ -1,0 +1,70 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: rootpassword
+          MYSQL_DATABASE: eventplatform_auth
+        ports:
+          - 3306:3306
+      postgres:
+        image: postgres:15-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: eventplatform
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build and test Java backend
+        run: |
+          cd java-backend
+          mvn clean test
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      - name: Install Python dependencies and test
+        run: |
+          cd python-backend
+          pip install -r requirements.txt
+          pytest
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install frontend dependencies and test
+        run: |
+          cd react-frontend
+          npm install
+          npm run test
+
+      - name: Build Docker images
+        run: |
+          docker build -t eventplatform-java-backend ./java-backend
+          docker build -t eventplatform-python-backend ./python-backend
+          docker build -t eventplatform-react-frontend ./react-frontend
