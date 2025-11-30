@@ -21,7 +21,7 @@ jobs:
         image: postgres:15-alpine
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
+          POSTGRES_PASSWORD: 200127
           POSTGRES_DB: eventplatform
         ports:
           - 5432:5432
@@ -46,6 +46,12 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Restore PostgreSQL backup
+        run: |
+          sudo apt-get install -y postgresql-client
+          psql -h localhost -U postgres -d eventplatform -f Workshop-3/python-backend/Backup/Backup_Events.sql
+        env:
+          PGPASSWORD: 200127
       - name: Install Python dependencies and test
         working-directory: Workshop-3/python-backend
         run: |
