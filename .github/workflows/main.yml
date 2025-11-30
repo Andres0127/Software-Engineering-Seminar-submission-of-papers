@@ -38,7 +38,7 @@ jobs:
 
       - name: Build and test Java backend
         run: |
-          cd java-backend
+          cd Workshop-3/java-backend
           mvn clean test
 
       - name: Set up Python
@@ -48,7 +48,7 @@ jobs:
 
       - name: Install Python dependencies and test
         run: |
-          cd python-backend
+          cd Workshop-3/python-backend
           pip install -r requirements.txt
           pytest
 
@@ -59,12 +59,12 @@ jobs:
 
       - name: Install frontend dependencies and test
         run: |
-          cd react-frontend
+          cd Workshop-3/react-frontend
           npm install
           npm run test
 
       - name: Build Docker images
         run: |
-          docker build -t eventplatform-java-backend ./java-backend
-          docker build -t eventplatform-python-backend ./python-backend
-          docker build -t eventplatform-react-frontend ./react-frontend
+          docker build -t eventplatform-java-backend ./Workshop-3/java-backend
+          docker build -t eventplatform-python-backend ./Workshop-3/python-backend
+          docker build -t eventplatform-react-frontend ./Workshop-3/react-frontend
