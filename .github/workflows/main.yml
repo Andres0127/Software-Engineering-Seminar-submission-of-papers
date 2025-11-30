@@ -49,7 +49,7 @@ jobs:
       - name: Restore PostgreSQL backup
         run: |
           sudo apt-get install -y postgresql-client
-          psql -h localhost -U postgres -d eventplatform -f Workshop-3/python-backend/Backup/Backup_Events.sql
+          pg_restore -h localhost -U postgres -d eventplatform Workshop-3/python-backend/Backup/Backup_Events.sql
         env:
           PGPASSWORD: 200127
       - name: Install Python dependencies and test
