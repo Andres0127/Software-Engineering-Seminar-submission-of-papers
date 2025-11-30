@@ -66,10 +66,15 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Install frontend dependencies and test
+      - name: Install frontend dependencies
         run: |
           cd Workshop-3/react-frontend
           npm install
+          npm install react-router-dom
+
+      - name: Run frontend tests
+        run: |
+          cd Workshop-3/react-frontend
           npm run test
 
       - name: Build Docker images
