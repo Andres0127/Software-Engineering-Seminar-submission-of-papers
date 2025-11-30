@@ -52,6 +52,11 @@ jobs:
           pg_restore -h localhost -U postgres -d eventplatform Workshop-3/python-backend/Backup/Backup_Events.sql
         env:
           PGPASSWORD: 200127
+        - name: Run database initialization script
+          run: |
+            psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -f Workshop-3/python-backend/Backup/create-database
+          env:
+            PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
       - name: Install Python dependencies and test
         working-directory: Workshop-3/python-backend
         run: |
