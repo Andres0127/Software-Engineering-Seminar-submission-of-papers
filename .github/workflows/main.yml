@@ -71,6 +71,11 @@ jobs:
           cd Workshop-3/react-frontend
           npm ci
 
+      - name: Verificar dependencias instaladas frontend
+        run: |
+          cd Workshop-3/react-frontend
+          npm list --depth=1
+
       - name: Run frontend tests
         run: |
           cd Workshop-3/react-frontend
