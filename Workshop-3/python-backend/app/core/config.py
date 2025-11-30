@@ -16,11 +16,11 @@ class Settings(BaseSettings):
     JWT_ALGORITHMS: List[str] = ["HS256", "HS384", "HS512"]
 
     # Database Configuration (can be overridden by environment variables)
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/eventplatform"
+    DATABASE_URL: str = "postgresql://postgres:200127@localhost:5432/eventplatform"
     POSTGRES_HOST: str = "localhost"
     POSTGRES_PORT: int = 5432
     POSTGRES_USER: str = "postgres"
-    POSTGRES_PASSWORD: str = "postgres"
+    POSTGRES_PASSWORD: str = "200127"
     POSTGRES_DB: str = "eventplatform"
 
     # CORS (can be overridden by environment variables)
