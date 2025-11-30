@@ -66,6 +66,12 @@ jobs:
         with:
           node-version: '20'
 
+      - name: Limpiar caché y node_modules frontend
+        run: |
+          cd Workshop-3/react-frontend
+          npm cache clean --force
+          rm -rf node_modules
+
       - name: Install frontend dependencies
         run: |
           cd Workshop-3/react-frontend
