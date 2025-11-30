@@ -46,12 +46,6 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: Restore PostgreSQL backup
-        run: |
-          sudo apt-get install -y postgresql-client
-          pg_restore -h localhost -U postgres -d eventplatform Workshop-3/python-backend/Backup/Backup_Events.sql
-        env:
-          PGPASSWORD: 200127
 
       - name: Run database initialization script
         run: |
