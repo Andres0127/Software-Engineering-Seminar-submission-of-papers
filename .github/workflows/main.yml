@@ -85,7 +85,7 @@ jobs:
       - name: Run frontend tests
         run: |
           cd Workshop-3/react-frontend
-          npm run test
+          CI=false npm run test
 
       - name: Build Docker images
         run: |
