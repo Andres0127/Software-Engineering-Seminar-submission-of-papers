@@ -49,9 +49,9 @@ jobs:
 
       - name: Run database initialization script
         run: |
-          psql -h localhost -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -f Workshop-3/python-backend/Backup/create-database
+          psql -h localhost -U $POSTGRES_USER -d $POSTGRES_DB -f Workshop-3/python-backend/Backup/create-database
         env:
-          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          PGPASSWORD: $POSTGRES_PASSWORD
       - name: Install Python dependencies and test
         working-directory: Workshop-3/python-backend
         run: |
