@@ -50,7 +50,7 @@ jobs:
         run: |
           cd Workshop-3/python-backend
           pip install -r requirements.txt
-          pytest
+          PYTHONPATH=$(pwd) pytest
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
