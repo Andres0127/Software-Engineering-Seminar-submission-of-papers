@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from app.core.config import settings
-from app.routes import events, tickets, orders, locations, categories, payments, notifications
+from app.routes import events, tickets, orders, locations, categories, payments, notifications, users
 from app.models import Base
 from app.core.database import engine
 import logging
@@ -56,6 +56,7 @@ app.include_router(locations.router)
 app.include_router(categories.router)
 app.include_router(payments.router)
 app.include_router(notifications.router)
+app.include_router(users.router)
 
 @app.get("/")
 async def root():

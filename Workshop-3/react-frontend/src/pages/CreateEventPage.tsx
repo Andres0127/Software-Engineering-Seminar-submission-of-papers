@@ -25,7 +25,7 @@ const INITIAL_FORM: FormState = {
   maxAttendees: 50,
   categoryId: '',
   locationId: '',
-  status: 'DRAFT',
+  status: 'PUBLISHED',
   maxTicketsPerPurchase: 10,
   ageRestriction: '',
 };
@@ -278,13 +278,20 @@ export const CreateEventPage: React.FC = () => {
         toast.success('Event updated successfully');
         navigate(`/events/${eventId}`);
       } else {
-        await EventService.createEvent(payload);
+        const createdEvent = await EventService.createEvent(payload);
+        console.log('Event created:', createdEvent);
         toast.success('Event created successfully');
-        navigate('/organizer');
+        // Navigate to events page to see the newly created event
+        // Use replace: false and add a timestamp to force refresh
+        navigate('/events', { replace: false });
       }
     } catch (error: any) {
       console.error(isEditMode ? 'Error updating event' : 'Error creating event', error);
-      toast.error(error.response?.data?.detail || 'Error processing the event');
+      console.error('Error response data:', error.response?.data);
+      console.error('Error message:', error.message);
+      // Extract error message from different possible locations
+      const errorMessage = error.message || error.response?.data?.detail || error.response?.data?.message || 'Error processing the event';
+      toast.error(errorMessage);
     } finally {
       setSaving(false);
     }
@@ -414,6 +421,59 @@ export const CreateEventPage: React.FC = () => {
           </div>
         </div>
 
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+              <label className="label" htmlFor="categoryId">Category</label>
+            <select
+              id="categoryId"
+              name="categoryId"
+              value={form.categoryId}
+              onChange={handleChange}
+              className="select"
+              required
+            >
+            <option value="">Select a category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id.toString()}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="label" htmlFor="locationId">Location</label>
+            <select
+              id="locationId"
+              name="locationId"
+              value={form.locationId}
+              onChange={handleChange}
+              className="select"
+              required
+            >
+              <option value="">Select a location</option>
+              {locations.map((location) => (
+                <option key={location.id} value={location.id.toString()}>
+                  {location.name} · {location.address}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="label" htmlFor="ageRestriction">Age restriction</label>
+            <input
+              id="ageRestriction"
+              name="ageRestriction"
+              type="text"
+              value={form.ageRestriction}
+              onChange={handleChange}
+              className="input"
+              placeholder="E.g. 18+"
+            />
+          </div>
+        </div>
+
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
@@ -506,59 +566,6 @@ export const CreateEventPage: React.FC = () => {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-              <label className="label" htmlFor="categoryId">Category</label>
-            <select
-              id="categoryId"
-              name="categoryId"
-              value={form.categoryId}
-              onChange={handleChange}
-              className="select"
-              required
-            >
-            <option value="">Select a category</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id.toString()}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="label" htmlFor="locationId">Location</label>
-            <select
-              id="locationId"
-              name="locationId"
-              value={form.locationId}
-              onChange={handleChange}
-              className="select"
-              required
-            >
-              <option value="">Select a location</option>
-              {locations.map((location) => (
-                <option key={location.id} value={location.id.toString()}>
-                  {location.name} · {location.address}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <div>
-            <label className="label" htmlFor="ageRestriction">Age restriction</label>
-            <input
-              id="ageRestriction"
-              name="ageRestriction"
-              type="text"
-              value={form.ageRestriction}
-              onChange={handleChange}
-              className="input"
-              placeholder="E.g. 18+"
-            />
           </div>
         </div>
 

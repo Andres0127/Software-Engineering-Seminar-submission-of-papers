@@ -1,0 +1,46 @@
+\babel@toc {spanish}{}\relax 
+\contentsline {section}{\numberline {1}Introduction}{5}{section.1}%
+\contentsline {section}{\numberline {2}Docker Containerization}{5}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Overview}{5}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}Java Backend Dockerfile}{5}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}Python Backend Dockerfile}{6}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}React Frontend Dockerfile}{7}{subsection.2.4}%
+\contentsline {subsection}{\numberline {2.5}Docker Compose Configuration}{8}{subsection.2.5}%
+\contentsline {subsection}{\numberline {2.6}Containerization Benefits}{11}{subsection.2.6}%
+\contentsline {section}{\numberline {3}Acceptance Testing with Apache Cucumber}{11}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Overview}{11}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}Cucumber Feature Files}{11}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Step Definitions}{12}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Cucumber Test Runner Configuration}{13}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}Test Execution and Results}{14}{subsection.3.5}%
+\contentsline {subsection}{\numberline {3.6}Benefits of Acceptance Testing}{14}{subsection.3.6}%
+\contentsline {section}{\numberline {4}API Stress Testing with Apache JMeter}{14}{section.4}%
+\babel@toc {spanish}{}\relax 
+\contentsline {subsection}{\numberline {4.1}Introducción}{14}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Plan de Pruebas}{14}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Configuración del Test Plan}{15}{subsection.4.3}%
+\contentsline {subsection}{\numberline {4.4}Escenarios de Prueba}{15}{subsection.4.4}%
+\contentsline {subsubsection}{\numberline {4.4.1}Escenario 1: Carga Gradual en Login}{15}{subsubsection.4.4.1}%
+\contentsline {subsubsection}{\numberline {4.4.2}Escenario 2: Pico de Carga en Consulta de Eventos}{15}{subsubsection.4.4.2}%
+\contentsline {subsubsection}{\numberline {4.4.3}Escenario 3: Carga Sostenida en Compra de Tickets}{15}{subsubsection.4.4.3}%
+\contentsline {subsection}{\numberline {4.5}Métricas Evaluadas}{16}{subsection.4.5}%
+\contentsline {subsection}{\numberline {4.6}Resultados Esperados}{16}{subsection.4.6}%
+\contentsline {subsection}{\numberline {4.7}Análisis de Resultados}{16}{subsection.4.7}%
+\contentsline {subsection}{\numberline {4.8}Recomendaciones}{16}{subsection.4.8}%
+\babel@toc {english}{}\relax 
+\contentsline {section}{\numberline {5}CI/CD Pipeline with GitHub Actions}{17}{section.5}%
+\contentsline {subsection}{\numberline {5.1}Overview}{17}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}GitHub Actions Workflow Configuration}{17}{subsection.5.2}%
+\contentsline {subsection}{\numberline {5.3}Workflow Stages}{20}{subsection.5.3}%
+\contentsline {subsubsection}{\numberline {5.3.1}1. Test Java Backend}{20}{subsubsection.5.3.1}%
+\contentsline {subsubsection}{\numberline {5.3.2}2. Test Python Backend}{20}{subsubsection.5.3.2}%
+\contentsline {subsubsection}{\numberline {5.3.3}3. Build Docker Images}{21}{subsubsection.5.3.3}%
+\contentsline {subsubsection}{\numberline {5.3.4}4. Lint Frontend}{21}{subsubsection.5.3.4}%
+\contentsline {subsection}{\numberline {5.4}CI/CD Benefits}{21}{subsection.5.4}%
+\contentsline {subsection}{\numberline {5.5}Workflow Execution Evidence}{21}{subsection.5.5}%
+\contentsline {section}{\numberline {6}Project Organization and Documentation}{22}{section.6}%
+\contentsline {subsection}{\numberline {6.1}Folder Structure}{22}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}README.md Structure}{22}{subsection.6.2}%
+\contentsline {subsection}{\numberline {6.3}Documentation Standards}{23}{subsection.6.3}%
+\contentsline {section}{\numberline {7}Conclusion}{23}{section.7}%
+\contentsline {section}{\numberline {8}References}{23}{section.8}%

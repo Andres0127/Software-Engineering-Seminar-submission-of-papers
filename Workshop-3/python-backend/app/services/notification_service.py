@@ -19,14 +19,29 @@ class NotificationService:
         db: Session,
         user_id: int,
         notification_type: str,
-        message: str
+        message: str,
+        title: Optional[str] = None
     ) -> Notification:
         """Create a new notification"""
+        # Generate title if not provided
+        if not title:
+            title_map = {
+                NotificationType.PAYMENT_SUCCESS: "Payment Successful",
+                NotificationType.PAYMENT_FAILED: "Payment Failed",
+                NotificationType.REFUND_REQUESTED: "Refund Requested",
+                NotificationType.REFUND_APPROVED: "Refund Approved",
+                NotificationType.REFUND_REJECTED: "Refund Rejected",
+                NotificationType.ORDER_CONFIRMED: "Order Confirmed",
+                NotificationType.ORDER_CANCELLED: "Order Cancelled",
+            }
+            title = title_map.get(notification_type, "Notification")
+        
         notification = Notification(
             user_id=user_id,
             type=notification_type,
+            title=title,
             message=message,
-            sent_at=datetime.utcnow(),
+            read_at=None,  # read_at is set when notification is marked as read
             is_read=False
         )
         

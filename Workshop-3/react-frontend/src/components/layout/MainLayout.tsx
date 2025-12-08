@@ -7,7 +7,7 @@ export const MainLayout: React.FC = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen" style={{ backgroundColor: '#F9FAFB' }}>
       <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
       
       <div className="flex">

@@ -15,7 +15,7 @@ from ..models.order import Order
 from ..models.ticket import Ticket, TicketType
 from ..schemas.order import OrderCreate, OrderPayment, OrderRefundRequest, OrderResponse
 from ..services.notification_service import NotificationService
-from ..utils.auth import get_current_user_id, require_buyer, require_organizer_or_admin
+from ..utils.auth import get_current_user_id, get_current_user_role, require_buyer, require_organizer_or_admin
 
 logger = logging.getLogger(__name__)
 
@@ -487,12 +487,28 @@ async def debug_dashboard_data(
 async def get_dashboard_stats(
     db: Session = Depends(get_db),
     current_user_id: int = Depends(get_current_user_id),
+    current_user_role: str = Depends(get_current_user_role),
 ):
-    """Get dashboard statistics for organizer"""
+    """Get dashboard statistics for organizer or admin"""
     try:
-        # Get all events for this organizer
-        organizer_events = db.query(Event).filter(Event.organizer_id == current_user_id).all()
-        event_ids = [event.id for event in organizer_events]
+        # For ADMIN, show all events. For ORGANIZER, show only their events
+        is_admin = current_user_role == "ROLE_ADMIN"
+        
+        if is_admin:
+            # Get all PUBLISHED events for admin (consistent with EventsPage)
+            # Use case-insensitive comparison to handle both "published" and "PUBLISHED"
+            all_events = db.query(Event).filter(
+                func.lower(Event.event_status) == "published"
+            ).all()
+            event_ids = [event.id for event in all_events]
+        else:
+            # Get all PUBLISHED events for this organizer
+            organizer_events = db.query(Event).filter(
+                Event.organizer_id == current_user_id,
+                func.lower(Event.event_status) == "published"
+            ).all()
+            event_ids = [event.id for event in organizer_events]
+            all_events = organizer_events
         
         if not event_ids:
             return JSONResponse(content={
@@ -519,20 +535,33 @@ async def get_dashboard_stats(
             Order.status.in_(["confirmed", "CONFIRMED", "refund_requested", "REFUND_REQUESTED"])
         ).scalar() or 0
         
-        # Count active events (not expired)
-        active_events = db.query(func.count(Event.id)).filter(
-            Event.organizer_id == current_user_id,
-            Event.end_date >= datetime.now()
-        ).scalar() or 0
+        # Count active events (not expired and published)
+        if is_admin:
+            active_events = db.query(func.count(Event.id)).filter(
+                func.lower(Event.event_status) == "published",
+                Event.end_date >= datetime.now()
+            ).scalar() or 0
+        else:
+            active_events = db.query(func.count(Event.id)).filter(
+                Event.organizer_id == current_user_id,
+                func.lower(Event.event_status) == "published",
+                Event.end_date >= datetime.now()
+            ).scalar() or 0
         
         # Revenue by event
-        revenue_by_event_query = db.query(
+        revenue_by_event_base_query = db.query(
             Event.name,
             func.sum(Order.total_amount).label('revenue')
         ).join(Order, Event.id == Order.event_id).filter(
-            Event.organizer_id == current_user_id,
             Order.status.in_(["confirmed", "CONFIRMED", "refund_requested", "REFUND_REQUESTED"])
-        ).group_by(Event.id, Event.name).order_by(func.sum(Order.total_amount).desc()).limit(10).all()
+        )
+        
+        if not is_admin:
+            revenue_by_event_base_query = revenue_by_event_base_query.filter(
+                Event.organizer_id == current_user_id
+            )
+        
+        revenue_by_event_query = revenue_by_event_base_query.group_by(Event.id, Event.name).order_by(func.sum(Order.total_amount).desc()).limit(10).all()
         
         revenue_by_event = [
             {"eventName": row.name, "revenue": float(row.revenue or 0)}
@@ -591,9 +620,10 @@ async def get_dashboard_stats(
             for row in status_distribution_query
         ]
         
-        # Recent events with metrics
+        # Recent events with metrics - order by most recent
+        sorted_events = sorted(all_events, key=lambda e: e.created_at if e.created_at else datetime.min, reverse=True)
         recent_events = []
-        for event in organizer_events[:10]:  # Last 10 events
+        for event in sorted_events[:10]:  # Last 10 events
             event_orders = db.query(Order).filter(
                 Order.event_id == event.id,
                 Order.status.in_(["confirmed", "CONFIRMED", "refund_requested", "REFUND_REQUESTED"])
@@ -614,7 +644,7 @@ async def get_dashboard_stats(
         
         return JSONResponse(content={
             "totalRevenue": float(total_revenue),
-            "totalEvents": len(organizer_events),
+            "totalEvents": len(all_events),
             "totalTicketsSold": int(total_tickets),
             "activeEvents": int(active_events),
             "revenueByEvent": revenue_by_event,

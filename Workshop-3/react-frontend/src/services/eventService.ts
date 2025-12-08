@@ -58,7 +58,10 @@ export class EventService {
       }
 
       const query = params.toString() ? `?${params.toString()}` : '';
+      console.log('Fetching events from:', `/events${query}`);
       const response: AxiosResponse<Event[]> = await eventApi.get(`/events${query}`);
+      console.log('Events API response:', response.data);
+      console.log('Number of events in response:', response.data?.length || 0);
       return response.data;
     } catch (error: any) {
       throw new Error(error.response?.data?.message || 'Unable to fetch events');
@@ -99,9 +102,13 @@ export class EventService {
     }[];
   }): Promise<Event> {
     try {
-      const response: AxiosResponse<Event> = await eventApi.post('/events/', eventData);
+      console.log('Creating event with data:', eventData);
+      const response: AxiosResponse<Event> = await eventApi.post('/events', eventData);
+      console.log('Event created successfully:', response.data);
       return response.data;
     } catch (error: any) {
+      console.error('Error creating event:', error);
+      console.error('Error response:', error.response?.data);
       throw new Error(error.response?.data?.message || 'Error creating event');
     }
   }
@@ -123,7 +130,10 @@ export class EventService {
       const response: AxiosResponse<Event> = await eventApi.put(`/events/${eventId}`, eventData);
       return response.data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.message || 'Error updating event');
+      console.error('Error updating event:', error);
+      console.error('Error response:', error.response?.data);
+      const errorMessage = error.response?.data?.detail || error.response?.data?.message || 'Error updating event';
+      throw new Error(errorMessage);
     }
   }
 

@@ -172,7 +172,20 @@ const RefundDetailsModal: React.FC<RefundDetailsModalProps> = ({
               </button>
               <button
                 onClick={handleApprove}
-                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+                className="px-4 py-2 text-white rounded-lg transition-all flex items-center space-x-2"
+                style={{ 
+                  background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #3395FF 0%, #855AFF 50%, #FF66B3 100%)';
+                  e.currentTarget.style.transform = 'translateY(-1px)';
+                  e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%)';
+                  e.currentTarget.style.transform = '';
+                  e.currentTarget.style.boxShadow = '';
+                }}
               >
                 <CheckCircle className="w-4 h-4" />
                 <span>Approve Refund</span>
@@ -385,7 +398,10 @@ const RefundRequestsPage: React.FC = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-right">
                         <button
                           onClick={() => setSelectedRefund(request)}
-                          className="inline-flex items-center space-x-1 px-3 py-2 bg-primary-600 text-white text-sm rounded-lg hover:bg-primary-700 transition-colors"
+                          className="inline-flex items-center space-x-1 px-3 py-2 text-white text-sm rounded-lg transition-colors"
+                          style={{ background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)' }}
+                          onMouseEnter={(e) => e.currentTarget.style.background = 'linear-gradient(135deg, #66AFFF 0%, #875BFF 100%)'}
+                          onMouseLeave={(e) => e.currentTarget.style.background = 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'}
                         >
                           <Eye className="w-4 h-4" />
                           <span>View Details</span>

@@ -9,8 +9,8 @@ import { useAuthStore } from '../store/authStore';
 
 const statusStyles: Record<string, string> = {
   PENDING: 'bg-yellow-100 text-yellow-800',
-  COMPLETED: 'bg-green-100 text-green-800',
-  CONFIRMED: 'bg-green-100 text-green-800',
+  COMPLETED: 'bg-blue-100 text-blue-600',
+  CONFIRMED: 'bg-blue-100 text-blue-600',
   CANCELLED: 'bg-red-100 text-red-800',
   REFUNDED: 'bg-red-100 text-red-800',
   REFUND_REQUESTED: 'bg-yellow-100 text-yellow-800',

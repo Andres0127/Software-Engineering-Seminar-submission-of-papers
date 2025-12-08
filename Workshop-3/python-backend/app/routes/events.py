@@ -1,10 +1,13 @@
+import logging
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, or_
+from sqlalchemy import func, or_, desc
 from sqlalchemy.orm import Session
+
+logger = logging.getLogger(__name__)
 
 from ..core.database import get_db
 from ..models.category import Category
@@ -12,6 +15,7 @@ from ..models.event import Event
 from ..models.location import Location
 from ..models.order import Order
 from ..models.ticket import Ticket, TicketType
+from ..models.user import User
 from ..schemas.category import CategoryResponse
 from ..schemas.event import (
     EventCreate,
@@ -78,11 +82,18 @@ def _get_ticket_types_for_event(db: Session, event_id: int) -> List[TicketTypeRe
 
 
 def _has_event_orders(db: Session, event_id: int) -> bool:
+    """Check if event has confirmed orders (case-insensitive)"""
+    # Only block updates if there are confirmed orders
+    # Allow updates if orders are pending, cancelled, or refunded
     count = (
         db.query(func.count(Order.id))
-        .filter(Order.event_id == event_id)
+        .filter(
+            Order.event_id == event_id,
+            func.lower(Order.status).in_(['confirmed', 'paid', 'completed'])
+        )
         .scalar()
     )
+    logger.info(f"Event {event_id} has {count} confirmed orders")
     return bool(count)
 
 
@@ -108,6 +119,7 @@ def _sync_ticket_types(
 def _build_event_response(event: Event, db: Session) -> EventResponse:
     category = None
     location = None
+    organizer = None
 
     category_id = getattr(event, "category_id", None)
     if category_id:
@@ -115,6 +127,18 @@ def _build_event_response(event: Event, db: Session) -> EventResponse:
 
     if event.location_id:
         location = db.query(Location).filter(Location.id == event.location_id).first()
+
+    # Get organizer information
+    organizer_name = None
+    if event.organizer_id:
+        organizer = db.query(User).filter(User.id == event.organizer_id).first()
+        if organizer:
+            organizer_name = organizer.name
+            logger.info(f"Found organizer: {organizer_name} (ID: {event.organizer_id})")
+        else:
+            logger.warning(f"Organizer with ID {event.organizer_id} not found in Python database")
+            # Try to get from Java backend if available
+            # For now, we'll leave it as None and handle in frontend
 
     ticket_price = 0.0
     ticket_types = _get_ticket_types_for_event(db, event.id)
@@ -138,6 +162,7 @@ def _build_event_response(event: Event, db: Session) -> EventResponse:
         categoryId=category.id if category else category_id,
         locationId=location.id if location else event.location_id,
         organizerId=event.organizer_id,
+        organizerName=organizer_name,
         category=CategoryResponse.model_validate(category) if category else None,
         location=LocationResponse.model_validate(location) if location else None,
         ageRestriction=event.age_restriction,
@@ -171,6 +196,14 @@ async def create_event(
 
     end_date = _validate_event_dates(payload.startDate, payload.endDate)
 
+    # Validate event capacity against location capacity
+    location_capacity = location.capacity if location and location.capacity else 0
+    if location_capacity > 0 and payload.maxAttendees > location_capacity:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Event capacity ({payload.maxAttendees}) exceeds location capacity ({location_capacity}). Please adjust the event capacity or select a different location."
+        )
+
     if payload.maxTicketsPerPurchase and payload.maxTicketsPerPurchase > payload.maxAttendees:
         raise HTTPException(
             status_code=400,
@@ -180,6 +213,10 @@ async def create_event(
     if payload.ticketPrice is not None and payload.ticketPrice < 0:
         raise HTTPException(status_code=400, detail="Ticket price must be positive.")
 
+    # Normalize status to lowercase for consistency
+    normalized_status = _normalize_status(payload.status.value)
+    logger.info(f"Creating event with status: {normalized_status} (from {payload.status.value})")
+    
     db_event = Event(
         name=payload.title.strip(),
         description=payload.description,
@@ -188,7 +225,7 @@ async def create_event(
         category=category.name,
         category_id=category.id,
         capacity=payload.maxAttendees,
-        event_status=_normalize_status(payload.status.value),
+        event_status=normalized_status,
         age_restriction=payload.ageRestriction,
         max_tickets_per_purchase=payload.maxTicketsPerPurchase or 10,
         organizer_id=current_user_id,
@@ -197,10 +234,44 @@ async def create_event(
 
     db.add(db_event)
     db.flush()
+    # Ensure created_at is set if it wasn't set automatically
+    if db_event.created_at is None:
+        db_event.created_at = datetime.utcnow()
+        db.flush()
+    logger.info(f"Event created with ID: {db_event.id}, status: {db_event.event_status}, created_at: {db_event.created_at}")
 
     zones = payload.zones or []
+    
+    # Validate zones capacity against location and event capacity
+    if zones:
+        total_zones_capacity = sum(zone.quantity for zone in zones)
+        location_capacity = location.capacity if location and location.capacity else 0
+        event_capacity = payload.maxAttendees
+        
+        # Check against location capacity
+        if total_zones_capacity > location_capacity:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Total zones capacity ({total_zones_capacity}) exceeds location capacity ({location_capacity}). Please adjust the zones quantities."
+            )
+        
+        # Check against event capacity
+        if total_zones_capacity > event_capacity:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Total zones capacity ({total_zones_capacity}) exceeds event capacity ({event_capacity}). Please adjust the zones quantities."
+            )
+    
     if not zones and payload.ticketPrice is not None:
-        ticket_quantity = payload.maxAttendees or (location.capacity if location else 0) or 1
+        location_capacity = location.capacity if location and location.capacity else 0
+        event_capacity = payload.maxAttendees
+        
+        # Use the minimum of location capacity and event capacity
+        ticket_quantity = min(
+            payload.maxAttendees,
+            location_capacity if location_capacity > 0 else payload.maxAttendees
+        ) or 1
+        
         zones = [
             TicketZonePayload(
                 name="General Admission",
@@ -210,6 +281,13 @@ async def create_event(
                 benefits="",
             )
         ]
+        
+        # Validate the auto-created zone
+        if ticket_quantity > location_capacity and location_capacity > 0:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Event capacity ({ticket_quantity}) exceeds location capacity ({location_capacity}). Please adjust the event capacity or select a different location."
+            )
 
     if zones:
         _sync_ticket_types(db, db_event, zones)
@@ -234,7 +312,14 @@ async def list_events(
     limit: int = Query(20, ge=1, le=50),
 ):
     query = db.query(Event)
-    query = query.filter(Event.event_status == _normalize_status(status))
+    # Use case-insensitive comparison for status
+    normalized_status = _normalize_status(status)
+    logger.info(f"Listing events with status filter: '{normalized_status}' (from query param: {status})")
+    query = query.filter(func.lower(Event.event_status) == normalized_status)
+    
+    # Log total count before pagination
+    total_count = query.count()
+    logger.info(f"Total events found with status '{normalized_status}': {total_count}")
 
     if category_id:
         query = query.filter(Event.category_id == category_id)
@@ -263,8 +348,10 @@ async def list_events(
         )
         query = query.filter(Event.id.in_(subquery))
 
+    # Order by creation date descending (newest first) so newly created events appear first
+    # If created_at is None, fall back to ordering by date ascending
     events = (
-        query.order_by(Event.date.asc())
+        query.order_by(desc(Event.created_at).nullslast(), Event.date.asc())
         .offset((page - 1) * limit)
         .limit(limit)
         .all()
@@ -296,6 +383,14 @@ async def list_events(
         raise HTTPException(status_code=404, detail="Location not found")
 
     end_date = _validate_event_dates(payload.startDate, payload.endDate)
+
+    # Validate event capacity against location capacity
+    location_capacity = location.capacity if location and location.capacity else 0
+    if location_capacity > 0 and payload.maxAttendees > location_capacity:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Event capacity ({payload.maxAttendees}) exceeds location capacity ({location_capacity}). Please adjust the event capacity or select a different location."
+        )
 
     if payload.maxTicketsPerPurchase and payload.maxTicketsPerPurchase > payload.maxAttendees:
         raise HTTPException(
@@ -330,11 +425,48 @@ async def list_events(
         ticket_type.description = payload.description or ticket_type.description
 
     if payload.zones:
-        if _has_event_orders(db, event.id):
+        # Calculate total confirmed orders quantity
+        confirmed_orders_quantity = (
+            db.query(func.coalesce(func.sum(Order.quantity), 0))
+            .filter(
+                Order.event_id == event.id,
+                func.lower(Order.status).in_(['confirmed', 'paid', 'completed'])
+            )
+            .scalar()
+        ) or 0
+        
+        # Validate zones capacity against location and event capacity
+        total_zones_capacity = sum(zone.quantity for zone in payload.zones)
+        location_capacity = location.capacity if location and location.capacity else 0
+        event_capacity = payload.maxAttendees
+        
+        logger.info(f"Validating zones: total={total_zones_capacity}, location_capacity={location_capacity}, event_capacity={event_capacity}, confirmed_orders={confirmed_orders_quantity}")
+        
+        # Check if new capacity is less than confirmed orders
+        if total_zones_capacity < confirmed_orders_quantity:
             raise HTTPException(
                 status_code=400,
-                detail="Cannot update ticket zones after sales have started.",
+                detail=f"Cannot reduce zones capacity to {total_zones_capacity}. There are {confirmed_orders_quantity} confirmed orders. The total zones capacity must be at least {confirmed_orders_quantity}."
             )
+        
+        # Check against location capacity
+        if location_capacity > 0 and total_zones_capacity > location_capacity:
+            error_msg = f"Total zones capacity ({total_zones_capacity}) exceeds location capacity ({location_capacity}). Please adjust the zones quantities."
+            logger.warning(f"Validation failed: {error_msg}")
+            raise HTTPException(
+                status_code=400,
+                detail=error_msg
+            )
+        
+        # Check against event capacity
+        if total_zones_capacity > event_capacity:
+            error_msg = f"Total zones capacity ({total_zones_capacity}) exceeds event capacity ({event_capacity}). Please adjust the zones quantities."
+            logger.warning(f"Validation failed: {error_msg}")
+            raise HTTPException(
+                status_code=400,
+                detail=error_msg
+            )
+        
         _sync_ticket_types(db, event, payload.zones)
 
     db.commit()

@@ -216,7 +216,7 @@ export const TicketPurchasePage: React.FC = () => {
                 </div>
                 
                 <div className="text-right">
-                  <div className="text-xl font-bold text-green-600">
+                  <div className="text-xl font-bold" style={{ color: '#0077FF' }}>
                     {formatPrice(ticketType.price)}
                   </div>
                   <div className="text-sm text-gray-500">
@@ -280,7 +280,7 @@ export const TicketPurchasePage: React.FC = () => {
             </div>
             
             <div className="text-right">
-              <div className="text-2xl font-bold text-green-600">
+              <div className="text-2xl font-bold" style={{ color: '#0077FF' }}>
                 {formatPrice(totalAmount)}
               </div>
               <div className="text-sm text-gray-500">Total</div>

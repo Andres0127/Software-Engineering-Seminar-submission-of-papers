@@ -215,7 +215,7 @@ export const OrganizerEventsPage: React.FC = () => {
                     <span
                       className={`px-3 py-1 rounded-full text-sm font-semibold ${
                         event.status === 'PUBLISHED'
-                          ? 'bg-success-100 text-success-600'
+                          ? 'bg-blue-100 text-blue-600'
                           : event.status === 'DRAFT'
                           ? 'bg-warning-100 text-warning-600'
                           : 'bg-error-100 text-error-600'

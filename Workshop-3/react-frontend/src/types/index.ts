@@ -70,6 +70,7 @@ export interface Event {
   categoryId: number;
   locationId: number;
   organizerId: number;
+  organizerName?: string;
   category?: Category;
   location?: Location;
   ageRestriction?: string;

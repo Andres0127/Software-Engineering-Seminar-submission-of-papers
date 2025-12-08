@@ -95,7 +95,7 @@ export const TicketsPage: React.FC = () => {
     <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
       {/* Styled header */}
       <div style={{ 
-        background: 'linear-gradient(135deg, var(--primary-600) 0%, var(--success-600) 100%)',
+        background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%)',
         borderRadius: 'var(--border-radius-xl)',
         padding: '32px',
         color: 'var(--white)',
@@ -206,7 +206,7 @@ export const TicketsPage: React.FC = () => {
                         className="p-2 rounded-lg mr-3"
                         style={{ backgroundColor: '#d1fae520' }}
                       >
-                        <MapPin className="w-4 h-4" style={{ color: 'var(--success-600)' }} />
+                        <MapPin className="w-4 h-4" style={{ color: '#0077FF' }} />
                       </div>
                       <span className="font-medium">{ticket.locationName || 'Location pending'}</span>
                     </div>

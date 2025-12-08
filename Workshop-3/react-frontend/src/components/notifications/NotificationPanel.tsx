@@ -101,13 +101,13 @@ const NotificationPanel: React.FC = () => {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'payment_success':
-        return <CircleDollarSign className="w-5 h-5 text-green-600" />;
+        return <CircleDollarSign className="w-5 h-5" style={{ color: '#0077FF' }} />;
       case 'payment_failed':
         return <AlertCircle className="w-5 h-5 text-red-600" />;
       case 'refund_requested':
         return <RefreshCw className="w-5 h-5 text-blue-600" />;
       case 'refund_approved':
-        return <CheckCircle className="w-5 h-5 text-green-600" />;
+        return <CheckCircle className="w-5 h-5" style={{ color: '#0077FF' }} />;
       case 'refund_rejected':
         return <XCircle className="w-5 h-5 text-red-600" />;
       default:
@@ -119,7 +119,7 @@ const NotificationPanel: React.FC = () => {
     switch (type) {
       case 'payment_success':
       case 'refund_approved':
-        return 'bg-green-50 border-green-200';
+        return 'bg-blue-50 border-blue-200';
       case 'payment_failed':
       case 'refund_rejected':
         return 'bg-red-50 border-red-200';

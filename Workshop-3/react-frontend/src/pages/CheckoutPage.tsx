@@ -182,7 +182,7 @@ export const CheckoutPage: React.FC = () => {
 
           <div className="mt-6 flex items-center justify-between border-t pt-4">
             <p className="text-lg font-semibold text-gray-900">Total</p>
-            <p className="text-2xl font-bold text-green-600">
+            <p className="text-2xl font-bold" style={{ color: '#0077FF' }}>
               ${grandTotal.toLocaleString('es-CO')} COP
             </p>
           </div>

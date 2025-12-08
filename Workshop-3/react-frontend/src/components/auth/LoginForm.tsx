@@ -42,108 +42,116 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    // Use a flexible container that fits the surrounding card instead of forcing full viewport height
-    <div className="flex flex-col lg:flex-row min-h-[480px]">
+    <div className="flex flex-col lg:flex-row h-full">
       {/* Left Side - Branding and Info */}
       <div 
-        className="hidden lg:flex lg:w-1/2 p-12 flex-col justify-between relative overflow-hidden"
+        className="hidden lg:flex lg:w-1/2 p-8 flex-col justify-between relative overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 50%, var(--primary-400) 100%)'
+          background: 'linear-gradient(135deg, #FFFFFF 0%, #0077FF 100%)'
         }}
       >
-        {/* Decorative Elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-white opacity-5 rounded-full -mr-48 -mt-48"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full -ml-48 -mb-48"></div>
+        {/* Animated decorative elements */}
+        <div className="absolute top-0 right-0 w-80 h-80 rounded-full -mr-40 -mt-40 animate-pulse" 
+             style={{ backgroundColor: '#0077FF', opacity: 0.1, animationDuration: '5s' }}></div>
+        <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full -ml-40 -mb-40 animate-pulse" 
+             style={{ backgroundColor: '#0077FF', opacity: 0.1, animationDuration: '7s', animationDelay: '1s' }}></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl" 
+             style={{ backgroundColor: '#0077FF', opacity: 0.05 }}></div>
         
-        {/* Logo and Title */}
+        {/* Logo and Title Section */}
         <div className="relative z-10">
-          <img 
-            src="/Eventify.png" 
-            alt="Eventify" 
-            className="h-10 w-auto mb-8"
-            style={{ filter: 'brightness(0) invert(1)' }}
-          />
-          <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
-            Manage Events Like Never Before
+          {/* Eventify Logo - Prominent */}
+          <div className="mb-5 flex items-center space-x-3">
+            <img 
+              src="/Eventify.png" 
+              alt="Eventify" 
+              className="h-12 w-auto drop-shadow-lg"
+            />
+          </div>
+          
+          <h1 className="text-3xl font-bold mb-2 leading-tight" style={{ color: '#0077FF' }}>
+            Welcome to Eventify
           </h1>
-          <p className="text-white text-lg leading-relaxed opacity-90">
+          <p className="text-base leading-relaxed mb-5" style={{ color: '#4A4A4A' }}>
             The complete platform for creating, managing, and scaling your events with powerful tools and insights.
           </p>
         </div>
 
-        {/* Features */}
-        <div className="relative z-10 space-y-6">
-          <div className="flex items-start space-x-4">
-            <div className="flex-shrink-0 w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-              <Calendar className="w-6 h-6 text-white" />
+        {/* Features Section */}
+        <div className="relative z-10 space-y-3">
+          <div className="flex items-start space-x-4 group">
+            <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center group-hover:bg-blue-50 transition-all duration-300 shadow-lg" style={{ backgroundColor: '#E5D9FF' }}>
+              <Calendar className="w-6 h-6" style={{ color: '#0077FF' }} />
             </div>
             <div>
-              <h3 className="text-white font-semibold text-lg mb-1">Event Management</h3>
-              <p className="text-white opacity-80">Create and manage events with ease</p>
+              <h3 className="font-semibold text-base mb-1" style={{ color: '#1A1A1A' }}>Event Management</h3>
+              <p className="text-sm" style={{ color: '#4A4A4A' }}>Create and manage events with ease</p>
             </div>
           </div>
           
-          <div className="flex items-start space-x-4">
-            <div className="flex-shrink-0 w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-              <Ticket className="w-6 h-6 text-white" />
+          <div className="flex items-start space-x-4 group">
+            <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center group-hover:bg-blue-50 transition-all duration-300 shadow-lg" style={{ backgroundColor: '#E5D9FF' }}>
+              <Ticket className="w-6 h-6" style={{ color: '#0077FF' }} />
             </div>
             <div>
-              <h3 className="text-white font-semibold text-lg mb-1">Ticket Sales</h3>
-              <p className="text-white opacity-80">Sell tickets with integrated payment processing</p>
+              <h3 className="font-semibold text-base mb-1" style={{ color: '#1A1A1A' }}>Ticket Sales</h3>
+              <p className="text-sm" style={{ color: '#4A4A4A' }}>Sell tickets with integrated payment processing</p>
             </div>
           </div>
           
-          <div className="flex items-start space-x-4">
-            <div className="flex-shrink-0 w-12 h-12 bg-white bg-opacity-20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-              <TrendingUp className="w-6 h-6 text-white" />
+          <div className="flex items-start space-x-4 group">
+            <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center group-hover:bg-blue-50 transition-all duration-300 shadow-lg" style={{ backgroundColor: '#E5D9FF' }}>
+              <TrendingUp className="w-6 h-6" style={{ color: '#0077FF' }} />
             </div>
             <div>
-              <h3 className="text-white font-semibold text-lg mb-1">Analytics Dashboard</h3>
-              <p className="text-white opacity-80">Track performance with real-time insights</p>
+              <h3 className="font-semibold text-base mb-1" style={{ color: '#1A1A1A' }}>Analytics Dashboard</h3>
+              <p className="text-sm" style={{ color: '#4A4A4A' }}>Track performance with real-time insights</p>
             </div>
           </div>
         </div>
 
         {/* Footer */}
         <div className="relative z-10">
-          <p className="text-white text-sm opacity-75">
+          <p className="text-xs" style={{ color: '#4A4A4A' }}>
             © 2025 Eventify. All rights reserved.
           </p>
         </div>
       </div>
 
       {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 lg:p-12 bg-white">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-8 bg-white overflow-y-auto">
         <div className="w-full max-w-md">
           {/* Mobile Logo */}
-          <div className="lg:hidden flex justify-center mb-8">
-            <img 
-              src="/Eventify.png" 
-              alt="Eventify" 
-              className="h-10 w-auto"
-            />
+          <div className="lg:hidden flex justify-center mb-5">
+            <div className="flex items-center space-x-3">
+              <img 
+                src="/Eventify.png" 
+                alt="Eventify" 
+                className="h-10 w-auto"
+              />
+            </div>
           </div>
 
           {/* Header */}
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold mb-2" style={{ background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', color: '#1A1A1A' }}>
               Welcome back
             </h2>
-            <p className="text-gray-600 text-base">
+            <p className="text-base" style={{ color: '#4A4A4A' }}>
               Sign in to your account to continue
             </p>
           </div>
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
             {/* Email Input */}
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="email" className="block text-sm font-semibold mb-1.5" style={{ color: '#1A1A1A' }}>
                 Email address
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none z-10" style={{ paddingLeft: '16px', height: '52px' }}>
-                  <Mail className="h-5 w-5 text-gray-400 flex-shrink-0" />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none z-10" style={{ paddingLeft: '12px', height: '42px' }}>
+                  <Mail className="h-4 w-4 transition-colors duration-200 flex-shrink-0" style={{ color: '#6B7280' }} />
                 </div>
                 <input
                   {...register('email')}
@@ -151,12 +159,24 @@ export const LoginForm: React.FC = () => {
                   type="email"
                   defaultValue="admin@eventplatform.com"
                   placeholder="you@example.com"
-                  className="block w-full py-3.5 pr-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white transition-all duration-200 hover:border-gray-300"
-                  style={{ paddingLeft: '52px', minHeight: '52px', fontSize: '15px' }}
+                  className="block w-full py-2.5 pr-4 border-2 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-300 shadow-sm hover:shadow-md"
+                  style={{ paddingLeft: '44px', minHeight: '42px', fontSize: '14px', backgroundColor: '#FFFFFF', borderColor: '#D9DCE0', color: '#1A1A1A' } as React.CSSProperties}
+                  onFocus={(e) => {
+                    e.target.style.borderColor = '#0077FF';
+                    e.target.style.boxShadow = '0 0 0 3px rgba(0, 119, 255, 0.1)';
+                    const icon = e.target.previousElementSibling?.querySelector('svg');
+                    if (icon) icon.style.color = '#0077FF';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.borderColor = '#D9DCE0';
+                    e.target.style.boxShadow = '';
+                    const icon = e.target.previousElementSibling?.querySelector('svg');
+                    if (icon) icon.style.color = '#6B7280';
+                  }}
                 />
               </div>
               {errors.email && (
-                <p className="mt-2 text-sm text-error-600 flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-error-600 flex items-center gap-1 animate-fadeIn">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-error-600"></span>
                   {errors.email.message}
                 </p>
@@ -165,24 +185,24 @@ export const LoginForm: React.FC = () => {
 
             {/* Password Input */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+              <label htmlFor="password" className="block text-sm font-semibold mb-1.5" style={{ color: '#1A1A1A' }}>
                 Password
               </label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none z-10" style={{ paddingLeft: '16px', height: '52px' }}>
-                  <Lock className="h-5 w-5 text-gray-400 flex-shrink-0" />
+              <div className="relative group">
+                <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none z-10" style={{ paddingLeft: '12px', height: '42px' }}>
+                  <Lock className="h-4 w-4 text-gray-400 group-focus-within:text-purple-500 transition-colors duration-200 flex-shrink-0" />
                 </div>
                 <input
                   {...register('password')}
                   id="password"
                   type="password"
                   placeholder="Enter your password"
-                  className="block w-full py-3.5 pr-4 bg-gray-50 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 focus:bg-white transition-all duration-200 hover:border-gray-300"
-                  style={{ paddingLeft: '52px', minHeight: '52px', fontSize: '15px' }}
+                  className="block w-full py-2.5 pr-4 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:bg-white transition-all duration-300 hover:border-gray-300 shadow-sm hover:shadow-md focus:border-[#336D82] focus:ring-[#336D82]"
+                  style={{ paddingLeft: '44px', minHeight: '42px', fontSize: '14px', backgroundColor: '#F5ECE0' }}
                 />
               </div>
               {errors.password && (
-                <p className="mt-2 text-sm text-error-600 flex items-center gap-1">
+                <p className="mt-1.5 text-xs text-error-600 flex items-center gap-1 animate-fadeIn">
                   <span className="inline-block w-1.5 h-1.5 rounded-full bg-error-600"></span>
                   {errors.password.message}
                 </p>
@@ -211,11 +231,14 @@ export const LoginForm: React.FC = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full text-white py-4 px-6 rounded-xl font-semibold text-base hover:shadow-lg hover:scale-[1.01] active:scale-[0.99] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2"
+              className="w-full text-white py-3.5 px-6 rounded-xl font-semibold text-base hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2 relative overflow-hidden group"
               style={{
-                background: 'linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 50%, var(--primary-400) 100%)'
+                background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%)'
               }}
             >
+              {/* Shine effect on hover */}
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
+              
               {isLoading ? (
                 <>
                   <div className="loading-spinner" style={{ width: '20px', height: '20px', borderWidth: '2px', borderColor: 'rgba(255,255,255,0.3)', borderTopColor: 'white' }}></div>
@@ -231,12 +254,12 @@ export const LoginForm: React.FC = () => {
           </form>
 
           {/* Divider */}
-          <div className="relative my-8">
+          <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-200"></div>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-white text-gray-500 font-medium">
+            <div className="relative flex justify-center text-xs">
+              <span className="px-3 bg-white text-gray-500 font-medium">
                 Don't have an account?
               </span>
             </div>
@@ -245,9 +268,20 @@ export const LoginForm: React.FC = () => {
           {/* Register Link */}
           <Link 
             to="/register" 
-            className="w-full flex items-center justify-center px-6 py-3.5 border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:border-primary-500 hover:text-primary-600 hover:bg-primary-50 transition-all duration-200 gap-2"
+            className="w-full flex items-center justify-center px-6 py-2.5 border-2 rounded-xl font-semibold text-sm transition-all duration-300 gap-2 group"
+            style={{ borderColor: '#D9DCE0', color: '#4A4A4A' }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.borderColor = '#0077FF';
+              e.currentTarget.style.color = '#0077FF';
+              e.currentTarget.style.backgroundColor = '#F2F4F7';
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.borderColor = '#D9DCE0';
+              e.currentTarget.style.color = '#4A4A4A';
+              e.currentTarget.style.backgroundColor = '';
+            }}
           >
-            <UserPlus className="h-5 w-5" />
+            <UserPlus className="h-4 w-4 group-hover:scale-110 transition-transform" />
             <span>Create an account</span>
           </Link>
         </div>

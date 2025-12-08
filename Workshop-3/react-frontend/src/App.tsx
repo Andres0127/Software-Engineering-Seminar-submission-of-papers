@@ -16,7 +16,9 @@ import { CheckoutPage } from './pages/CheckoutPage';
 import { TicketPurchasePage } from './pages/TicketPurchasePage';
 import { TicketsPage } from './pages/TicketsPage';
 import { OrdersPage } from './pages/OrdersPage';
+import { ProfilePage } from './pages/ProfilePage';
 import RefundRequestsPage from './pages/RefundRequestsPage';
+import { UsersPage } from './pages/UsersPage';
 
 // Component that ensures routes are only accessible when the user has one of the allowed roles
 const RoleProtectedRoute: React.FC<{ 
@@ -132,12 +134,28 @@ function App() {
               } 
             />
             
+            {/* Profile - accessible to all authenticated users */}
+            <Route 
+              path="profile" 
+              element={<ProfilePage />} 
+            />
+            
             {/* Refund requests - restricted to organizers and admins */}
             <Route 
               path="refunds" 
               element={
                 <RoleProtectedRoute allowedRoles={['ORGANIZER', 'ADMIN']}>
                   <RefundRequestsPage />
+                </RoleProtectedRoute>
+              } 
+            />
+            
+            {/* Users - restricted to admins only */}
+            <Route 
+              path="users" 
+              element={
+                <RoleProtectedRoute allowedRoles={['ADMIN']}>
+                  <UsersPage />
                 </RoleProtectedRoute>
               } 
             />

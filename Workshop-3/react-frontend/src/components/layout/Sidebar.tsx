@@ -6,9 +6,9 @@ import {
   Ticket, 
   Users, 
   BarChart3, 
-  Settings,
   Plus,
-  Receipt
+  Receipt,
+  User
 } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 
@@ -64,10 +64,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       show: user?.userType === 'ADMIN'
     },
     {
-      name: 'Settings',
-      href: '/settings',
-      icon: Settings,
-      show: true
+      name: 'My Profile',
+      href: '/profile',
+      icon: User,
+      show: user?.userType === 'BUYER'
     }
   ];
 

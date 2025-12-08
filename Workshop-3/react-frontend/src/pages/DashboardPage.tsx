@@ -200,12 +200,12 @@ export const DashboardPage: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div className="card p-6 hover:shadow-lg transition-all">
           <div className="flex items-center justify-between mb-4">
-            <div className="p-3 bg-green-100 rounded-lg">
-              <DollarSign className="h-6 w-6 text-green-600" />
+            <div className="p-3 rounded-lg" style={{ background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%)' }}>
+              <DollarSign className="h-6 w-6 text-white" />
             </div>
           </div>
-          <p className="text-gray-600 text-sm mb-1">Total Revenue</p>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-sm mb-1" style={{ color: '#4A4A4A' }}>Total Revenue</p>
+          <p className="text-2xl font-bold" style={{ color: '#1A1A1A' }}>
             {formatCurrency(stats.totalRevenue)}
           </p>
         </div>
@@ -216,8 +216,8 @@ export const DashboardPage: React.FC = () => {
               <Calendar className="h-6 w-6 text-blue-600" />
             </div>
           </div>
-          <p className="text-gray-600 text-sm mb-1">Total Events</p>
-          <p className="text-2xl font-bold text-gray-900">{formatNumber(stats.totalEvents)}</p>
+          <p className="text-sm mb-1" style={{ color: '#4A4A4A' }}>Total Events</p>
+          <p className="text-2xl font-bold" style={{ color: '#1A1A1A' }}>{formatNumber(stats.totalEvents)}</p>
         </div>
 
         <div className="card p-6 hover:shadow-lg transition-all">
@@ -226,8 +226,8 @@ export const DashboardPage: React.FC = () => {
               <Ticket className="h-6 w-6 text-purple-600" />
             </div>
           </div>
-          <p className="text-gray-600 text-sm mb-1">Tickets Sold</p>
-          <p className="text-2xl font-bold text-gray-900">
+          <p className="text-sm mb-1" style={{ color: '#4A4A4A' }}>Tickets Sold</p>
+          <p className="text-2xl font-bold" style={{ color: '#1A1A1A' }}>
             {formatNumber(stats.totalTicketsSold)}
           </p>
         </div>
@@ -238,8 +238,8 @@ export const DashboardPage: React.FC = () => {
               <Activity className="h-6 w-6 text-orange-600" />
             </div>
           </div>
-          <p className="text-gray-600 text-sm mb-1">Active Events</p>
-          <p className="text-2xl font-bold text-gray-900">{formatNumber(stats.activeEvents)}</p>
+          <p className="text-sm mb-1" style={{ color: '#4A4A4A' }}>Active Events</p>
+          <p className="text-2xl font-bold" style={{ color: '#1A1A1A' }}>{formatNumber(stats.activeEvents)}</p>
         </div>
       </div>
 
@@ -254,7 +254,7 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         <div className="card p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <h3 className="text-lg font-semibold mb-4" style={{ color: '#1A1A1A' }}>
             Sales Over Time (Current Month)
           </h3>
           <div style={{ height: '300px' }}>
@@ -265,7 +265,7 @@ export const DashboardPage: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
         <div className="card p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <h3 className="text-lg font-semibold mb-4" style={{ color: '#1A1A1A' }}>
             Ticket Type Distribution
           </h3>
           <div style={{ height: '300px' }}>
@@ -291,7 +291,7 @@ export const DashboardPage: React.FC = () => {
         </div>
 
         <div className="card p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+          <h3 className="text-lg font-semibold mb-4" style={{ color: '#1A1A1A' }}>
             Order Status Distribution
           </h3>
           <div style={{ height: '300px' }}>
@@ -318,7 +318,7 @@ export const DashboardPage: React.FC = () => {
       </div>
 
       <div className="card p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold mb-4" style={{ color: '#1A1A1A' }}>
           Recent Events
         </h3>
         <div className="overflow-x-auto">
@@ -359,7 +359,7 @@ export const DashboardPage: React.FC = () => {
                     <span
                       className={`px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full ${
                         event.status === 'ACTIVE'
-                          ? 'bg-green-100 text-green-600'
+                          ? 'bg-blue-100 text-blue-600'
                           : event.status === 'PUBLISHED'
                           ? 'bg-blue-100 text-blue-600'
                           : 'bg-gray-100 text-gray-600'

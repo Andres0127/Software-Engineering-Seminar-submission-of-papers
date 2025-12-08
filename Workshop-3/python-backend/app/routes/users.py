@@ -6,10 +6,10 @@ from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.models.user import User, UserType, UserStatus
 from app.schemas.user import UserCreate, UserUpdate, UserResponse
-from app.utils.auth import require_auth
+from app.utils.auth import require_auth, require_admin
 
 
-router = APIRouter(prefix="/api/users", tags=["users"], dependencies=[Depends(require_auth)])
+router = APIRouter(prefix="/api/users", tags=["users"], dependencies=[Depends(require_auth)], redirect_slashes=False)
 
 
 @router.post("/", response_model=UserResponse)
@@ -40,8 +40,29 @@ def get_user(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/", response_model=List[UserResponse])
-def list_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    return db.query(User).order_by(User.id.asc()).offset(skip).limit(limit).all()
+def list_users(
+    skip: int = 0, 
+    limit: int = 100, 
+    db: Session = Depends(get_db),
+    payload: dict = Depends(require_admin)
+):
+    """List all users - Admin only"""
+    import logging
+    logger = logging.getLogger(__name__)
+    
+    users = db.query(User).order_by(User.id.asc()).offset(skip).limit(limit).all()
+    logger.info(f"Found {len(users)} users in database")
+    
+    # Ensure all users have a valid status
+    for user in users:
+        if user.status is None:
+            user.status = UserStatus.ACTIVE
+    
+    # Log user details for debugging
+    for user in users:
+        logger.info(f"User: {user.id} - {user.name} - {user.email} - {user.user_type} - {user.status}")
+    
+    return users
 
 
 @router.put("/{user_id}", response_model=UserResponse)

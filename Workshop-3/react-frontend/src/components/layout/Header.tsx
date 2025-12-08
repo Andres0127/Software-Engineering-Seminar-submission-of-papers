@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, LogOut, Settings, ChevronDown, Menu, Calendar } from 'lucide-react';
+import { User, LogOut, ChevronDown, Menu, Calendar } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
 import NotificationPanel from '../notifications/NotificationPanel';
 import toast from 'react-hot-toast';
@@ -49,13 +49,12 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
               </button>
             )}
             
-            <Link to="/events" className="flex items-center space-x-3 hover:opacity-80 transition-opacity">
-              <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center shadow-sm">
-                <Calendar className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-semibold text-gray-900">
-                Event Platform
-              </span>
+            <Link to="/events" className="flex items-center hover:opacity-80 transition-opacity">
+              <img 
+                src="/Eventify.png" 
+                alt="Eventify" 
+                className="h-12 w-auto drop-shadow-sm"
+              />
             </Link>
           </div>
 
@@ -71,7 +70,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                   onClick={toggleUserMenu}
                   className="flex items-center space-x-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)' }}>
                     <User className="w-4 h-4 text-white" />
                   </div>
                   <div className="hidden md:flex flex-col items-start">
@@ -115,14 +114,6 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
                           >
                             <User className="w-4 h-4 mr-3" />
                             My Profile
-                          </Link>
-                          <Link
-                            to="/settings"
-                            onClick={closeUserMenu}
-                            className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                          >
-                            <Settings className="w-4 h-4 mr-3" />
-                            Settings
                           </Link>
                         </div>
 

@@ -7,24 +7,24 @@
 }
 
 :root {
-  /* Professional palette - Minimalist */
-  --primary-700: #0f172a;
-  --primary-600: #1e293b;
-  --primary-500: #334155;
-  --primary-400: #475569;
-  --primary-300: #64748b;
-  --primary-200: #94a3b8;
-  --primary-100: #cbd5e1;
-  --primary-50: #f1f5f9;
+  /* Brand Colors - Vibrant palette */
+  --primary-700: #0077FF;
+  --primary-600: #0077FF;
+  --primary-500: #3A8DFF;
+  --primary-400: #66AFFF;
+  --primary-300: #8BC4FF;
+  --primary-200: #B0D9FF;
+  --primary-100: #D5EDFF;
+  --primary-50: #1A1A1A;
 
-  /* Accent - Single elegant accent color */
-  --accent-600: #0f172a;
-  --accent-500: #1e293b;
-  --accent-400: #334155;
-  --accent-300: #475569;
-  --accent-200: #64748b;
-  --accent-100: #94a3b8;
-  --accent-50: #f8fafc;
+  /* Accent - Violet gradient */
+  --accent-600: #6A40FF;
+  --accent-500: #875BFF;
+  --accent-400: #C1A4FF;
+  --accent-300: #D4C2FF;
+  --accent-200: #E7E0FF;
+  --accent-100: #F3EFFF;
+  --accent-50: #1A1A1A;
 
   /* Blue palette for accents and actions */
   --blue-600: #2563eb;
@@ -52,28 +52,31 @@
   --warning-100: #fef3c7;
   --warning-50: #fffbeb;
 
-  /* Purple palette for charts */
-  --purple-600: #9333ea;
-  --purple-500: #a855f7;
-  --purple-100: #e9d5ff;
+  /* Pink/Magenta palette for accents */
+  --purple-600: #FF3399;
+  --purple-500: #FF66B3;
+  --purple-400: #FFB3D9;
+  --purple-100: #FFB3D9;
+  --magenta-600: #FF007A;
+  --magenta-700: #99004D;
   
   /* Orange palette for charts */
   --orange-600: #ea580c;
   --orange-500: #f97316;
   --orange-100: #ffedd5;
 
-  /* Neutrals */
-  --white: #ffffff;
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-400: #94a3b8;
-  --gray-500: #64748b;
-  --gray-600: #475569;
-  --gray-700: #334155;
-  --gray-800: #1e293b;
-  --gray-900: #0f172a;
+  /* Neutrals - Light theme */
+  --white: #FFFFFF;
+  --gray-50: #F9FAFB;
+  --gray-100: #F2F4F7;
+  --gray-200: #D9DCE0;
+  --gray-300: #C4C8CC;
+  --gray-400: #9CA3AF;
+  --gray-500: #6B7280;
+  --gray-600: #4A4A4A;
+  --gray-700: #4A4A4A;
+  --gray-800: #1A1A1A;
+  --gray-900: #1A1A1A;
 
   /* Minimalist shadows */
   --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
@@ -96,7 +99,7 @@ body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   line-height: 1.5;
   color: var(--gray-900);
-  background-color: var(--gray-50);
+  background-color: #F9FAFB;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
@@ -144,7 +147,7 @@ body {
 
 .card:hover {
   box-shadow: var(--shadow-md);
-  border-color: var(--gray-300);
+  border-color: #3395FF;
 }
 
 .card-elevated {
@@ -177,7 +180,7 @@ body {
 }
 
 .btn-primary:hover {
-  background-color: var(--primary-500);
+  background-color: #3395FF;
 }
 
 .btn-primary:active {
@@ -190,10 +193,10 @@ body {
   justify-content: center;
   padding: 12px 20px;
   background-color: var(--white);
-  color: var(--gray-700);
+  color: var(--gray-800);
   font-weight: 500;
   font-size: 14px;
-  border: 1px solid var(--gray-300);
+  border: 1px solid var(--gray-200);
   border-radius: var(--border-radius-md);
   cursor: pointer;
   transition: var(--transition);
@@ -201,8 +204,9 @@ body {
 }
 
 .btn-secondary:hover {
-  background-color: var(--gray-50);
-  border-color: var(--gray-400);
+  background-color: var(--gray-100);
+  border-color: #3395FF;
+  color: #0077FF;
 }
 
 .btn-success {
@@ -210,7 +214,7 @@ body {
   align-items: center;
   justify-content: center;
   padding: 12px 20px;
-  background-color: var(--success-600);
+  background: linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%);
   color: var(--white);
   font-weight: 500;
   font-size: 14px;
@@ -222,7 +226,9 @@ body {
 }
 
 .btn-success:hover {
-  background-color: var(--success-500);
+  background: linear-gradient(135deg, #3395FF 0%, #855AFF 50%, #FF66B3 100%);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .btn-outline {
@@ -251,7 +257,7 @@ body {
   width: 100%;
   padding: 12px 14px;
   background-color: var(--white);
-  border: 1px solid var(--gray-300);
+  border: 1px solid var(--gray-200);
   border-radius: var(--border-radius-md);
   font-size: 14px;
   font-weight: 400;
@@ -261,16 +267,20 @@ body {
 
 .input:focus {
   outline: none;
-  border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
+  border-color: #0077FF;
+  box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.1);
 }
 
 .input::placeholder {
   color: var(--gray-500);
 }
 
+.select::placeholder {
+  color: var(--gray-500);
+}
+
 .input:disabled {
-  background-color: var(--gray-50);
+  background-color: var(--gray-100);
   color: var(--gray-500);
   cursor: not-allowed;
 }
@@ -280,7 +290,7 @@ body {
   width: 100%;
   padding: 12px 14px;
   background-color: var(--white);
-  border: 1px solid var(--gray-300);
+  border: 1px solid var(--gray-200);
   border-radius: var(--border-radius-md);
   font-size: 14px;
   font-weight: 400;
@@ -291,8 +301,8 @@ body {
 
 .select:focus {
   outline: none;
-  border-color: var(--primary-500);
-  box-shadow: 0 0 0 3px rgba(30, 41, 59, 0.1);
+  border-color: #0077FF;
+  box-shadow: 0 0 0 3px rgba(0, 119, 255, 0.1);
 }
 
 /* Professional layout */
@@ -356,7 +366,7 @@ body {
   height: 200px;
   position: relative;
   overflow: hidden;
-  background-color: var(--gray-100);
+  background: linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%);
 }
 
 .badge {
@@ -695,7 +705,7 @@ body {
 }
 
 .bg-gray-50 {
-  background-color: var(--gray-50);
+  background-color: #F9FAFB;
 }
 
 .bg-red-50 {
@@ -707,7 +717,7 @@ body {
 }
 
 .text-gray-700 {
-  color: var(--gray-700);
+  color: var(--gray-800);
 }
 
 .text-gray-600 {
@@ -851,7 +861,7 @@ body {
 }
 
 .sidebar-link:hover {
-  background-color: var(--gray-100);
+  background-color: #E5D9FF;
   color: var(--gray-900);
   transform: translateX(4px);
 }
@@ -861,7 +871,7 @@ body {
   align-items: center;
   gap: 12px;
   padding: 12px 16px;
-  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 100%);
+  background: linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%);
   color: var(--white);
   text-decoration: none;
   border-radius: var(--border-radius-md);
@@ -959,13 +969,13 @@ body {
 
 .event-card:hover {
   box-shadow: var(--shadow-lg);
-  border-color: var(--primary-300);
+  border-color: #3395FF;
   transform: translateY(-4px);
 }
 
 .event-image {
   height: 220px;
-  background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-400) 50%, var(--primary-600) 100%);
+  background: linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%);
   position: relative;
   display: flex;
   align-items: center;
@@ -1016,7 +1026,7 @@ body {
   right: 12px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
-  color: var(--success-600);
+  color: #FF3399;
   padding: 6px 12px;
   border-radius: var(--border-radius-md);
   font-size: 15px;

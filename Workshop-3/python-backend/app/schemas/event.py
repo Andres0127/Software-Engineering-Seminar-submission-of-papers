@@ -72,6 +72,7 @@ class EventResponse(BaseModel):
     categoryId: Optional[int] = None
     locationId: Optional[int] = None
     organizerId: Optional[int] = None
+    organizerName: Optional[str] = None
     category: Optional[CategoryResponse] = None
     location: Optional[LocationResponse] = None
     ageRestriction: Optional[str] = None

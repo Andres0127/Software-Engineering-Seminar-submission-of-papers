@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Calendar, MapPin, Users, Clock, Plus } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { Calendar, MapPin, Users, Clock, Plus, ChevronDown, ChevronUp, Filter } from 'lucide-react';
 import { Event, Category, Location } from '../types';
 import { EventService } from '../services/eventService';
 import { useAuthStore } from '../store/authStore';
@@ -11,6 +11,7 @@ export const EventsPage: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [filters, setFilters] = useState({
     search: '',
     categoryId: '',
@@ -20,6 +21,7 @@ export const EventsPage: React.FC = () => {
     maxPrice: ''
   });
   const { user } = useAuthStore();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,12 +29,20 @@ export const EventsPage: React.FC = () => {
         setLoading(true);
         
         // Load events and categories in parallel
+        // Request more events to ensure we get newly created ones (max 50 per backend limit)
         const [eventsData, categoriesData, locationsData] = await Promise.all([
-          EventService.getEvents(),
+          EventService.getEvents({ limit: 50, page: 1 }),
           EventService.getCategories(),
           EventService.getLocations()
         ]);
 
+        console.log('Events loaded:', eventsData);
+        console.log('Number of events:', eventsData?.length || 0);
+        // Log first few events to verify ordering
+        if (eventsData && eventsData.length > 0) {
+          console.log('First 3 events:', eventsData.slice(0, 3).map(e => ({ id: e.id, title: e.title })));
+        }
+        
         setEvents(eventsData);
         setCategories(categoriesData);
         setLocations(locationsData);
@@ -104,7 +114,7 @@ export const EventsPage: React.FC = () => {
     };
 
     fetchData();
-  }, []);
+  }, [location.pathname]); // Reload when navigating to this page
 
   const handleFilterChange = async () => {
     try {
@@ -176,10 +186,10 @@ export const EventsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold text-gray-900">
+          <h1 className="text-4xl font-bold" style={{ color: '#1A1A1A' }}>
             Events
           </h1>
-          <p className="text-gray-600 mt-2">
+          <p className="mt-2" style={{ color: '#4A4A4A' }}>
             Discover incredible experiences near you
           </p>
         </div>
@@ -195,100 +205,119 @@ export const EventsPage: React.FC = () => {
         )}
       </div>
 
-      {/* Filtros */}
-      <div className="card p-8 space-y-6">
-        <div>
-          <h3 className="text-2xl font-semibold text-gray-900 mb-2">Filter events</h3>
-          <p className="text-gray-600">Find exactly what you're looking for</p>
-        </div>
+      {/* Filtros - Desplegable */}
+      <div className="card overflow-hidden">
+        {/* Header clickeable */}
+        <button
+          onClick={() => setFiltersOpen(!filtersOpen)}
+          className="w-full p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+        >
+          <div className="flex items-center gap-3">
+            <Filter className="w-5 h-5" style={{ color: '#0077FF' }} />
+            <div className="text-left">
+              <h3 className="text-xl font-semibold" style={{ color: '#1A1A1A' }}>Filter events</h3>
+              <p className="text-sm" style={{ color: '#4A4A4A' }}>Find exactly what you're looking for</p>
+            </div>
+          </div>
+          {filtersOpen ? (
+            <ChevronUp className="w-5 h-5" style={{ color: '#0077FF' }} />
+          ) : (
+            <ChevronDown className="w-5 h-5" style={{ color: '#0077FF' }} />
+          )}
+        </button>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div>
-            <label className="label">Search</label>
-            <input
-              type="search"
-              placeholder="Keywords, titles, venues..."
-              value={filters.search}
-              onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
-              className="input"
-            />
-          </div>
-          <div>
-            <label className="label">Location</label>
-            <select
-              value={filters.locationId}
-              onChange={(e) => setFilters((prev) => ({ ...prev, locationId: e.target.value }))}
-              className="select"
-            >
-              <option value="">All locations</option>
-              {locations.map((location) => (
-                <option key={location.id} value={location.id.toString()}>
-                  {location.name}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
+        {/* Contenido desplegable */}
+        {filtersOpen && (
+          <div className="px-6 pb-6 space-y-6 border-t" style={{ borderColor: '#D9DCE0' }}>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pt-6">
+              <div>
+                <label className="label">Search</label>
+                <input
+                  type="search"
+                  placeholder="Keywords, titles, venues..."
+                  value={filters.search}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+                  className="input"
+                />
+              </div>
+              <div>
+                <label className="label">Location</label>
+                <select
+                  value={filters.locationId}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, locationId: e.target.value }))}
+                  className="select"
+                >
+                  <option value="">All locations</option>
+                  {locations.map((location) => (
+                    <option key={location.id} value={location.id.toString()}>
+                      {location.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="label">Category</label>
-            <select
-              value={filters.categoryId}
-              onChange={(e) => setFilters((prev) => ({ ...prev, categoryId: e.target.value }))}
-              className="select"
-            >
-              <option value="">All categories</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id.toString()}>
-                  {category.name}
-                </option>
-              ))}
-            </select>
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="label">Category</label>
+                <select
+                  value={filters.categoryId}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, categoryId: e.target.value }))}
+                  className="select"
+                >
+                  <option value="">All categories</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.id.toString()}>
+                      {category.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-          <div>
-            <label className="label">Start date</label>
-            <input
-              type="date"
-              value={filters.startDate}
-              onChange={(e) => setFilters((prev) => ({ ...prev, startDate: e.target.value }))}
-              className="input"
-            />
-          </div>
+              <div>
+                <label className="label">Start date</label>
+                <input
+                  type="date"
+                  value={filters.startDate}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, startDate: e.target.value }))}
+                  className="input"
+                />
+              </div>
 
-          <div>
-            <label className="label">End date</label>
-            <input
-              type="date"
-              value={filters.endDate}
-              onChange={(e) => setFilters((prev) => ({ ...prev, endDate: e.target.value }))}
-              className="input"
-            />
-          </div>
-        </div>
+              <div>
+                <label className="label">End date</label>
+                <input
+                  type="date"
+                  value={filters.endDate}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, endDate: e.target.value }))}
+                  className="input"
+                />
+              </div>
+            </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <div>
-            <label className="label">Max price</label>
-            <input
-              type="number"
-              placeholder="Enter amount"
-              value={filters.maxPrice}
-              onChange={(e) => setFilters((prev) => ({ ...prev, maxPrice: e.target.value }))}
-              className="input"
-            />
-          </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="label">Max price</label>
+                <input
+                  type="number"
+                  placeholder="Enter amount"
+                  value={filters.maxPrice}
+                  onChange={(e) => setFilters((prev) => ({ ...prev, maxPrice: e.target.value }))}
+                  className="input"
+                />
+              </div>
 
-          <div className="md:col-span-2 flex items-end gap-3">
-            <button onClick={handleFilterChange} className="btn-primary w-full">
-              Filter
-            </button>
-            <button onClick={handleClearFilters} className="btn-outline w-full">
-              Clear filters
-            </button>
+              <div className="md:col-span-2 flex items-end gap-3">
+                <button onClick={handleFilterChange} className="btn-primary w-full">
+                  Filter
+                </button>
+                <button onClick={handleClearFilters} className="btn-outline w-full">
+                  Clear filters
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Events list */}
@@ -312,10 +341,10 @@ export const EventsPage: React.FC = () => {
 
             <div className="p-6 flex-1 flex flex-col">
               {/* Title and description */}
-              <h3 className="text-xl font-semibold text-gray-900 mb-3 leading-tight">
+              <h3 className="text-xl font-semibold mb-3 leading-tight" style={{ color: '#1A1A1A' }}>
                 {event.title}
               </h3>
-              <p className="text-gray-600 mb-4 flex-1" style={{ fontSize: '14px', lineHeight: '1.6' }}>
+              <p className="mb-4 flex-1" style={{ fontSize: '14px', lineHeight: '1.6', color: '#4A4A4A' }}>
                 {event.description.length > 120 
                   ? `${event.description.substring(0, 120)}...` 
                   : event.description

@@ -7,3 +7,5 @@ docker-compose --version
 echo OK: Docker Compose encontrado
 pause
 
+
+

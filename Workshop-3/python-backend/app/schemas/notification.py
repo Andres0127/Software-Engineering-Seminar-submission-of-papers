@@ -9,6 +9,7 @@ from typing import Optional
 class NotificationBase(BaseModel):
     """Base notification schema"""
     type: str
+    title: str
     message: Optional[str] = None
 
 
@@ -24,7 +25,7 @@ class NotificationResponse(NotificationBase):
     id: int
     user_id: int
     is_read: bool
-    sent_at: Optional[datetime] = None
+    read_at: Optional[datetime] = None
     created_at: datetime
     updated_at: datetime
 

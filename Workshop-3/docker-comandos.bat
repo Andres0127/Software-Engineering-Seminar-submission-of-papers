@@ -10,6 +10,9 @@ REM   restart     - Reiniciar contenedores
 REM   logs        - Ver logs (puede seguir con -f para tiempo real)
 REM   ps          - Ver estado
 REM   clean       - Limpiar todo (contenedores, volumenes, imagenes)
+REM   rebuild-java    - Reconstruir solo Java backend
+REM   rebuild-python  - Reconstruir solo Python backend
+REM   rebuild-react   - Reconstruir solo React frontend
 
 setlocal enabledelayedexpansion
 
@@ -31,6 +34,9 @@ if "%COMMAND%"=="" (
     echo   ps          - Ver estado de contenedores
     echo   clean       - Limpiar todo (contenedores, volumenes, imagenes)
     echo   build       - Reconstruir imagenes
+    echo   rebuild-java    - Reconstruir solo Java backend
+    echo   rebuild-python  - Reconstruir solo Python backend
+    echo   rebuild-react   - Reconstruir solo React frontend
     echo.
     echo Ejemplos:
     echo   docker-comandos.bat build-up
@@ -183,6 +189,33 @@ if "%COMMAND%"=="build" (
     docker-compose build --no-cache
     if errorlevel 1 exit /b 1
     echo Imagenes reconstruidas exitosamente!
+    goto :END
+)
+
+if "%COMMAND%"=="rebuild-java" (
+    echo Reconstruyendo Java backend...
+    docker-compose up -d --build java-backend
+    if errorlevel 1 exit /b 1
+    echo Java backend reconstruido e iniciado exitosamente!
+    docker-compose ps java-backend
+    goto :END
+)
+
+if "%COMMAND%"=="rebuild-python" (
+    echo Reconstruyendo Python backend...
+    docker-compose up -d --build python-backend
+    if errorlevel 1 exit /b 1
+    echo Python backend reconstruido e iniciado exitosamente!
+    docker-compose ps python-backend
+    goto :END
+)
+
+if "%COMMAND%"=="rebuild-react" (
+    echo Reconstruyendo React frontend...
+    docker-compose up -d --build react-frontend
+    if errorlevel 1 exit /b 1
+    echo React frontend reconstruido e iniciado exitosamente!
+    docker-compose ps react-frontend
     goto :END
 )
 
