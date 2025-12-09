@@ -1,14 +1,26 @@
-from sqlalchemy import Column, String, Integer, Numeric, text
+from sqlalchemy import Column, String, Integer, Numeric, Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import ENUM as PGEnum
 from .base import BaseModel
+import enum
+import os
 
-ticket_status_enum = PGEnum(
-    'PENDING',
-    'CONFIRMED',
-    'CANCELLED',
-    name='ticketstatus',
-    create_type=False,
-)
+class TicketStatus(str, enum.Enum):
+    PENDING = 'PENDING'
+    CONFIRMED = 'CONFIRMED'
+    CANCELLED = 'CANCELLED'
+
+# Use standard Enum for SQLite compatibility, PGEnum for PostgreSQL
+# Check DATABASE_URL environment variable or default to SQLEnum for compatibility
+database_url = os.getenv('DATABASE_URL', '')
+if database_url.startswith('postgresql'):
+    ticket_status_enum = PGEnum(
+        TicketStatus,
+        name='ticketstatus',
+        create_type=False,
+    )
+else:
+    # Use standard SQLEnum for SQLite and other databases
+    ticket_status_enum = SQLEnum(TicketStatus)
 
 
 class TicketType(BaseModel):
@@ -31,6 +43,6 @@ class Ticket(BaseModel):
     status = Column(
         ticket_status_enum,
         nullable=False,
-        server_default=text("'PENDING'::ticketstatus"),
+        default=TicketStatus.PENDING,
     )
     order_id = Column(Integer)

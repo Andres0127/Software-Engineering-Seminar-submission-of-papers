@@ -18,3 +18,4 @@ Feature: User authentication
     And the JSON response should have field "token" present
 
 
+

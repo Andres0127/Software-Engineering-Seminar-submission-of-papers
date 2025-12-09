@@ -4,7 +4,13 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 
-from main import app
+import sys
+import os
+backend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../python-backend'))
+if backend_path not in sys.path:
+    sys.path.insert(0, backend_path)
+
+from app.main import app
 from app.core.database import get_db
 from app.models.base import Base
 from app.models.category import Category

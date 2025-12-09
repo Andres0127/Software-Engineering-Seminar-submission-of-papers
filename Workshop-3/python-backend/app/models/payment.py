@@ -1,7 +1,15 @@
-from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Numeric, Text
+from sqlalchemy import Column, String, Integer, ForeignKey, DateTime, Numeric, Text, JSON
 from sqlalchemy.dialects.postgresql import JSONB
 from datetime import datetime
 from .base import BaseModel
+import os
+
+# Use JSONB for PostgreSQL, JSON for SQLite and other databases
+database_url = os.getenv('DATABASE_URL', '')
+if database_url.startswith('postgresql'):
+    JSONType = JSONB
+else:
+    JSONType = JSON
 
 class Payment(BaseModel):
     __tablename__ = "payments"
@@ -29,7 +37,7 @@ class Payment(BaseModel):
     completed_at = Column(DateTime)
     
     # Detalles adicionales (JSON para flexibilidad)
-    payment_details = Column(JSONB)  # Últimos 4 dígitos, banco, cuotas, etc.
+    payment_details = Column(JSONType)  # Últimos 4 dígitos, banco, cuotas, etc.
     
     # Información del cliente
     payer_name = Column(String(200))

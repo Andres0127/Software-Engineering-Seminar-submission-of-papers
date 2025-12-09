@@ -71,11 +71,27 @@ public class AuthStepDefinitions {
     }
 
     @Given("an existing user with email {string} and password {string}")
-    public void anExistingUserWithEmailAndPassword(String email, String password) {
+    public void anExistingUserWithEmailAndPassword(String email, String password) throws Exception {
+        // First, register the user to ensure they exist
+        RegisterRequest registerRequest = new RegisterRequest();
+        registerRequest.setName("Test User");
+        registerRequest.setEmail(email);
+        registerRequest.setPassword(password);
+        registerRequest.setUserType("BUYER");
+        
+        // Register the user
+        mockMvc.perform(
+                post("/api/auth/register")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(registerRequest))
+        );
+        
+        // Now set up the login request
         loginRequest = new LoginRequest();
         loginRequest.setEmail(email);
         loginRequest.setPassword(password);
     }
 }
+
 
 

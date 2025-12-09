@@ -5,12 +5,19 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
 from decimal import Decimal
 
-from main import app
+import sys
+import os
+backend_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../python-backend'))
+if backend_path not in sys.path:
+    sys.path.insert(0, backend_path)
+
+from app.main import app
 from app.core.database import get_db
 from app.models.base import Base
 from app.models.ticket import TicketType
 from app.models.event import Event
 from app.models.location import Location
+from app.models.category import Category
 from datetime import datetime, timedelta
 
 # Create in-memory SQLite database for testing
@@ -38,15 +45,43 @@ def db_session():
 @pytest.fixture(scope="function")
 def client(db_session):
     """Create a test client with database override"""
+    from app.utils.auth import require_organizer_or_admin, require_buyer_or_admin, get_current_user_id
+    
     def override_get_db():
         try:
             yield db_session
         finally:
             pass
+    
+    def override_require_organizer_or_admin():
+        return {"sub": "1", "email": "organizer@example.com", "role": "ROLE_ORGANIZER"}
+    
+    def override_require_buyer_or_admin():
+        return {"sub": "1", "email": "buyer@example.com", "role": "ROLE_BUYER"}
+    
+    def override_get_current_user_id():
+        return 1
 
     app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[require_organizer_or_admin] = override_require_organizer_or_admin
+    app.dependency_overrides[require_buyer_or_admin] = override_require_buyer_or_admin
+    app.dependency_overrides[get_current_user_id] = override_get_current_user_id
+    
     yield TestClient(app)
     app.dependency_overrides.clear()
+
+
+@pytest.fixture
+def sample_category(db_session):
+    """Create a sample category for testing"""
+    category = Category(
+        name="Music",
+        description="Music events and concerts"
+    )
+    db_session.add(category)
+    db_session.commit()
+    db_session.refresh(category)
+    return category
 
 
 @pytest.fixture
@@ -64,12 +99,13 @@ def sample_location(db_session):
 
 
 @pytest.fixture
-def sample_event(db_session, sample_location):
+def sample_event(db_session, sample_location, sample_category):
     """Create a sample event for testing"""
     event = Event(
         name="Test Event",
         date=datetime.now() + timedelta(days=30),
         category="Music",
+        category_id=sample_category.id,
         capacity=500,
         event_status="published",
         organizer_id=1,
@@ -109,14 +145,15 @@ def test_create_ticket_type_success(client, sample_event):
         "event_id": sample_event.id
     }
     
-    response = client.post("/api/tickets/types", json=ticket_data)
+    response = client.post("/api/tickets/types", json=ticket_data, headers={"Authorization": "Bearer mock-token"})
     
     assert response.status_code == 200
     data = response.json()
     assert data["name"] == "General Admission"
     assert float(data["price"]) == 49.99
     assert data["quantity"] == 200
-    assert data["event_id"] == sample_event.id
+    # The schema uses camelCase, so event_id becomes eventId
+    assert data.get("eventId") == sample_event.id or data.get("event_id") == sample_event.id
 
 
 def test_create_ticket_type_missing_fields(client, sample_event):
@@ -125,7 +162,7 @@ def test_create_ticket_type_missing_fields(client, sample_event):
         "name": "Incomplete Ticket"
     }
     
-    response = client.post("/api/tickets/types", json=ticket_data)
+    response = client.post("/api/tickets/types", json=ticket_data, headers={"Authorization": "Bearer mock-token"})
     assert response.status_code == 422  # Validation error
 
 
@@ -159,13 +196,14 @@ def test_get_event_ticket_types_success(client, sample_event, sample_ticket_type
     assert any(ticket["id"] == sample_ticket_type.id for ticket in data)
 
 
-def test_get_event_ticket_types_empty(client, db_session, sample_location):
+def test_get_event_ticket_types_empty(client, db_session, sample_location, sample_category):
     """Test retrieving ticket types for event with no tickets"""
     # Create a new event without tickets
     new_event = Event(
         name="Empty Event",
         date=datetime.now() + timedelta(days=30),
         category="Sports",
+        category_id=sample_category.id,
         capacity=100,
         event_status="published",
         organizer_id=1,
