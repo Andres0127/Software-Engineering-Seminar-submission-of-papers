@@ -54,11 +54,8 @@ jobs:
             sleep 2
           done
           echo "PostgreSQL is ready!"
-          # Verificar que los scripts existen
-          ls -la Workshop-3/python-backend/scripts/
-          # Ejecutar scripts de inicialización con rutas absolutas
-          PGPASSWORD=200127 psql -h localhost -U postgres -d eventplatform -f "${GITHUB_WORKSPACE}/Workshop-3/python-backend/scripts/01-create-database.sql" || true
-          PGPASSWORD=200127 psql -h localhost -U postgres -d eventplatform -f "${GITHUB_WORKSPACE}/Workshop-3/python-backend/scripts/02-setup-schema-and-data.sql"
+          # Ejecutar script de inicialización completa
+          PGPASSWORD=200127 psql -h localhost -U postgres -d eventplatform -f "${GITHUB_WORKSPACE}/Workshop-3/python-backend/scripts/01-create-database-complete.sql"
         env:
           PGPASSWORD: 200127
 
