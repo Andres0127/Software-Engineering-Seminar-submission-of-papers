@@ -242,7 +242,7 @@ cd Workshop-3/java-backend
 ```powershell
 cd Workshop-3/python-backend
 poetry install
-poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8000
+poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 **Verify:**
@@ -289,7 +289,7 @@ cd Workshop-3/java-backend
 ```powershell
 cd Workshop-3/python-backend
 poetry install
-poetry run uvicorn main:app --reload --host 0.0.0.0 --port 8000
+poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
 ### Terminal 3 – React Frontend
