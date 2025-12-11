@@ -190,16 +190,21 @@ export const CheckoutPage: React.FC = () => {
           <button
             onClick={handleProceedToPayment}
             disabled={processing}
-            className="mt-6 w-full inline-flex items-center justify-center gap-2 bg-primary-600 text-white py-4 px-6 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-60 transition-all"
+            className="mt-6 w-full inline-flex items-center justify-center gap-3 text-white py-4 px-6 rounded-xl font-bold text-lg shadow-lg hover:shadow-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+            style={{
+              background: processing 
+                ? 'linear-gradient(135deg, #6B7280 0%, #9CA3AF 100%)'
+                : 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'
+            }}
           >
             {processing ? (
               <>
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
                 Creating order...
               </>
             ) : (
               <>
-                <ShoppingCart className="w-5 h-5" />
+                <ShoppingCart className="w-6 h-6" />
                 Proceed to payment
               </>
             )}

@@ -167,14 +167,37 @@ export const EventsPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center" style={{ minHeight: '400px', gap: '24px' }}>
-        <div className="loading-spinner mx-auto" style={{ width: '48px', height: '48px', borderWidth: '4px', borderColor: 'var(--primary-600)', borderTopColor: 'transparent' }}></div>
+      <div className="flex flex-col items-center justify-center py-20 animate-fadeIn">
+        <div 
+          className="relative w-20 h-20 mb-8"
+          style={{
+            animation: 'spin 1s linear infinite'
+          }}
+        >
+          <div 
+            className="absolute inset-0 rounded-full"
+            style={{
+              background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%)',
+              opacity: 0.2
+            }}
+          />
+          <div 
+            className="absolute inset-2 rounded-full bg-white"
+          />
+          <div 
+            className="absolute inset-0 rounded-full border-4 border-transparent"
+            style={{
+              borderTopColor: '#0077FF',
+              borderRightColor: '#6A40FF'
+            }}
+          />
+        </div>
         <div className="text-center">
-          <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-            Loading events...
+          <h3 className="text-2xl font-bold bg-gradient-to-r from-eventify-blue via-eventify-purple to-eventify-pink bg-clip-text text-transparent mb-2">
+            Loading amazing events...
           </h3>
-          <p className="text-gray-600">
-            Preparing the best experiences for you
+          <p className="text-gray-600 text-lg">
+            Preparing the best experiences for you ✨
           </p>
         </div>
       </div>
@@ -186,44 +209,66 @@ export const EventsPage: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-4xl font-bold" style={{ color: '#1A1A1A' }}>
-            Events
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-eventify-blue via-eventify-purple to-eventify-pink bg-clip-text text-transparent mb-2">
+            Discover Events
           </h1>
-          <p className="mt-2" style={{ color: '#4A4A4A' }}>
-            Discover incredible experiences near you
+          <p className="text-lg text-gray-600">
+            Find incredible experiences and unforgettable moments ✨
           </p>
         </div>
         
         {(user?.userType === 'ORGANIZER' || user?.userType === 'ADMIN') && (
           <Link
             to="/events/create"
-            className="btn-primary"
+            className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-white shadow-lg hover:shadow-2xl transition-all transform hover:scale-105 active:scale-95"
+            style={{
+              background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'
+            }}
           >
-            <Plus className="w-5 h-5 mr-2" />
+            <Plus className="w-5 h-5" />
             Create Event
           </Link>
         )}
       </div>
 
       {/* Filtros - Desplegable */}
-      <div className="card overflow-hidden">
+      <div 
+        className="rounded-2xl overflow-hidden shadow-md border"
+        style={{
+          background: 'linear-gradient(135deg, rgba(0, 119, 255, 0.02) 0%, rgba(106, 64, 255, 0.02) 100%)',
+          borderColor: 'rgba(0, 119, 255, 0.1)'
+        }}
+      >
         {/* Header clickeable */}
         <button
           onClick={() => setFiltersOpen(!filtersOpen)}
-          className="w-full p-6 flex items-center justify-between hover:bg-gray-50 transition-colors"
+          className="w-full p-6 flex items-center justify-between hover:bg-white/50 transition-all"
         >
-          <div className="flex items-center gap-3">
-            <Filter className="w-5 h-5" style={{ color: '#0077FF' }} />
+          <div className="flex items-center gap-4">
+            <div 
+              className="w-12 h-12 rounded-xl flex items-center justify-center shadow-md"
+              style={{
+                background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'
+              }}
+            >
+              <Filter className="w-6 h-6 text-white" />
+            </div>
             <div className="text-left">
-              <h3 className="text-xl font-semibold" style={{ color: '#1A1A1A' }}>Filter events</h3>
-              <p className="text-sm" style={{ color: '#4A4A4A' }}>Find exactly what you're looking for</p>
+              <h3 className="text-xl font-bold text-gray-900">Filter & Search</h3>
+              <p className="text-sm text-gray-600">Find exactly what you're looking for</p>
             </div>
           </div>
-          {filtersOpen ? (
-            <ChevronUp className="w-5 h-5" style={{ color: '#0077FF' }} />
-          ) : (
-            <ChevronDown className="w-5 h-5" style={{ color: '#0077FF' }} />
-          )}
+          <div 
+            className={`w-10 h-10 rounded-xl flex items-center justify-center transition-all ${
+              filtersOpen ? 'bg-eventify-blue' : 'bg-gray-100'
+            }`}
+          >
+            {filtersOpen ? (
+              <ChevronUp className="w-5 h-5 text-white" />
+            ) : (
+              <ChevronDown className="w-5 h-5 text-eventify-blue" />
+            )}
+          </div>
         </button>
 
         {/* Contenido desplegable */}
@@ -308,11 +353,20 @@ export const EventsPage: React.FC = () => {
               </div>
 
               <div className="md:col-span-2 flex items-end gap-3">
-                <button onClick={handleFilterChange} className="btn-primary w-full">
-                  Filter
+                <button 
+                  onClick={handleFilterChange} 
+                  className="w-full px-6 py-3 rounded-xl font-bold text-white shadow-lg hover:shadow-xl transition-all transform hover:scale-105"
+                  style={{
+                    background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'
+                  }}
+                >
+                  Apply Filters
                 </button>
-                <button onClick={handleClearFilters} className="btn-outline w-full">
-                  Clear filters
+                <button 
+                  onClick={handleClearFilters} 
+                  className="w-full px-6 py-3 rounded-xl font-bold border-2 border-gray-300 text-gray-700 hover:border-eventify-blue hover:text-eventify-blue hover:bg-eventify-blue/5 transition-all"
+                >
+                  Clear All
                 </button>
               </div>
             </div>
@@ -325,26 +379,52 @@ export const EventsPage: React.FC = () => {
         {events.map((event, index) => (
           <div 
             key={event.id} 
-            className="event-card animate-fadeIn"
+            className="group bg-white rounded-2xl overflow-hidden shadow-md hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 animate-fadeIn border border-gray-100"
             style={{ animationDelay: `${index * 0.05}s` }}
           >
-            {/* Event image */}
-            <div className="event-image">
-              <div className="event-badge">
-                {event.category?.name || 'General'}
+            {/* Event image with gradient overlay */}
+            <div 
+              className="relative h-48 flex items-center justify-center overflow-hidden"
+              style={{
+                background: index % 3 === 0 
+                  ? 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'
+                  : index % 3 === 1
+                  ? 'linear-gradient(135deg, #6A40FF 0%, #FF3399 100%)'
+                  : 'linear-gradient(135deg, #FF3399 0%, #0077FF 100%)'
+              }}
+            >
+              {/* Decorative pattern */}
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full -mr-16 -mt-16"></div>
+                <div className="absolute bottom-0 left-0 w-48 h-48 bg-white rounded-full -ml-24 -mb-24"></div>
               </div>
-              <div className="event-price">
-                {formatPrice(event.ticketPrice)}
+              
+              {/* Category badge */}
+              <div className="absolute top-4 left-4 px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-full">
+                <span className="text-xs font-semibold text-white uppercase tracking-wide">
+                  {event.category?.name || 'General'}
+                </span>
               </div>
-              <Calendar className="w-12 h-12 text-white" style={{ opacity: 0.3 }} />
+              
+              {/* Price tag */}
+              <div className="absolute top-4 right-4 px-4 py-2 bg-white rounded-full shadow-lg">
+                <span className="text-sm font-bold bg-gradient-to-r from-eventify-blue to-eventify-purple bg-clip-text text-transparent">
+                  {formatPrice(event.ticketPrice)}
+                </span>
+              </div>
+              
+              {/* Icon */}
+              <Calendar className="w-20 h-20 text-white opacity-40 group-hover:scale-110 transition-transform duration-300" />
             </div>
 
             <div className="p-6 flex-1 flex flex-col">
-              {/* Title and description */}
-              <h3 className="text-xl font-semibold mb-3 leading-tight" style={{ color: '#1A1A1A' }}>
+              {/* Title */}
+              <h3 className="text-xl font-bold mb-3 leading-tight text-gray-900 group-hover:text-eventify-blue transition-colors">
                 {event.title}
               </h3>
-              <p className="mb-4 flex-1" style={{ fontSize: '14px', lineHeight: '1.6', color: '#4A4A4A' }}>
+              
+              {/* Description */}
+              <p className="mb-4 flex-1 text-sm leading-relaxed text-gray-600">
                 {event.description.length > 120 
                   ? `${event.description.substring(0, 120)}...` 
                   : event.description
@@ -353,31 +433,37 @@ export const EventsPage: React.FC = () => {
 
               {/* Event information */}
               <div className="space-y-3 mb-6">
-                <div className="info-item">
-                  <Calendar className="info-icon" />
-                  <div>
-                    <div className="info-label">Date</div>
-                    <div className="info-value">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-eventify-blue/10 to-eventify-purple/10 flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-eventify-blue" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Date</div>
+                    <div className="text-sm font-semibold text-gray-900 truncate">
                       {formatDate(event.startDate)}
                     </div>
                   </div>
                 </div>
                 
-                <div className="info-item">
-                  <MapPin className="info-icon" />
-                  <div>
-                    <div className="info-label">Location</div>
-                    <div className="info-value">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-eventify-purple/10 to-eventify-pink/10 flex items-center justify-center">
+                    <MapPin className="w-5 h-5 text-eventify-purple" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Location</div>
+                    <div className="text-sm font-semibold text-gray-900 truncate">
                       {event.location?.name || 'To be defined'}
                     </div>
                   </div>
                 </div>
                 
-                <div className="info-item">
-                  <Users className="info-icon" />
-                  <div>
-                    <div className="info-label">Capacity</div>
-                    <div className="info-value">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-eventify-pink/10 to-eventify-blue/10 flex items-center justify-center">
+                    <Users className="w-5 h-5 text-eventify-pink" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-0.5">Capacity</div>
+                    <div className="text-sm font-semibold text-gray-900">
                       {event.maxAttendees} people
                     </div>
                   </div>
@@ -388,14 +474,17 @@ export const EventsPage: React.FC = () => {
               <div className="flex space-x-3 mt-auto">
                 <Link
                   to={`/events/${event.id || 'unknown'}`}
-                  className="btn-secondary flex-1 text-center"
+                  className="flex-1 text-center px-4 py-2.5 rounded-xl border-2 border-gray-200 font-semibold text-gray-700 hover:border-eventify-blue hover:text-eventify-blue hover:bg-eventify-blue/5 transition-all"
                 >
                   View details
                 </Link>
                 {user?.userType === 'BUYER' && (
                   <Link
                     to={`/events/${event.id || 'unknown'}/tickets`}
-                    className="btn-primary"
+                    className="px-6 py-2.5 rounded-xl font-semibold text-white hover:shadow-lg transition-all transform hover:scale-105"
+                    style={{
+                      background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'
+                    }}
                   >
                     Buy
                   </Link>
@@ -407,34 +496,41 @@ export const EventsPage: React.FC = () => {
       </div>
 
       {events.length === 0 && !loading && (
-        <div className="card text-center py-16 animate-fadeIn">
-          <div className="mb-6" style={{ margin: '0 auto 24px auto' }}>
+        <div 
+          className="text-center py-20 px-6 animate-fadeIn rounded-2xl border-2 border-dashed"
+          style={{
+            background: 'linear-gradient(135deg, rgba(0, 119, 255, 0.03) 0%, rgba(106, 64, 255, 0.03) 100%)',
+            borderColor: 'rgba(0, 119, 255, 0.2)'
+          }}
+        >
+          <div className="mb-8 mx-auto w-fit">
             <div 
-              className="rounded-full flex items-center justify-center mb-4 mx-auto"
+              className="w-24 h-24 rounded-2xl flex items-center justify-center shadow-xl mx-auto mb-4 transform hover:scale-110 transition-transform"
               style={{ 
-                width: '96px', 
-                height: '96px', 
-                backgroundColor: 'var(--primary-600)', 
+                background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'
               }}
             >
               <Calendar className="w-12 h-12 text-white" />
             </div>
           </div>
           
-          <h3 className="text-2xl font-bold text-gray-900 mb-4">
-            No events available
+          <h3 className="text-3xl font-bold text-gray-900 mb-3">
+            No events found
           </h3>
-          <p className="text-gray-600 mb-8 mx-auto" style={{ maxWidth: '400px' }}>
-            There are no events matching your filters.
+          <p className="text-lg text-gray-600 mb-8 mx-auto" style={{ maxWidth: '500px' }}>
+            We couldn't find any events matching your criteria. Try adjusting your filters or create a new event!
           </p>
           
           {(user?.userType === 'ORGANIZER' || user?.userType === 'ADMIN') && (
             <Link
               to="/events/create"
-              className="btn-primary"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white shadow-xl hover:shadow-2xl transition-all transform hover:scale-105"
+              style={{
+                background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'
+              }}
             >
-              <Plus className="w-5 h-5 mr-2" />
-              Create Event
+              <Plus className="w-6 h-6" />
+              Create Your First Event
             </Link>
           )}
         </div>

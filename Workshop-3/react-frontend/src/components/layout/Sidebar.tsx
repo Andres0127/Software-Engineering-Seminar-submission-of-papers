@@ -83,18 +83,25 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
       )}
       
       <div 
-        className={`sidebar ${isOpen ? 'open' : ''}`}
+        className={`${isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'} fixed md:sticky top-[73px] left-0 z-40 md:z-auto transition-transform duration-300 ease-in-out`}
         style={{ 
           width: '280px', 
           minHeight: 'calc(100vh - 73px)', 
-          position: 'sticky', 
-          top: '73px', 
           maxHeight: 'calc(100vh - 73px)', 
-          overflowY: 'auto'
+          overflowY: 'auto',
+          background: 'linear-gradient(180deg, #0077FF 0%, #6A40FF 100%)',
+          boxShadow: '2px 0 10px rgba(0, 0, 0, 0.1)'
         }}
       >
         <div className="p-6">
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+          {/* Navigation Label */}
+          <div className="mb-6">
+            <h3 className="text-white/60 text-xs font-semibold uppercase tracking-wider mb-4">
+              Navigation
+            </h3>
+          </div>
+
+          <nav className="flex flex-col gap-2">
             {navigation
               .filter(item => item.show)
               .map((item) => (
@@ -103,18 +110,43 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
                   to={item.href}
                   onClick={onClose}
                   className={({ isActive }) =>
-                    isActive
-                      ? 'sidebar-link-active'
-                      : 'sidebar-link'
+                    `group flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 ${
+                      isActive
+                        ? 'bg-white text-eventify-blue shadow-lg transform scale-105'
+                        : 'text-white/90 hover:bg-white/10 hover:text-white hover:translate-x-1'
+                    }`
                   }
                 >
-                  <div className="sidebar-icon">
-                    <item.icon className="w-5 h-5" />
-                  </div>
-                  <span>{item.name}</span>
+                  {({ isActive }) => (
+                    <>
+                      <div className={`flex-shrink-0 ${isActive ? 'text-eventify-blue' : 'text-white/80 group-hover:text-white'}`}>
+                        <item.icon className="w-5 h-5" strokeWidth={isActive ? 2.5 : 2} />
+                      </div>
+                      <span className={`font-medium ${isActive ? 'font-semibold' : ''}`}>
+                        {item.name}
+                      </span>
+                      {isActive && (
+                        <div className="ml-auto">
+                          <div className="w-2 h-2 bg-eventify-blue rounded-full" />
+                        </div>
+                      )}
+                    </>
+                  )}
                 </NavLink>
               ))}
           </nav>
+
+          {/* Footer Section */}
+          <div className="mt-8 pt-6 border-t border-white/10">
+            <div className="px-4 py-3 rounded-lg bg-white/5 backdrop-blur-sm">
+              <p className="text-white/60 text-xs font-medium mb-1">Eventify Pro</p>
+              <p className="text-white text-sm font-semibold">
+                {user?.userType === 'ADMIN' && '🎯 Admin Access'}
+                {user?.userType === 'ORGANIZER' && '🎪 Event Organizer'}
+                {user?.userType === 'BUYER' && '🎫 Event Explorer'}
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     </>

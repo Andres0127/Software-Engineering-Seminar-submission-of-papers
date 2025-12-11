@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, LogIn, UserPlus, Ticket, Calendar, TrendingUp } from 'lucide-react';
+import { Mail, Lock, LogIn, UserPlus, Calendar, TrendingUp, Users, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useAuthStore } from '../../store/authStore';
 
@@ -22,6 +22,7 @@ type LoginFormData = z.infer<typeof loginSchema>;
 export const LoginForm: React.FC = () => {
   const navigate = useNavigate();
   const { login, isLoading, error } = useAuthStore();
+  const [showPassword, setShowPassword] = useState(false);
   
   const {
     register,
@@ -42,206 +43,194 @@ export const LoginForm: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col lg:flex-row h-full">
-      {/* Left Side - Branding and Info */}
+    <div className="grid lg:grid-cols-2 min-h-screen">
+      {/* Left Panel - Branding */}
       <div 
-        className="hidden lg:flex lg:w-1/2 p-8 flex-col justify-between relative overflow-hidden"
+        className="hidden lg:flex flex-col justify-between p-12 relative overflow-hidden"
         style={{
-          background: 'linear-gradient(135deg, #FFFFFF 0%, #0077FF 100%)'
+          background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'
         }}
       >
-        {/* Animated decorative elements */}
-        <div className="absolute top-0 right-0 w-80 h-80 rounded-full -mr-40 -mt-40 animate-pulse" 
-             style={{ backgroundColor: '#0077FF', opacity: 0.1, animationDuration: '5s' }}></div>
-        <div className="absolute bottom-0 left-0 w-80 h-80 rounded-full -ml-40 -mb-40 animate-pulse" 
-             style={{ backgroundColor: '#0077FF', opacity: 0.1, animationDuration: '7s', animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full blur-3xl" 
-             style={{ backgroundColor: '#0077FF', opacity: 0.05 }}></div>
-        
-        {/* Logo and Title Section */}
+        {/* Decorative background pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white rounded-full -mr-32 -mt-32"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-white rounded-full -ml-48 -mb-48"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-white rounded-full opacity-50 blur-3xl"></div>
+        </div>
+
+        {/* Content */}
         <div className="relative z-10">
-          {/* Eventify Logo - Prominent */}
-          <div className="mb-5 flex items-center space-x-3">
+          <div className="mb-12">
             <img 
               src="/Eventify.png" 
               alt="Eventify" 
-              className="h-12 w-auto drop-shadow-lg"
+              className="h-28 w-auto drop-shadow-2xl"
             />
           </div>
-          
-          <h1 className="text-3xl font-bold mb-2 leading-tight" style={{ color: '#0077FF' }}>
-            Welcome to Eventify
-          </h1>
-          <p className="text-base leading-relaxed mb-5" style={{ color: '#4A4A4A' }}>
-            The complete platform for creating, managing, and scaling your events with powerful tools and insights.
-          </p>
-        </div>
 
-        {/* Features Section */}
-        <div className="relative z-10 space-y-3">
-          <div className="flex items-start space-x-4 group">
-            <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center group-hover:bg-blue-50 transition-all duration-300 shadow-lg" style={{ backgroundColor: '#E5D9FF' }}>
-              <Calendar className="w-6 h-6" style={{ color: '#0077FF' }} />
-            </div>
-            <div>
-              <h3 className="font-semibold text-base mb-1" style={{ color: '#1A1A1A' }}>Event Management</h3>
-              <p className="text-sm" style={{ color: '#4A4A4A' }}>Create and manage events with ease</p>
-            </div>
+          {/* Hero text */}
+          <div className="space-y-4">
+            <h1 className="text-4xl font-bold text-white leading-tight">
+              Transform Your
+              <br />
+              Event Experience
+            </h1>
+            <p className="text-lg text-white/90 leading-relaxed max-w-md">
+              The all-in-one platform for creating, managing, and scaling unforgettable events.
+            </p>
           </div>
-          
-          <div className="flex items-start space-x-4 group">
-            <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center group-hover:bg-blue-50 transition-all duration-300 shadow-lg" style={{ backgroundColor: '#E5D9FF' }}>
-              <Ticket className="w-6 h-6" style={{ color: '#0077FF' }} />
+
+          {/* Features */}
+          <div className="mt-12 space-y-6">
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <Calendar className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold">Smart Event Management</h3>
+                <p className="text-white/80 text-sm">Streamlined tools for every event type</p>
+              </div>
             </div>
-            <div>
-              <h3 className="font-semibold text-base mb-1" style={{ color: '#1A1A1A' }}>Ticket Sales</h3>
-              <p className="text-sm" style={{ color: '#4A4A4A' }}>Sell tickets with integrated payment processing</p>
+
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold">Real-time Analytics</h3>
+                <p className="text-white/80 text-sm">Track performance with live insights</p>
+              </div>
             </div>
-          </div>
-          
-          <div className="flex items-start space-x-4 group">
-            <div className="flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center group-hover:bg-blue-50 transition-all duration-300 shadow-lg" style={{ backgroundColor: '#E5D9FF' }}>
-              <TrendingUp className="w-6 h-6" style={{ color: '#0077FF' }} />
-            </div>
-            <div>
-              <h3 className="font-semibold text-base mb-1" style={{ color: '#1A1A1A' }}>Analytics Dashboard</h3>
-              <p className="text-sm" style={{ color: '#4A4A4A' }}>Track performance with real-time insights</p>
+
+            <div className="flex items-center gap-4">
+              <div className="flex-shrink-0 w-12 h-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                <Users className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h3 className="text-white font-semibold">Attendee Engagement</h3>
+                <p className="text-white/80 text-sm">Keep your audience connected</p>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="relative z-10">
-          <p className="text-xs" style={{ color: '#4A4A4A' }}>
-            © 2025 Eventify. All rights reserved.
-          </p>
+        <div className="relative z-10 text-white/70 text-sm">
+          © 2025 Eventify. All rights reserved.
         </div>
       </div>
 
-      {/* Right Side - Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-6 lg:p-8 bg-white overflow-y-auto">
+      {/* Right Panel - Login Form */}
+      <div className="flex items-center justify-center p-8 lg:p-12 bg-white">
         <div className="w-full max-w-md">
-          {/* Mobile Logo */}
-          <div className="lg:hidden flex justify-center mb-5">
-            <div className="flex items-center space-x-3">
-              <img 
-                src="/Eventify.png" 
-                alt="Eventify" 
-                className="h-10 w-auto"
-              />
-            </div>
+          {/* Mobile logo */}
+          <div className="lg:hidden mb-8 flex justify-center">
+            <img 
+              src="/Eventify.png" 
+              alt="Eventify" 
+              className="h-12 w-auto"
+            />
           </div>
 
           {/* Header */}
-          <div className="mb-6">
-            <h2 className="text-3xl font-bold mb-2" style={{ background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', color: '#1A1A1A' }}>
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
               Welcome back
             </h2>
-            <p className="text-base" style={{ color: '#4A4A4A' }}>
-              Sign in to your account to continue
+            <p className="text-gray-600">
+              Enter your credentials to access your account
             </p>
           </div>
 
-          {/* Login Form */}
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3.5">
-            {/* Email Input */}
+          {/* Form */}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Email field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-semibold mb-1.5" style={{ color: '#1A1A1A' }}>
+              <label 
+                htmlFor="email" 
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Email address
               </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none z-10" style={{ paddingLeft: '12px', height: '42px' }}>
-                  <Mail className="h-4 w-4 transition-colors duration-200 flex-shrink-0" style={{ color: '#6B7280' }} />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   {...register('email')}
                   id="email"
                   type="email"
-                  defaultValue="admin@eventplatform.com"
                   placeholder="you@example.com"
-                  className="block w-full py-2.5 pr-4 border-2 rounded-xl placeholder-gray-400 focus:outline-none focus:ring-2 transition-all duration-300 shadow-sm hover:shadow-md"
-                  style={{ paddingLeft: '44px', minHeight: '42px', fontSize: '14px', backgroundColor: '#FFFFFF', borderColor: '#D9DCE0', color: '#1A1A1A' } as React.CSSProperties}
-                  onFocus={(e) => {
-                    e.target.style.borderColor = '#0077FF';
-                    e.target.style.boxShadow = '0 0 0 3px rgba(0, 119, 255, 0.1)';
-                    const icon = e.target.previousElementSibling?.querySelector('svg');
-                    if (icon) icon.style.color = '#0077FF';
-                  }}
-                  onBlur={(e) => {
-                    e.target.style.borderColor = '#D9DCE0';
-                    e.target.style.boxShadow = '';
-                    const icon = e.target.previousElementSibling?.querySelector('svg');
-                    if (icon) icon.style.color = '#6B7280';
-                  }}
+                  className="block w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 />
               </div>
               {errors.email && (
-                <p className="mt-1.5 text-xs text-error-600 flex items-center gap-1 animate-fadeIn">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-error-600"></span>
+                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  <span className="w-1 h-1 rounded-full bg-red-600"></span>
                   {errors.email.message}
                 </p>
               )}
             </div>
 
-            {/* Password Input */}
+            {/* Password field */}
             <div>
-              <label htmlFor="password" className="block text-sm font-semibold mb-1.5" style={{ color: '#1A1A1A' }}>
+              <label 
+                htmlFor="password" 
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
                 Password
               </label>
-              <div className="relative group">
-                <div className="absolute inset-y-0 left-0 flex items-center pointer-events-none z-10" style={{ paddingLeft: '12px', height: '42px' }}>
-                  <Lock className="h-4 w-4 text-gray-400 group-focus-within:text-purple-500 transition-colors duration-200 flex-shrink-0" />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <input
                   {...register('password')}
                   id="password"
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
-                  className="block w-full py-2.5 pr-4 border-2 border-gray-200 rounded-xl text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:bg-white transition-all duration-300 hover:border-gray-300 shadow-sm hover:shadow-md focus:border-[#336D82] focus:ring-[#336D82]"
-                  style={{ paddingLeft: '44px', minHeight: '42px', fontSize: '14px', backgroundColor: '#F5ECE0' }}
+                  className="block w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
+                </button>
               </div>
               {errors.password && (
-                <p className="mt-1.5 text-xs text-error-600 flex items-center gap-1 animate-fadeIn">
-                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-error-600"></span>
+                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  <span className="w-1 h-1 rounded-full bg-red-600"></span>
                   {errors.password.message}
                 </p>
               )}
             </div>
 
-            {/* Error Message */}
+            {/* Error message */}
             {error && (
-              <div className="bg-error-50 border-l-4 border-error-500 p-4 rounded-lg animate-fadeIn">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 mt-0.5">
-                    <svg className="h-5 w-5 text-error-500" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="flex-1">
-                    <p className="text-sm text-error-700 font-medium">
-                      {error}
-                    </p>
-                  </div>
-                </div>
+              <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                <p className="text-sm text-red-700">{error}</p>
               </div>
             )}
 
-            {/* Submit Button */}
+            {/* Submit button */}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full text-white py-3.5 px-6 rounded-xl font-semibold text-base hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:shadow-none flex items-center justify-center gap-2 relative overflow-hidden group"
+              className="w-full py-3 px-6 rounded-lg font-semibold text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 active:translate-y-0 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:shadow-lg flex items-center justify-center gap-2 relative overflow-hidden group"
               style={{
-                background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 50%, #FF3399 100%)'
+                background: 'linear-gradient(135deg, #0077FF 0%, #6A40FF 100%)'
               }}
             >
-              {/* Shine effect on hover */}
-              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></span>
-              
+              <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"></span>
               {isLoading ? (
                 <>
-                  <div className="loading-spinner" style={{ width: '20px', height: '20px', borderWidth: '2px', borderColor: 'rgba(255,255,255,0.3)', borderTopColor: 'white' }}></div>
+                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                   <span>Signing in...</span>
                 </>
               ) : (
@@ -251,39 +240,26 @@ export const LoginForm: React.FC = () => {
                 </>
               )}
             </button>
+
+            {/* Divider */}
+            <div className="relative my-8">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-300"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="px-4 bg-white text-gray-500">New to Eventify?</span>
+              </div>
+            </div>
+
+            {/* Register link */}
+            <Link
+              to="/register"
+              className="w-full py-3 px-6 rounded-lg font-semibold text-gray-700 border-2 border-gray-300 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 flex items-center justify-center gap-2 group"
+            >
+              <UserPlus className="h-5 w-5 group-hover:scale-110 transition-transform" />
+              <span>Create an account</span>
+            </Link>
           </form>
-
-          {/* Divider */}
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-200"></div>
-            </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="px-3 bg-white text-gray-500 font-medium">
-                Don't have an account?
-              </span>
-            </div>
-          </div>
-
-          {/* Register Link */}
-          <Link 
-            to="/register" 
-            className="w-full flex items-center justify-center px-6 py-2.5 border-2 rounded-xl font-semibold text-sm transition-all duration-300 gap-2 group"
-            style={{ borderColor: '#D9DCE0', color: '#4A4A4A' }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#0077FF';
-              e.currentTarget.style.color = '#0077FF';
-              e.currentTarget.style.backgroundColor = '#F2F4F7';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = '#D9DCE0';
-              e.currentTarget.style.color = '#4A4A4A';
-              e.currentTarget.style.backgroundColor = '';
-            }}
-          >
-            <UserPlus className="h-4 w-4 group-hover:scale-110 transition-transform" />
-            <span>Create an account</span>
-          </Link>
         </div>
       </div>
     </div>
