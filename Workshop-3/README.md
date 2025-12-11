@@ -182,7 +182,8 @@ Workshop-3/
 │   │   ├── 01-create-database.sql
 │   │   └── 02-setup-schema-and-data.sql
 │   ├── tests/                      # Pytest test suite
-│   ├── requirements.txt
+│   ├── pyproject.toml              # Poetry dependencies & config
+│   ├── poetry.lock                 # Locked dependency versions
 │   ├── Dockerfile
 │   └── README.md                   # Python backend documentation
 │
@@ -236,8 +237,9 @@ docker-compose up --build
 ### Option 2: Local Development
 
 **Prerequisites:**
+**Prerequisites:**
 - Java 17+, Maven
-- Python 3.11+
+- Python 3.11+, Poetry
 - Node.js 18+
 - MySQL 8.0 running on port 3306
 - PostgreSQL 17 running on port 5432
@@ -251,6 +253,12 @@ mvn spring-boot:run
 **2. Start Python Backend:**
 ```bash
 cd python-backend
+
+# Option A: Using Poetry (recommended)
+poetry install
+poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+# Option B: Using pip
 python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 pip install -r requirements.txt

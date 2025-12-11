@@ -59,11 +59,28 @@ jobs:
         env:
           PGPASSWORD: 200127
 
-      - name: Install Python dependencies and test
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: 1.7.1
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+
+      - name: Cache Poetry dependencies
+        uses: actions/cache@v3
+        with:
+          path: Workshop-3/python-backend/.venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+
+      - name: Install Python dependencies with Poetry
         working-directory: Workshop-3/python-backend
         run: |
-          pip install -r requirements.txt
-          pytest
+          poetry install --no-interaction --no-root
+
+      - name: Run Python tests with Poetry
+        working-directory: Workshop-3/python-backend
+        run: |
+          poetry run pytest
         env:
           DATABASE_URL: postgresql://postgres:200127@localhost:5432/eventplatform
 

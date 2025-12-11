@@ -369,19 +369,22 @@ CREATE TABLE audit_logs (
 
 - Python 3.11+
 - PostgreSQL 17
-- pip or poetry
+- Poetry (recommended) or pip
 
 ### Local Development
 
-1. **Create Virtual Environment:**
+#### Option 1: Using Poetry (Recommended)
+
+1. **Install Poetry:**
    ```powershell
-   python -m venv .venv
-   .\.venv\Scripts\Activate.ps1
+   # Windows PowerShell
+   (Invoke-WebRequest -Uri https://install.python-poetry.org -UseBasicParsing).Content | python -
    ```
 
 2. **Install Dependencies:**
    ```bash
-   pip install -r requirements.txt
+   cd python-backend
+   poetry install
    ```
 
 3. **Setup Database:**
@@ -398,7 +401,12 @@ CREATE TABLE audit_logs (
 
 5. **Run Application:**
    ```bash
+   # Option A: Activate Poetry shell
+   poetry shell
    uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+   # Option B: Run directly with Poetry
+   poetry run uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
    ```
 
 6. **Verify:**
@@ -406,7 +414,28 @@ CREATE TABLE audit_logs (
    - Swagger: http://localhost:8000/docs
    - Events: http://localhost:8000/api/events
 
+#### Option 2: Using pip (Alternative)
+
+1. **Create Virtual Environment:**
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
+
+2. **Install Dependencies:**
+   ```bash
+   # Generate requirements.txt from Poetry if needed
+   poetry export -f requirements.txt --output requirements.txt --without-hashes
+   
+   # Install with pip
+   pip install -r requirements.txt
+   ```
+
+3. **Follow steps 3-6 from Option 1**
+
 ### Docker
+
+The Docker image uses Poetry for dependency management:
 
 ```bash
 docker build -t eventplatform-python-backend .
@@ -415,11 +444,90 @@ docker run -p 8000:8000 \
   eventplatform-python-backend
 ```
 
+**Note:** The Dockerfile automatically installs dependencies using Poetry and only includes production dependencies for optimal image size.
+
+---
+
+## Dependency Management with Poetry
+
+### Adding Dependencies
+
+```bash
+# Add production dependency
+poetry add fastapi
+
+# Add development dependency
+poetry add --group dev pytest
+
+# Add dependency with extras
+poetry add "pydantic[email]"
+```
+
+### Updating Dependencies
+
+```bash
+# Update all dependencies
+poetry update
+
+# Update specific dependency
+poetry update fastapi
+
+# Show outdated dependencies
+poetry show --outdated
+```
+
+### Viewing Dependencies
+
+```bash
+# List all installed packages
+poetry show
+
+# Show dependency tree
+poetry show --tree
+
+# Show specific package info
+poetry show fastapi
+```
+
+### Lock File
+
+The `poetry.lock` file ensures reproducible installations. **Commit this file to version control.**
+
+```bash
+# Update lock file without installing
+poetry lock --no-update
+
+# Install exact versions from lock file
+poetry install
+```
+
 ---
 
 ## Testing
 
 ### Run Tests
+
+#### Using Poetry (Recommended)
+
+```bash
+# All tests
+poetry run pytest
+
+# With coverage
+poetry run pytest --cov=app --cov-report=html
+
+# Specific test file
+poetry run pytest tests/test_events.py
+
+# Verbose output
+poetry run pytest -v
+
+# Inside Poetry shell
+poetry shell
+pytest --cov=app --cov-report=html
+```
+
+#### Using pip
 
 ```bash
 # All tests
