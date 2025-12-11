@@ -77,6 +77,12 @@ jobs:
         run: |
           poetry install --no-interaction --no-root
 
+      - name: Run Pylint code quality check
+        working-directory: Workshop-3/python-backend
+        run: |
+          poetry run pylint app --fail-under=6.0 --output-format=text
+        continue-on-error: false
+
       - name: Run Python tests with Poetry
         working-directory: Workshop-3/python-backend
         run: |

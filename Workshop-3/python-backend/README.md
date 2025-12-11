@@ -548,6 +548,89 @@ pytest -v
 The test suite covers:
 - ✅ Event CRUD operations
 - ✅ Category management
+
+---
+
+## Code Quality with Pylint
+
+### What is Pylint?
+
+Pylint is a static code analysis tool that checks for:
+- ✅ **Code errors** before runtime
+- ✅ **PEP 8 style compliance**
+- ✅ **Code smells** and best practices
+- ✅ **Code quality score** (0-10 rating)
+
+### Running Pylint
+
+#### Using Poetry (Recommended)
+
+```bash
+# Check all app code
+poetry run pylint app
+
+# Check specific module
+poetry run pylint app/routes/events.py
+
+# Generate detailed report
+poetry run pylint app --output-format=text
+
+# Check with minimum score requirement (CI/CD uses 6.0)
+poetry run pylint app --fail-under=6.0
+```
+
+#### Using pip
+
+```bash
+# Check all app code
+pylint app
+
+# Check specific module
+pylint app/routes/events.py
+```
+
+### Understanding the Score
+
+- **10.0** = Perfect code
+- **8.0-9.9** = Very good quality
+- **6.0-7.9** = Acceptable (minimum for CI/CD)
+- **< 6.0** = Needs improvement
+
+### Configuration
+
+The project uses `.pylintrc` for custom configuration:
+- Disabled overly strict rules for starting projects
+- Configured for FastAPI/SQLAlchemy patterns
+- Maximum line length: 100 characters
+- Allows common variable names: `id`, `db`, `i`, `j`, `k`
+
+### Common Issues and Fixes
+
+```python
+# ❌ Missing docstring
+def get_user(user_id):
+    return db.query(User).get(user_id)
+
+# ✅ With docstring
+def get_user(user_id):
+    """Retrieve user by ID from database."""
+    return db.query(User).get(user_id)
+
+# ❌ Unused import
+import os
+from fastapi import FastAPI
+
+# ✅ Remove unused imports
+from fastapi import FastAPI
+
+# ❌ Too many arguments
+def create_event(name, desc, date, time, loc, cat, org, price, cap):
+    pass
+
+# ✅ Use objects or dataclasses
+def create_event(event_data: EventCreate):
+    pass
+```
 - ✅ Location and zone queries
 - ✅ Ticket inventory
 - ✅ Order creation and status updates
