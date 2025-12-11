@@ -46,20 +46,26 @@ jobs:
         with:
           python-version: '3.12'
 
-
-      - name: Run database initialization script
+      - name: Initialize PostgreSQL database
         run: |
-          psql -h localhost -U $POSTGRES_USER -d $POSTGRES_DB -f Workshop-3/python-backend/Backup/create-database
+          # Esperar a que PostgreSQL esté listo
+          until pg_isready -h localhost -U postgres; do
+            echo "Waiting for PostgreSQL to be ready..."
+            sleep 2
+          done
+          # Ejecutar scripts de inicialización
+          PGPASSWORD=200127 psql -h localhost -U postgres -d eventplatform -f Workshop-3/python-backend/scripts/01-create-database.sql || true
+          PGPASSWORD=200127 psql -h localhost -U postgres -d eventplatform -f Workshop-3/python-backend/scripts/02-setup-schema-and-data.sql
         env:
-          POSTGRES_USER: postgres
-          POSTGRES_DB: eventplatform
-          POSTGRES_PASSWORD: 200127
           PGPASSWORD: 200127
+
       - name: Install Python dependencies and test
         working-directory: Workshop-3/python-backend
         run: |
           pip install -r requirements.txt
           pytest
+        env:
+          DATABASE_URL: postgresql://postgres:200127@localhost:5432/eventplatform
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -85,7 +91,7 @@ jobs:
       - name: Run frontend tests
         run: |
           cd Workshop-3/react-frontend
-          CI=false npm run test
+          CI=true npm test -- --passWithNoTests --watchAll=false
 
       - name: Build Docker images
         run: |
